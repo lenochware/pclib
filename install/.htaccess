@@ -1,0 +1,13 @@
+# PClib Nice URL support.
+# Copy into root directory of your application.
+
+# RewriteBase /path/to/app
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond $1 !^(index\.php)
+    RewriteRule ^(.*)$ index.php?r=$1&%{QUERY_STRING} [L]
+</IfModule>

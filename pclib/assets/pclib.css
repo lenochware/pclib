@@ -1,0 +1,17 @@
+/* UL.pctree */
+
+ul.pctree li { list-style: none; margin: 6px 12px; }
+ul.pctree, ul.pctree ul  { padding:0px; }
+ul.pctree li.open>span:before   { content:url(minus.gif);  padding-right: 5px }
+ul.pctree li.closed>span:before { content:url(plus.gif);   padding-right: 5px }
+
+ul.pctree li.open ul { display: block; }
+ul.pctree li.closed ul { display: none; }
+
+li.folder .label {
+  cursor:pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}

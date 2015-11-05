@@ -1,0 +1,4 @@
+# pclib ignore directories
+
+/refman/*
+/tests/*

@@ -1,0 +1,195 @@
+<?php
+
+/**
+ * \file
+ * Grid with form capabilities.
+ *
+ * \author -dk- <lenochware@gmail.com>
+ * \warning Experimental! Use on your own risk.
+ * http://pclib.brambor.net/
+ */
+
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+
+require_once PCLIB_DIR . 'Grid.php';
+require_once PCLIB_DIR . 'Form.php';
+
+/**
+ * \class GridForm
+ * Just like grid, but you can use form tags: input, select, check, etc.
+ * You can submit this and store to database with insert() and update() functions.
+ * Each row will be updated using primary key, which must be defined. 
+ * Use "primary FIELDNAME" in elements. Whole page is updated at once and only
+ * one (active) page is submitted.
+ * Note that lot of form capabilities are not supported at now. No validation,
+ * file uploads etc. This is just alpha-version.
+ * See http://pclib.brambor.net/demo/gridform/ for some example.
+ */
+class GridForm extends Grid
+{
+
+/**
+ * This variable is set when formgrid has been submitted, in which case
+ * it contains name of pressed button.
+ */
+public $submitted = false;
+
+private $form = null;
+private $pk = null;
+
+/** Name of the 'class' element */
+protected $className = 'gridform';
+
+/**
+ * Constructor - load formgrid template
+ *
+ * \param string $tpl_file Filename of template file
+ * \param string $sessname When set, object is stored in session as $sessname
+ */
+function __construct($path = '', $sessName = '')
+{
+	parent::__construct($path, $sessName);
+	$this->form = new GridForm_Form();
+	$this->form->elements = $this->elements;
+	$this->form->name = $this->name;
+	
+	if ($_REQUEST['submitted'] == $this->name) {
+		$this->submitted = ifnot($_REQUEST['action'], true);
+		$this->values = $_REQUEST['data']; //TODO GET/POST instead REQUEST
+		if (get_magic_quotes_gpc() and is_array($this->values))
+			foreach($this->values as $k => $v)
+				if (is_string($v)) $this->values[$k] = stripslashes($v);
+
+		/*if (count($_FILES)) foreach ($_FILES as $id => $aFile)
+			if($this->elements[$id]['file'])
+				$this->values[$id] = $aFile['name'];*/
+	}
+}
+
+/**
+ * This function is called for each template tag when it is printed.
+ * \copydoc tag-handler
+**/
+function print_Element($id, $sub, $value)
+{
+	$elem = $this->elements[$id];
+	
+	if ($elem['type'] == 'primary') {
+		$this->print_Primary($id, $sub, $value);
+		return;
+	}
+	
+	if (parent::hasType($elem['type'])) {
+		parent::print_Element($id, $sub, $value);
+	}
+	else {
+		if ($elem['type'] == 'check') $value = $this->form->checkboxToArray($value);
+		$this->form->print_Element($id, $sub, $value);
+	}
+}
+
+/**
+ * Print hidden input field with primary key value. Used for update.
+ * \copydoc tag-handler
+ */
+protected function print_Primary($id, $sub, $value)
+{
+	$rowno = $this->form->rowno;
+
+	if ($sub == 'value') print $value;
+	elseif($sub == 'rowno') print $rowno;
+	else {
+		print $this->htmlTag('input', array(
+		'type' => 'hidden',
+		'id' => $id.'_'.$rowno,
+		'name' => "data[$rowno][$id]",
+		'value' => $value,
+		));
+	}
+}
+
+function print_BlockRow($block_id, $rowno = null)
+{
+	$this->form->rowno = $rowno;
+	parent::print_BlockRow($block_id, $rowno);
+}
+
+protected function parseLine($line)
+{
+	$id = parent::parseLine($line);
+	if ($this->elements[$id]['type'] == 'primary') $this->pk = $id;
+	return $id;
+}
+
+function out($block = null)
+{
+	print $this->form->head();
+	parent::out($block);
+	print $this->form->foot();
+}
+
+/**
+ * Insert form values into dbtable $tab.
+ * \param string $tab database table name
+ * \see form::insert()
+ */
+function insert($tab)
+{
+	if (!$tab) return false;
+	if (!$this->form->db) throw new NoDatabaseException;
+
+	foreach ($this->values as $frow) {
+		$this->form->values = $frow;
+		$this->form->insert($tab);
+	}
+}
+
+/**
+ * Update records in database table $tab, using primary key (pk).
+ * \param string $tab database table name
+ * \see form::update()
+ */
+function update($tab)
+{
+	if (!$tab) return false;
+	if (!$this->form->db) throw new NoDatabaseException;
+	if (!$this->pk) throw new NoValueException('Primary key not found.');
+
+	foreach ($_REQUEST['data'] as $frow) {
+		$this->form->values = $frow;
+		$this->form->update($tab, $this->pk . "='".$frow[$this->pk]."'");
+	}
+}
+
+} //class GridForm
+
+/** \privatesection */
+
+//Helper class for gridform. Do not use directly.
+class GridForm_Form extends Form
+{
+	public $rowno;
+
+/** Name of the 'class' element */
+protected $className = 'gridform';
+
+function getTag($id, $ignore_html_attr = false)
+{
+	$tag = parent::getTag($id, $ignore_html_attr);
+	if ($this->elements[$id]['block'] == 'items') {
+		$tag['id'] = $tag['id'].'_'.$this->rowno;
+		$tag['name'] = "data[$this->rowno][$id]";
+	}
+	return $tag;
+}
+
+public function head() { return parent::head(); }
+public function foot() { return parent::foot(); }
+public function checkboxToArray($value) { return parent::checkboxToArray($value); }
+
+} //class GridForm_Form
+
+?>
