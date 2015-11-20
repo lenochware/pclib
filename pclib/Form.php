@@ -66,11 +66,6 @@ private $ajax_id;
 /** Name of the 'class' element */
 protected $className = 'form';
 
-public $cssClasses = array(
-		'button'=>'button','check'=>'check','radio'=>'radio',
-		'listinput'=>'listinput',
-	);
-
 /** Files matching patterns cannot be uploaded by Form class. */
 public $uploadBlackList = array('*.php','*.php?','*.phtml','*.exe','.htaccess');
 
@@ -271,11 +266,6 @@ private function columnToElementStr(array $col)
 	return $s."\n";
 }
 
-protected function addCssClass(array &$classes, $name)
-{
-	if ($this->cssClasses[$name]) $classes[] = $this->cssClasses[$name];
-}
-
 /** 
  * Prepare form tag with common attributes.
  * @return array $tag
@@ -304,7 +294,6 @@ protected function getTag($id, $ignoreHtmlAttr = false)
 
 	$class = array();
 	if ($elem['html']['class']) $class[] = $elem['html']['class'];
-	$this->addCssClass($class, $elem['type']);
 	if ($this->getAttr($id, 'noedit')) $class[] = 'disabled';
 	if ($this->invalid[$id]) $class[] = 'err';
 	if ($elem['required']) $class[] = 'required';
@@ -718,6 +707,7 @@ function print_ListInput($id, $sub, $value)
 	$items = $this->getItems($id);
 	$tag   = $this->getTag($id);
 	$tag['type'] = 'text';
+	$tag['class'][] = 'listinput';
 	$tag['maxlength'] = $elem['maxlength']? $elem['maxlength'] : $elem['size'];
 	$tag['value'] = $this->escape($value);
 	$tag['list'] = 'dl_'.$tag['id'];
