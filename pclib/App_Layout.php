@@ -7,16 +7,13 @@
  */
 class App_Layout extends Tpl
 {
-
-public $cssClassMessage = 'message';
-public $cssClassWarning = 'warning';
-public $cssClassError   = 'error';
-
 protected $headTag;
+protected $messagesTag;
+public $MESSAGE_PATTERN = '<div class="%s">%s</div>';
 
 /**
  * Add links to *.css, *.js scripts into template.
- * Template must contains a {HEAD} tag.
+ * Template must contains a head tag.
  * Example: $app->layout->addScripts('js/jquery.js', 'css/bootstrap.css');
  * @param array|variable_number_of_arguments List of paths to css and js files
  */
@@ -27,6 +24,22 @@ public function addScripts()
 	if (is_array($scripts[0])) $scripts = $scripts[0];
 	if (is_array($this->values[$this->headTag])) $this->values[$this->headTag] += $scripts;
 	else $this->values[$this->headTag] = $scripts;
+}
+
+/**
+ * Add flash (session stored) message.
+ * Template must contains a messages tag.
+ * @param string $message
+ * @param string $cssClass Css-class of the message div
+ * @param mixed $args Variable number of message arguments
+ */
+public function addMessage($message, $cssClass = null, $params = array())
+{
+	if (!$this->messagesTag) throw new NoValueException('Missing "messages" tag in template.');
+	if (!$cssClass) $cssClass = 'message';
+	$flash = $this->app->getSession('pclib.flash');
+	$flash[$cssClass][] = $this->app->t($message, $params);
+	$this->app->setSession('pclib.flash', $flash);
 }
 
 /**
@@ -53,6 +66,20 @@ function print_Head($id, $sub, $value)
 	}
 }
 
+/**
+ * Print flash messages.
+ * @copydoc tag-handler
+ */
+function print_Messages($id, $sub, $value)
+{
+	$flash = $this->app->getSession('pclib.flash');
+	if (!$flash) return;
+	foreach ($flash as $cssClass => $messages) {
+		print sprintf($this->MESSAGE_PATTERN, $cssClass, implode('<br>', $messages));
+	}
+	$this->app->setSession('pclib.flash', null);
+}
+
 function __construct($path = '', $sessName = '')
 {
 	parent::__construct($path, $sessName);
@@ -65,6 +92,9 @@ function print_Element($id, $sub, $value)
 		case 'head':
 			$this->print_Head($id,$sub,$value);
 			break;
+		case 'messages':
+			$this->print_Messages($id,$sub,$value);
+			break;
 		default:
 			parent::print_Element($id, $sub, $value);
 			break;
@@ -75,20 +105,8 @@ protected function parseLine($line)
 {
 	$id = parent::parseLine($line);
 	if ($this->elements[$id]['type'] == 'head') $this->headTag = $id;
+	if ($this->elements[$id]['type'] == 'messages') $this->messagesTag = $id;
 	return $id;
 }
 
-
-function out($block = null)
-{
-	if ($flash = $this->app->getSession('pclib.flash')) {
-		if ($flash['WARNINGS']) $flash['PRECONTENT'] .= "<div class=\"$this->cssClassWarning\">".implode('<br>', $flash['WARNINGS']).'</div>';
-		if ($flash['MESSAGES']) $flash['PRECONTENT'] .= "<div class=\"$this->cssClassMessage\">".implode('<br>', $flash['MESSAGES']).'</div>';
-		unset($flash['MESSAGES'],$flash['WARNINGS']);
-		$this->values = array_merge($this->values, $flash);
-		$this->app->setSession('pclib.flash', null);
-	}
-	parent::out($block);
 }
-
-}  //class App_Layout

@@ -60,7 +60,7 @@ function getArgs($actionMethod, array $params)
 	foreach($rm->getParameters() as $param)  {
 		$param_value = $params[$param->name];
 		if (!strlen($param_value) and !$param->isOptional()) {
-			$this->app->error('Required parameter "%s" for page "%s" missing.', $param->name, get_class($this) .'/'.$this->action);
+			$this->app->error('Required parameter "%s" for page "%s" missing.', null, $param->name, get_class($this) .'/'.$this->action);
 		}
 		if (isset($param_value)) $args[] = $param_value;
 	}
@@ -95,7 +95,7 @@ public function run($action, array $params = array())
 	$this->init();
 
 	if (!$this->action) {
-		$this->app->error('Page not found: "%s"', $this->name.'/'.$action);
+		$this->app->error('Page not found: "%s"', null, $this->name.'/'.$action);
 	}
 
 	$action_method = $this->action.$this->ACTION_POSTFIX;

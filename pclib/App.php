@@ -349,50 +349,45 @@ function t($s)
 
 /**
  * Display flash message.
- * Layout template must contains placeholder {PRECONTENT}.
+ * Layout template must contains messages tag.
  * In message %%s arguments can be used. Messages are also translated with Translator.
  * You can call message() even before redirect.
  * Example: $app->message('File %%s not found', $fileName);
  * @param string $message
+ * @param string $cssClass Css-class of the message div
  * @param mixed $args Variable number of message arguments
  */
-function message()
+function message($message, $cssClass = null)
 {
-	$params = func_get_args();
-	if (is_array($params[0])) $params[0] = implode('<br>', $params[0]);
-	$message = $this->t(array_shift($params), $params);
-	$flash = $this->getSession('pclib.flash');
-	$flash['MESSAGES'][] = $message;
-	$this->setSession('pclib.flash', $flash);
+	$args = array_slice(func_get_args(), 2);
+	$this->layout->addMessage($message, $cssClass, $args);
 }
 
 /**
  * Display warning message.
+ * @deprecated Use app->message($message, 'warning');
  * @see message()
  **/
-function warning()
+function warning($message, $cssClass = null)
 {
-	$params = func_get_args();
-	if (is_array($params[0])) $params[0] = implode('<br>', $params[0]);
-	$message = $this->t(array_shift($params), $params);
-	$flash = $this->getSession('pclib.flash');
-	$flash['WARNINGS'][] = $message;
-	$this->setSession('pclib.flash', $flash);
+	$args = array_slice(func_get_args(), 2);
+	$this->layout->addMessage($message, $cssClass? $cssClass : 'warning', $args);
 }
 
 /**
  * Display error message and exit application.
  * @see message()
  **/
-function error()
+function error($message, $cssClass = null)
 {
-	$params = func_get_args();
-	if (is_array($params[0])) $params[0] = implode('<br>', $params[0]);
-	$message = $this->t(array_shift($params), $params);
+	$args = array_slice(func_get_args(), 2);
+	$message = vsprintf($this->t($message), $args);
+	if (!$cssClass) $cssClass = 'error';
+
 	$event = $this->onError($message);
 	if ($event and !$event->propagate) return;
 
-	$this->setContent('<div class="'.$this->layout->cssClassError.'">'.$message.'</div>');
+	$this->setContent('<div class="'.$cssClass.'">'.$message.'</div>');
 	$this->out();
 	exit(1);
 }
@@ -645,7 +640,7 @@ function run($rs = null)
 	if ($event and !$event->propagate) return;
 
 	$ct = $this->getController($this->controller);
-	if (!$ct) $this->error('Page not found: "%s"', $this->controller);
+	if (!$ct) $this->error('Page not found: "%s"', null, $this->controller);
 	if ($errors = $ct->result['errors']) $this->error(implode('<br>', $errors));
 
 	$html = $ct->run($this->action, $params);
