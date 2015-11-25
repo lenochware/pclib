@@ -29,6 +29,9 @@ public $name;
 /** Application configuration. */
 public $config = array();
 
+/** application base paths (webroot, basedir, baseurl and pclib) */
+public $paths;
+
 /** Master template of the website. @see setLayout() */
 public $layout;
 
@@ -86,6 +89,7 @@ function __construct($name)
 	$this->errorHandler = new ErrorHandler;
 	$this->errorHandler->register();
 
+	$this->paths = $this->getPaths();
 	$this->addConfig( PCLIB_DIR.'Config.php' );
 	$this->route = $_GET['r']? $this->getRoute() : $this->getRoute_Old();
 	$this->loadSession();
@@ -276,6 +280,9 @@ public function configure()
 	if ($this->config['pclib.logger']) {
 		$this->getLogger($this->config['pclib.logger']);
 	}
+	foreach ($this->config['pclib.directories'] as $k => $dir) {
+		$this->config['pclib.directories'][$k] = paramstr($dir, $this->paths);
+	}
 	//$this->events->run($this, 'pclib.app.onconfigure');
 }
 
@@ -326,6 +333,23 @@ function getLanguage()
 {
 	if (!$this->services['translator']) return '';
 	return $this->services['translator']->language;
+}
+
+private function normalizeDir($s)
+{
+	return rtrim(strtr($s, "\\", "/"),"/");
+}
+
+function getPaths()
+{
+	$webroot = str_replace($_SERVER['SCRIPT_NAME'], '', $_SERVER['SCRIPT_FILENAME']);
+
+	return array(
+		'webroot' => $this->normalizeDir($webroot),
+		'baseurl' => $this->normalizeDir(dirname($_SERVER['SCRIPT_NAME'])),
+		'basedir' => $this->normalizeDir(dirname($_SERVER['SCRIPT_FILENAME'])),
+		'pclib' 	=> $this->normalizeDir(substr(PCLIB_DIR, strlen($webroot))),
+	);
 }
 
 /**

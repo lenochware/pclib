@@ -245,6 +245,16 @@ function getSource($fileName, $line, $width = 3)
 //TRACE
 
 /**
+ * Convert absolute filesystem path to relative from webroot
+**/
+private function relpath($path)
+{
+ $webroot = str_replace($_SERVER['SCRIPT_NAME'], '', $_SERVER['SCRIPT_FILENAME']);
+ return strtr(substr($path, strlen($webroot)), "\\", "/");
+}
+
+
+/**
  * Return stack-trace array of an exception or place where it is called.
  * @see gettrace()
  * @return array $strace
@@ -268,7 +278,7 @@ protected function traceArray(Exception $e = null)
 		if ($call['class'] == get_class($this)) break;
 		if ($call['class'])
 			$call['function'] = $call['class'].$call['type'].$call['function'];
-		$call['relpath'] = pcl_relpath($call['file']);
+		$call['relpath'] = $this->relpath($call['file']);
 
 		if($this->useHtml) {
 			$call['function'] = '<b>'.$call['function'].'</b>';

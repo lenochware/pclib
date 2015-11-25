@@ -201,15 +201,6 @@ function pcl_build_query($query_data)
 }
 
 /**
- * Convert absolute filesystem path to relative based on document root
-**/
-function pcl_relpath($absolutepath)
-{
- $docroot = str_replace($_SERVER['SCRIPT_NAME'], '', $_SERVER['SCRIPT_FILENAME']);
- return strtr(substr($absolutepath, strlen($docroot)), "\\", "/");
-}
-
-/**
  * Return mime-type of the file $path.
  * It uses linux command 'file', so it works only on *nix with exec() allowed.
  * On windows you can set array of extension => mime-type pairs into pclib.mimetypes

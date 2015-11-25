@@ -26,7 +26,7 @@ $config = array(
 	'pclib.directories' => array(
 		'controllers' => 'controllers/',
 		'logs' => 'temp/log/',
-		'assets' => pcl_relpath(PCLIB_DIR).'assets/',
+		'assets' => '{pclib}/assets/',
 	),
 
 	'pclib.tpl.escape' => false,
