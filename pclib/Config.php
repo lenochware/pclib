@@ -27,6 +27,7 @@ $config = array(
 		'controllers' => 'controllers/',
 		'logs' => 'temp/log/',
 		'assets' => '{pclib}/assets/',
+		'localization' => '{webroot}{pclib}/localization/',
 	),
 
 	'pclib.tpl.escape' => false,
