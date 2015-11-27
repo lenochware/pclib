@@ -273,10 +273,10 @@ protected function registerDebugBar()
 public function configure()
 {
 	$this->errorHandler->options = $this->config['pclib.errors'];
-	if ($this->config['pclib.compatibility']['controller_underscore_postfixes']) {
-		$this->CONTROLLER_POSTFIX = '_Controller';
-		$this->MODEL_POSTFIX = '_Model';
-	}
+	$underscore = $this->config['pclib.compatibility']['controller_underscore_postfixes']? '_' : '';
+	$this->CONTROLLER_POSTFIX = $underscore.'Controller';
+	$this->MODEL_POSTFIX = $underscore.'Model';
+
 	if ($this->config['pclib.logger']) {
 		$this->getLogger($this->config['pclib.logger']);
 	}
@@ -536,13 +536,19 @@ function getNavig($separ = ' / ', $lastLink = false)
  **/
 function getController($name)
 {
-	$className = $name.$this->CONTROLLER_POSTFIX;
+	$className = ucfirst($name).$this->CONTROLLER_POSTFIX;
+
 	$dir = $this->config['pclib.directories']['controllers'];
-	$path = $dir.$className.'.php';
-	
-	if (!file_exists($path)) {
-		$path = $dir.$name.'.php'; //compatibility
-		if (!file_exists($path)) return null;
+
+	$searchPaths = array(
+		$dir.$className.'.php', 
+		$dir.strtolower($className).'.php',
+		$dir.$name.'.php',
+	);
+
+	while ($path = array_shift($searchPaths)) {
+		if (file_exists($path)) break;
+		if (!$searchPaths) return null;
 	}
 
 	require_once($path);
