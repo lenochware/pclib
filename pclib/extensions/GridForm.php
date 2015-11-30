@@ -57,16 +57,24 @@ function __construct($path = '', $sessName = '')
 	$this->form->name = $this->name;
 	
 	if ($_REQUEST['submitted'] == $this->name) {
-		$this->submitted = ifnot($_REQUEST['action'], true);
+		$this->submitted = ifnot($_REQUEST['pcl_form_submit'], true);
 		$this->values = $_REQUEST['data']; //TODO GET/POST instead REQUEST
-		if (get_magic_quotes_gpc() and is_array($this->values))
-			foreach($this->values as $k => $v)
-				if (is_string($v)) $this->values[$k] = stripslashes($v);
 
 		/*if (count($_FILES)) foreach ($_FILES as $id => $aFile)
 			if($this->elements[$id]['file'])
 				$this->values[$id] = $aFile['name'];*/
 	}
+}
+
+protected function getValues()
+{
+	$rows = parent::getValues();
+	if ($this->submitted) {
+		foreach ($rows as $i => $row) {
+			$rows[$i] = array_merge($rows[$i],$_REQUEST['rowdata'][$i]);
+		}
+	}
+	return $rows;
 }
 
 /**
@@ -105,7 +113,7 @@ protected function print_Primary($id, $sub, $value)
 		print $this->htmlTag('input', array(
 		'type' => 'hidden',
 		'id' => $id.'_'.$rowno,
-		'name' => "data[$rowno][$id]",
+		'name' => "rowdata[$rowno][$id]",
 		'value' => $value,
 		));
 	}
@@ -141,7 +149,7 @@ function insert($tab)
 	if (!$tab) return false;
 	if (!$this->form->db) throw new NoDatabaseException;
 
-	foreach ($this->values as $frow) {
+	foreach ($_REQUEST['rowdata'] as $frow) {
 		$this->form->values = $frow;
 		$this->form->insert($tab);
 	}
@@ -158,7 +166,7 @@ function update($tab)
 	if (!$this->form->db) throw new NoDatabaseException;
 	if (!$this->pk) throw new NoValueException('Primary key not found.');
 
-	foreach ($_REQUEST['data'] as $frow) {
+	foreach ($_REQUEST['rowdata'] as $frow) {
 		$this->form->values = $frow;
 		$this->form->update($tab, $this->pk . "='".$frow[$this->pk]."'");
 	}
@@ -181,7 +189,7 @@ function getTag($id, $ignore_html_attr = false)
 	$tag = parent::getTag($id, $ignore_html_attr);
 	if ($this->elements[$id]['block'] == 'items') {
 		$tag['id'] = $tag['id'].'_'.$this->rowno;
-		$tag['name'] = "data[$this->rowno][$id]";
+		$tag['name'] = "rowdata[$this->rowno][$id]";
 	}
 	return $tag;
 }

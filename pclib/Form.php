@@ -90,14 +90,6 @@ protected function _init()
 		and $_REQUEST['csrf_token'] != $this->getCsrfToken()
 	) throw new AuthException("CSRF authorisation failed.");
 
-
-	//stripslashes
-	if (get_magic_quotes_gpc()) {
-		foreach((array)$this->values as $k => $v) {
-			if (is_string($v)) $this->values[$k] = stripslashes($v);
-		}
-	}
-
 	//set input file names
 	foreach ((array)$_FILES as $id => $aFile) {
 		if($this->elements[$id]['file'] and $aFile['size']) {

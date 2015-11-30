@@ -1122,7 +1122,7 @@ private function callback_getvalue($param)
 {
 	list($id,$sub) = explode('.', $param[1]);
 	if ($id == 'GET') {
-		if ($sub) return get_magic_quotes_gpc()? stripslashes($_GET[$sub]):$_GET[$sub];
+		if ($sub) return $_GET[$sub];
 		else return '__GET__';
 	}
 	else return $this->getValue($param[1]);
