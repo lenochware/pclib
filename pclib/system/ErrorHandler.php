@@ -82,11 +82,16 @@ class ErrorHandler extends BaseObject
 		// disable error capturing to avoid recursive errors
 		restore_error_handler();
 
-		//osetrit warningy
+		//Handle warnings...
 		if ($this->codeSeverity($code) != 'Error') {
+			
+			//skip warning when '@' operator is used.
+			if (!error_reporting()) return;
+
 			$this->_onWarning(
 				new ErrorException($message, $code, 0, $file, $line)
 			);
+			
 			return;
 		}
 
