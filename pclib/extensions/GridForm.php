@@ -37,11 +37,13 @@ class GridForm extends Grid
  */
 public $submitted = false;
 
-private $form = null;
+public $form = null;
 private $pk = null;
 
 /** Name of the 'class' element */
 protected $className = 'gridform';
+
+protected $inputCount = 0;
 
 /**
  * Constructor - load formgrid template
@@ -54,7 +56,7 @@ function __construct($path = '', $sessName = '')
 	parent::__construct($path, $sessName);
 	$this->form = new GridForm_Form();
 	$this->form->elements = $this->elements;
-	$this->form->name = $this->name;
+	$this->form->_init();
 	
 	if ($_REQUEST['submitted'] == $this->name) {
 		$this->submitted = ifnot($_REQUEST['pcl_form_submit'], true);
@@ -90,10 +92,11 @@ function print_Element($id, $sub, $value)
 		return;
 	}
 	
-	if (parent::hasType($elem['type'])) {
+	if (!$elem['type'] or parent::hasType($elem['type'])) {
 		parent::print_Element($id, $sub, $value);
 	}
 	else {
+		$this->inputCount++;
 		if ($elem['type'] == 'check') $value = $this->form->checkboxToArray($value);
 		$this->form->print_Element($id, $sub, $value);
 	}
@@ -110,6 +113,7 @@ protected function print_Primary($id, $sub, $value)
 	if ($sub == 'value') print $value;
 	elseif($sub == 'rowno') print $rowno;
 	else {
+		$this->inputCount++;
 		print $this->htmlTag('input', array(
 		'type' => 'hidden',
 		'id' => $id.'_'.$rowno,
@@ -134,9 +138,16 @@ protected function parseLine($line)
 
 function out($block = null)
 {
+	$this->inputCount = 0;
 	print $this->form->head();
 	parent::out($block);
 	print $this->form->foot();
+
+	if ($this->inputCount > ini_get('max_input_vars')) {
+		throw new Exception(sprintf(
+			"Php INI directive 'max_input_vars' exceeds. %s inputs used.", $this->inputCount
+		));
+	}
 }
 
 /**
