@@ -672,19 +672,13 @@ function run($rs = null)
 
 	$ct = $this->getController($this->controller);
 	if (!$ct) $this->error('Page not found: "%s"', null, $this->controller);
-	if ($errors = $ct->result['errors']) $this->error(implode('<br>', $errors));
 
 	$html = $ct->run($this->action, $params);
 
 	$event = $this->onAfterRun();
 	if ($event and $event->propagate) return;
 
-	if ($errors = $ct->result['errors'])
-		$this->error(implode('<br>', $errors));
-	elseif ($re = $ct->result['redirect'])
-		$this->redirect($re);
-	else
-		$this->setContent($html);
+	$this->setContent($html);
 }
 
 /**

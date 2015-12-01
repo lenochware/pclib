@@ -26,9 +26,6 @@ public $name;
 /** Name of the called action without postfix. */
 public $action;
 
-/** Controller results. */
-public $result;
-
 /** Occurs when Controller is initialized. */
 public $onInit;
 
@@ -105,11 +102,11 @@ public function run($action, array $params = array())
 
 /**
  * Redirect to $route.
- * Use return $this->redirect('route'); in your action.
+ * @deprecated Use $this->app->redirect().
  **/
 function redirect($route)
 {
-	$this->result['redirect'] = $route;
+	$this->app->redirect($route);
 }
 
 }
