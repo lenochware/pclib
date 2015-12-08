@@ -256,6 +256,18 @@ function enable()
 }
 
 /**
+ * Disable (hide) tag or block $name.
+ *
+ * @param array|list of tag names
+ */
+function disable()
+{
+	$args = func_get_args();
+	if (is_array($args[0])) $args = $args[0];
+	$this->enable($args, false);
+}
+
+/**
  * Set attributes for template elements.
  * $keystr can be 'element/attribute' or 'block/element/attribute'. If you
  * need set all elements in block, you can use wildcard: 'block/ * /attribute'.
