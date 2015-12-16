@@ -1039,7 +1039,7 @@ protected function formatStr($s, $fmt)
 	$len = strlen($fmt);
 	for($i = 0; $i < $len; $i++) {
 		switch ($fmt{$i}) {
-		case "n": $s = nl2br($s); break;
+		case "n": $s = nl2br($s, $this->useXhtml); break;
 		case "h": $s = utf8_htmlspecialchars($s); break;
 		case "H": $s = strip_tags($s); break;
 		case "u": $s = utf8_strtoupper($s); break;
