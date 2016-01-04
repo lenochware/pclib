@@ -143,7 +143,8 @@ function out($block = null)
 	parent::out($block);
 	print $this->form->foot();
 
-	if ($this->inputCount > ini_get('max_input_vars')) {
+	$maxInputs = ini_get('max_input_vars');
+	if ($maxInputs and $this->inputCount > $maxInputs) {
 		throw new Exception(sprintf(
 			"Php INI directive 'max_input_vars' exceeds. %s inputs used.", $this->inputCount
 		));
