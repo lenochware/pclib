@@ -340,17 +340,4 @@ function startsWith($s, $substr)
 	return (strpos($s, $substr) === 0);
 }
 
-//for php <= 5.2
-if (!function_exists('get_called_class')) {
-	function get_called_class()
-	{
-		foreach ( debug_backtrace() as $trace ) {
-			if ( isset( $trace['object'] ) )
-				if ( $trace['object'] instanceof $trace['class'] )
-					return get_class( $trace['object'] );
-		}
-		return false;
-	}
-}
-
 ?>
