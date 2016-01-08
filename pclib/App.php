@@ -417,6 +417,17 @@ function error($message, $cssClass = null)
 	exit(1);
 }
 
+function httpError($code, $message, $cssClass = null)
+{
+	if (function_exists('http_response_code')) {
+		http_response_code($code);
+	}
+
+	$args = array_slice(func_get_args(), 2);
+	$message = vsprintf($this->t($message), $args);
+	$this->error($message, $cssClass);
+}
+
 /**
  * Get application session variable.
  * Session variables are stored in their own namespace $ns.
@@ -671,7 +682,7 @@ function run($rs = null)
 	if ($event and !$event->propagate) return;
 
 	$ct = $this->getController($this->controller);
-	if (!$ct) $this->error('Page not found: "%s"', null, $this->controller);
+	if (!$ct) $this->httpError(404, 'Page not found: "%s"', null, $this->controller);
 
 	$html = $ct->run($this->action, $params);
 

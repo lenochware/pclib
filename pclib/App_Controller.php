@@ -92,7 +92,7 @@ public function run($action, array $params = array())
 	$this->init();
 
 	if (!$this->action) {
-		$this->app->error('Page not found: "%s"', null, $this->name.'/'.$action);
+		$this->app->httpError(404, 'Page not found: "%s"', null, $this->name.'/'.$action);
 	}
 
 	$action_method = $this->action.$this->ACTION_POSTFIX;

@@ -170,6 +170,10 @@ class ErrorHandler extends BaseObject
 	 */	
 	function displayProductionError(Exception $e)
 	{
+		if (!headers_sent()) {
+			header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
+		}
+
 		try {
 			$template = $this->options['template'];
 			$t = new Tpl($template? $template : PCLIB_DIR.'assets/error.tpl');
