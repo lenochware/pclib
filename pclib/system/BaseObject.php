@@ -138,9 +138,9 @@ class BaseObject
 	/**
 	 * Add event handler to $object->$name property. 
 	 * @param string $name Event name e.g. 'onSave'.
-	 * @param callable $callback Event handler.
+	 * @param callable $callback Event handler. (callable type hint is not supported in php 5.3)
 	 */
-	function addEvent($name, callable $callback)
+	function addEvent($name, /*callable*/ $callback)
 	{
 		if (!is_array($this->$name)) $this->$name = array();
 		array_push($this->$name, $callback);
