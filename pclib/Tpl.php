@@ -66,6 +66,9 @@ public $db;
 /** var Translator */
 public $translator;
 
+/** var Router */
+public $router;
+
 /** Generate XHTML code. */
 public $useXhtml = false;
 
@@ -489,7 +492,8 @@ function print_Element($id, $sub, $value)
 			$this->print_Class($id,$sub,null);
 			break;
 		case 'include':
-			$this->print_Include($id,$sub,null);
+		case 'action':
+			$this->print_Action($id,$sub,null);
 			break;
 
 		default:
@@ -655,21 +659,19 @@ function print_Class($id, $sub, $value)
 
 /**
  * Call controller's method and include result into template.
- * Example: include comments route "comments/list/id:{id}" will call method
- * Comments_Controller::list_action($id)
+ * Example: action comments route "comments/list/id:{id}" will call method
+ * CommentsController::listAction($id)
  * @copydoc tag-handler
  */
-function print_Include($id, $sub, $value)
+function print_Action($id, $sub, $value)
 {
 	$rs = $this->replaceParams($this->elements[$id]['route']);
-	$ra = $this->app->splitRoute($rs);
-	$route = $ra['route'];
-	$ct = $this->app->getController($route[0]);
-	if (!$ct) {print "Page $route[0] not found.";}
-	else $html = $ct->run($route[1], $ra['params']);
-	if ($errors = $ct->result['errors'])
-		print implode('<br>', $errors);
-	else print $html;
+	$route = Route::createFromString($rs);
+	$ct = $this->app->getController($route->controller);
+	if (!$ct) {
+		printf($this->t('Page not found: "%s"'), $route->controller);
+	}
+	else print $ct->run($route->action, $route->params);
 }
 
 /**
@@ -820,7 +822,7 @@ protected function getUrl($elem)
 
 	if ($elem['route']) {
 		$rs = $this->replaceParams($elem['route']);
-		return $this->app->getUrl($rs);
+		return $this->service('router')->createUrl($rs);
 	}
 
 	return false;
@@ -1106,11 +1108,10 @@ protected function getLkpLookup($lookup)
 
 protected function getDataSource($rs)
 {
-	$ra = $this->app->splitRoute($this->replaceParams($rs));
-	$route = $ra['route'];
-	$ct = $this->app->getController($route[0]);
-	$args = $ct->getArgs($route[1], $ra['params']);
-	return call_user_func_array(array($ct, $route[1]), $args);
+	$route = Route::createFromString($this->replaceParams($rs));
+	$ct = $this->app->getController($route->controller);
+	$args = $ct->getArgs($route->action, $route->params);
+	return call_user_func_array(array($ct, $route->action), $args);
 }
 
 protected function getLkpList($list)

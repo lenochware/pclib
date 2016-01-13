@@ -38,9 +38,6 @@ public $layout;
 /** Storage of the global services - Db, Auth, Logger etc. */
 public $services = array();
 
-/** Current route: [controller,action] array. See also getRoute() , run() */
-public $route = array();
-
 /** Current enviroment (such as 'develop','test','production'). See setEnviroment() */
 public $enviroment;
 
@@ -91,7 +88,7 @@ function __construct($name)
 
 	$this->paths = $this->getPaths();
 	$this->addConfig( PCLIB_DIR.'Config.php' );
-	$this->route = $_GET['r']? $this->getRoute() : $this->getRoute_Old();
+
 	$this->loadSession();
 
 }
@@ -100,9 +97,9 @@ function __construct($name)
 function __get($name)
 {
 	switch($name) {
-		case 'controller': return $this->route[0];
-		case 'action':   return $this->route[1];
-		case 'routestr': return implode('/', $this->route);
+		case 'controller': return $this->router->currentRoute->controller;
+		case 'action':   return $this->router->currentRoute->action;
+		case 'routestr': return $this->router->currentRoute->toString();
 		case 'content':  return $this->layout->values['CONTENT'];
 		case 'language': return $this->getLanguage();
 	}
@@ -114,8 +111,8 @@ function __get($name)
 function __set($name, $value)
 {
 	switch($name) {
-		case 'controller': $this->route[0] = $value; return;
-		case 'action':  $this->route[1] = $value; return;
+		case 'controller': $this->router->currentRoute->controller = $value; return;
+		case 'action':  $this->router->currentRoute->action = $value; return;
 		case 'content': $this->setContent($value); return;
 		case 'language': $this->setLanguage($value); return;
 	}
@@ -197,6 +194,19 @@ function getRequest()
 }
 
 /**
+ * Return Request object, create it, if not exists.
+ */
+function getRouter()
+{
+	if (!$this->services['router']) {
+		$router = new App_Router;
+		$router->getRoute();
+		$this->setService('router', $router);
+	}
+	return $this->services['router'];
+}
+
+/**
  * Return Logger object, create it, if not exists.
  */
 function getLogger($options = array())
@@ -224,6 +234,7 @@ function setService($name, IService $service)
 
 function getService($serviceName)
 {
+	if ($serviceName == 'router') return $this->getRouter();
 	if ($serviceName == 'request') return $this->getRequest();
 	if ($serviceName == 'debugger') return $this->getDebugger();
 	if ($serviceName == 'logger') return $this->getLogger();
@@ -291,10 +302,10 @@ public function configure()
  * Example: $app->redirect("products/edit/id:$id");
  * See also @ref pcl-route
  */
-function redirect($route)
+function redirect($stringRoute)
 {
 	$this->saveSession();
-	$url = $this->getUrl($route);
+	$url = $this->router->createUrl($stringRoute);
 	header("Location: $url");
 	exit();
 }
@@ -501,7 +512,7 @@ function deleteSession($name = null, $ns = null)
  */
 function bookmark($level, $title, $route = null, $url = null)
 {
-	if ($route) list($temp, $url) = explode('?', $this->getUrl($route));
+	if ($route) list($temp, $url) = explode('?', $this->router->createUrl($route));
 
 	$maxlevel =& $this->bookmarks[-1]['maxlevel'];
 	for ($i = $maxlevel; $i > $level; $i--) { unset($this->bookmarks[$i]); }
@@ -583,84 +594,6 @@ function getModel($name)
 }
 
 /**
- * Read current URL and return route [controller,action].
- * Override for your own route format. By default it takes parameter 'r'
- * .i.e. url '?r=orders/add' means call method add() of Orders_Controller.
- */
-function getRoute()
-{
-	$route = explode('/', $_GET['r']);
-
-	//%form button has been pressed, set route accordingly.
-	if ($_REQUEST['pcl_form_submit'])
-		$route[1] = $_REQUEST['pcl_form_submit'];
-	return $route;
-}
-
-//Support of old url format for backward compatibility.
-function getRoute_Old()
-{
-	$module = $_GET['module']? $_GET['module'] : $_GET['modul'];
-	$action = $_GET['action'];
-	$id     = $_GET['id'];
-
-	if ($_REQUEST['pcl_form_submit'])
-		$action = $_REQUEST['pcl_form_submit'];
-
-	return array($module, $action, $id);
-}
-
-/**
- * Translate internal route to proper url.
- * Used when links in templates are generated or for redirection.
- * @param string|array $ra route 'ctrl/action/param:param' or array('route'=>...,'params=>...)
- */
-function getUrl($ra)
-{
-	if (!$ra) return '';
-	if (is_string($ra)) $ra = $this->splitRoute($this->replaceParams($ra));
-
-	$index = BASE_URL.$this->indexFile;
-	if ($ra['route']) {
-		$ra['params'] = array('r' => implode('/', $ra['route'])) + (array)$ra['params'];
-	}
-	$spar = pcl_build_query($ra['params']);
-	return $index.($spar? '?'.$spar:'');
-}
-
-function splitRoute($rs)
-{
-	if (!$rs) return array();
-	$ra = array('route' => array(), 'params' => array());
-
-	foreach(explode('/', $rs) as $section) {
-		if ($section == '__GET__') {$ra['params'] += $_GET; continue;}
-		list($name,$value) = explode(':', $section);
-		if (isset($value)) $ra['params'][$name] = $value;
-		else $ra['route'][] = $section;
-	}
-	return $ra;
-}
-
-protected function replaceParams($s)
-{
-	if (strpos($s,'{') !== false) $s = preg_replace_callback (
-		"/{([a-z0-9_.]+)}/i", array($this, 'callback_getvalue'), $s
-	);
-	return $s;
-}
-
-private function callback_getvalue($param)
-{
-	list($id,$sub) = explode('.', $param[1]);
-	if ($id == 'GET') {
-		if ($sub) return $_GET[$sub];
-		else return '__GET__';
-	}
-	else return null;
-}
-
-/**
  * Execute method of the controller.
  * Without parameters, route is read from current url - i.e. from #$route variable.
  * Route ['products','add'] means: call method Products_Controller->add_action();
@@ -671,12 +604,13 @@ function run($rs = null)
 	if ($this->debugMode) $this->registerDebugBar();
 
 	if ($rs) {
-		$ra = $this->splitRoute($rs);
-		$this->route = $ra['route'];
-		$params = $ra['params'];
+		$this->router->currentRoute = Route::createFromString($rs);
 	}
-	else
-		$params = $_GET;
+	else {
+		$this->router->getRoute();
+	}
+	
+	$params = $this->router->currentRoute->params;
 
 	$event = $this->onBeforeRun();
 	if ($event and !$event->propagate) return;

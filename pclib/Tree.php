@@ -44,8 +44,8 @@ public $table = 'TREE_LOOKUPS';
 
 public $cssClass;
 
-/** var App */
-protected $app;
+/** var Router */
+protected $router;
 
 private $id;
 private $name;
@@ -64,10 +64,8 @@ public $LEVEL_SEPAR = '/';
  */
 function __construct($cssClass = 'pctree')
 {
-	global $pclib;
 	parent::__construct();
 	$this->cssClass = $cssClass;
-	$this->app = $pclib->app;
 	$this->service('db');
 }
 
@@ -132,7 +130,7 @@ protected function htmlNode($node)
 	if ($class) $node['ATTR'] = trim($node['ATTR']." class=\"$class\"");
 	if (!$node['ID']) $node['ID'] = $this->i;
 	if ($node['ROUTE']) {
-		$node['URL'] = $this->app->getUrl($node['ROUTE']);
+		$node['URL'] = $this->service('router')->createUrl($node['ROUTE']);
 	}
 
 	$this->service('translator', false);

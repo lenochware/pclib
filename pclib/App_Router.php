@@ -16,7 +16,7 @@
  * Translates URL to instance of Route class.
  * Route contains class and method name (with parameters) which will be called.
  */
-class App_Router
+class App_Router implements IService
 {
 	public $friendlyUrl = false;
 	public $baseUrl;

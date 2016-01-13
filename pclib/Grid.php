@@ -56,7 +56,7 @@ public $sortArray = array();
 /** %grid sql query. */
 protected $sql;
 
-protected $route;
+protected $baseUrl;
 
 /** Name of the 'class' element */
 protected $className = 'grid';
@@ -70,7 +70,7 @@ protected function _init()
 {
 	parent::_init();
 
-	$this->route = $this->getRoute();
+	$this->baseUrl = $this->getBaseUrl();
 
 	$pgid = ifnot($this->header['pager'], 'pager');
 	$this->pager += (array)$this->elements[$pgid];
@@ -373,10 +373,7 @@ protected function sortUrl($id)
 		$s = ($sa[$id] == $id)? $id.':d' : $id;
 	}
 
-	$ra = $this->route;
-	$ra['params']['sort'] = $s;
-	$ra['params']['page'] = 1;
-	return $this->app->getUrl($ra);
+	return $this->baseUrl."sort=$s&page=1";
 }
 
 /**
@@ -568,14 +565,19 @@ function create($dsstr, $fileName = null, $template = null)
 	}
 }
 
-/** get proper base route for %grid sort and pager & other links */
-protected function getRoute()
+/** get proper base url for %grid sort and pager & other links */
+protected function getBaseUrl()
 {
-	$ra = $this->app->splitRoute($_GET['r']);
-	$par = $_GET; unset($par['sort'],$par['page'],$par['r']);
-	if (!$this->header['singlepage']) $par['grid'] = $this->name;
-	$ra['params'] = $par;
-	return $ra;
+	$url = $this->getUrl($this->header);
+	if (!$url) {
+		$route = clone $this->service('router')->currentRoute;
+		unset($route->params['sort']);
+		unset($route->params['page']);
+		if (!$this->header['singlepage']) $route->params['grid'] = $this->name;
+		$url = $this->service('router')->getUrl($route);
+	}
+
+	return $url . ((strpos($url,'?') === false)? '?' : '&');
 }
 
 /**
@@ -638,9 +640,7 @@ protected function pagerRange($page, $size)
  */
 protected function pagerUrl($page)
 {
-	$ra = $this->route;
-	$ra['params']['page'] = $page;
-	return $this->app->getUrl($ra);
+	return $this->baseUrl."page=$page";
 }
 
 
