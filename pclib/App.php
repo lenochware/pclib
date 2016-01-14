@@ -176,49 +176,25 @@ function log($category, $message_id, $message = null, $item_id = null)
 }
 
 /**
- * Return Debugger object, create it, if not exists.
+ * Return default service object or null, if service must be created by user.
+ * @param string $serviceName
+ * @return IService $service
  */
-function getDebugger()
-{
-	if (!$this->services['debugger']) $this->setService('debugger', new Debugger);
-	return $this->services['debugger'];
-}
+protected function createDefaultService($serviceName) {
+	$canBeDefault = array('logger', 'debugger', 'request', 'router');
+	if (in_array($serviceName, $canBeDefault)) {
+		$className = ucfirst($serviceName);
+		//Router hack
+		if ($serviceName == 'router') {
+			$router = new App_Router;
+			$router->getRoute();
+			return $router;
+			
+		}
 
-/**
- * Return Request object, create it, if not exists.
- */
-function getRequest()
-{
-	if (!$this->services['request']) $this->setService('request', new Request);
-	return $this->services['request'];
-}
-
-/**
- * Return Request object, create it, if not exists.
- */
-function getRouter()
-{
-	if (!$this->services['router']) {
-		$router = new App_Router;
-		$router->getRoute();
-		$this->setService('router', $router);
+		return new $className;
 	}
-	return $this->services['router'];
-}
-
-/**
- * Return Logger object, create it, if not exists.
- */
-function getLogger($options = array())
-{
-	if (!$this->services['logger']) {
-		$this->setService('logger', new Logger);
-	}
-	if ($options) {
-		$this->services['logger']->categories = $options['log'];
-	}
-
-	return $this->services['logger'];
+	else return null;
 }
 
 /**
@@ -234,11 +210,17 @@ function setService($name, IService $service)
 
 function getService($serviceName)
 {
-	if ($serviceName == 'router') return $this->getRouter();
-	if ($serviceName == 'request') return $this->getRequest();
-	if ($serviceName == 'debugger') return $this->getDebugger();
-	if ($serviceName == 'logger') return $this->getLogger();
-	return $this->services[$serviceName];
+	if (isset($this->services[$serviceName])) {
+		return $this->services[$serviceName];
+	}
+	else {
+		$service = $this->createDefaultService($serviceName);
+		if ($service) {
+			$this->setService($serviceName, $service);
+			return $service;
+		}
+	}
+	return false;
 }
 
 /**
@@ -288,8 +270,8 @@ public function configure()
 	$this->CONTROLLER_POSTFIX = $underscore.'Controller';
 	$this->MODEL_POSTFIX = $underscore.'Model';
 
-	if ($this->config['pclib.logger']) {
-		$this->getLogger($this->config['pclib.logger']);
+	if ($this->config['pclib.logger']['log']) {
+		$this->logger->categories = $this->config['pclib.logger']['log'];
 	}
 	foreach ($this->config['pclib.directories'] as $k => $dir) {
 		$this->config['pclib.directories'][$k] = paramstr($dir, $this->paths);
@@ -360,7 +342,7 @@ function getPaths()
 		'webroot' => $this->normalizeDir($webroot),
 		'baseurl' => $this->normalizeDir(dirname($_SERVER['SCRIPT_NAME'])),
 		'basedir' => $this->normalizeDir(dirname($_SERVER['SCRIPT_FILENAME'])),
-		'pclib' 	=> $this->normalizeDir(substr(PCLIB_DIR, strlen($webroot))),
+		'pclib' => $this->normalizeDir(substr(PCLIB_DIR, strlen($webroot))),
 	);
 }
 
@@ -428,6 +410,10 @@ function error($message, $cssClass = null)
 	exit(1);
 }
 
+/**
+ * Display error message with http response code header and exit application.
+ * @see message()
+ **/
 function httpError($code, $message, $cssClass = null)
 {
 	if (function_exists('http_response_code')) {

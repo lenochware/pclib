@@ -66,7 +66,7 @@ function paramstr($str, $param, $keepEmpty = false)
 function dump()
 {
 	global $pclib;
-	$debug = $pclib->app->getDebugger();
+	$debug = $pclib->app->debugger;
 	$args = func_get_args();
 	$s = $debug->getDump($args);
 	$debug->errorDump('DUMP: Application stopped at');
@@ -103,7 +103,7 @@ function logdump()
 	$app = $pclib->app;
 	$args = func_get_args();
 	
-	$debug = $app->getDebugger();
+	$debug = $app->debugger;
 	$sav = $debug->useHtml;
 	$debug->useHtml = false;
 	$s = $debug->getDump($args);
