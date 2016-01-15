@@ -186,7 +186,7 @@ protected function createDefaultService($serviceName) {
 		$className = ucfirst($serviceName);
 		//Router hack
 		if ($serviceName == 'router') {
-			$router = new App_Router;
+			$router = new Router;
 			$router->getRoute();
 			return $router;
 			

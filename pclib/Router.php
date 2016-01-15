@@ -16,7 +16,7 @@
  * Translates URL to instance of Route class.
  * Route contains class and method name (with parameters) which will be called.
  */
-class App_Router implements IService
+class Router implements IService
 {
 	public $friendlyUrl = false;
 	public $baseUrl;
@@ -90,7 +90,7 @@ protected function buildQuery($query_data)
 	return strtr(http_build_query($query_data), $trans);
 }
 
-} //App_Router
+} //Router
 
 /**
  * It encapsulates call of the object method: $controller->action($params).
