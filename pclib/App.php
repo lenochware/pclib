@@ -592,9 +592,6 @@ function run($rs = null)
 	if ($rs) {
 		$this->router->currentRoute = Route::createFromString($rs);
 	}
-	else {
-		$this->router->getRoute();
-	}
 	
 	$params = $this->router->currentRoute->params;
 
