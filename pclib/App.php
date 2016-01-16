@@ -420,7 +420,7 @@ function httpError($code, $message, $cssClass = null)
 		http_response_code($code);
 	}
 
-	$args = array_slice(func_get_args(), 2);
+	$args = array_slice(func_get_args(), 3);
 	$message = vsprintf($this->t($message), $args);
 	$this->error($message, $cssClass);
 }
