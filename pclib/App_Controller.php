@@ -61,7 +61,6 @@ function getArgs($actionMethod, array $params)
 		}
 		if (isset($param_value)) $args[] = $param_value;
 	}
-	//if (is_array($params['args'])) $args += $params['args'];
 	return $args;
 }
 
@@ -71,13 +70,15 @@ function getArgs($actionMethod, array $params)
 function findAction($action)
 {
 	if (!$action) $action = 'index';
-	if (!is_callable(array($this, $action.$this->ACTION_POSTFIX))) {
-		if (method_exists($this, 'default'.$this->ACTION_POSTFIX))
-			return 'default';
-		else
-			return null;
+
+	if (method_exists($this, $action.$this->ACTION_POSTFIX)) {
+		return $action;
 	}
-	return $action;
+	elseif (method_exists($this, 'default'.$this->ACTION_POSTFIX)) {
+		return 'default';		
+	}
+
+	return false;
 }
 
 /**
