@@ -88,7 +88,7 @@ function jdump()
 	}
 	
 	if ($pclib->app->layout)
-		$pclib->app->layout->_PRECONTENT = "<script>$js</script>";
+		$pclib->app->layout->addInline("<script>$js</script>");
 	else
 		print "<script>$js</script>";
 }

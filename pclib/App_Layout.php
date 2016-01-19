@@ -26,6 +26,12 @@ public function addScripts()
 	else $this->values[$this->headTag] = $scripts;
 }
 
+function addInline($s) 
+{
+	if (!$this->headTag) throw new NoValueException('Missing "head" tag in template.');
+	$this->elements[$this->headTag]['inline'] .= $s;
+}
+
 /**
  * Add flash (session stored) message.
  * Template must contains a messages tag.
@@ -64,6 +70,9 @@ function print_Head($id, $sub, $value)
 		case '.css': print "<link rel=\"stylesheet\" type=\"text/css\" href=\"$script$version\">\n"; break;
 		}
 	}
+
+	$inline = $this->elements[$id]['inline'];
+	if ($inline) print $inline;
 }
 
 /**
