@@ -125,7 +125,9 @@ protected function print_Primary($id, $sub, $value)
 
 function print_BlockRow($block_id, $rowno = null)
 {
-	$this->form->rowno = $rowno;
+	if ($block_id == 'items') {
+		$this->form->rowno = $rowno;
+	}
 	parent::print_BlockRow($block_id, $rowno);
 }
 
@@ -199,7 +201,7 @@ protected $className = 'gridform';
 function getTag($id, $ignore_html_attr = false)
 {
 	$tag = parent::getTag($id, $ignore_html_attr);
-	if ($this->elements[$id]['block'] == 'items') {
+	if ($this->isInBlock($id, 'items')) {
 		$tag['id'] = $tag['id'].'_'.$this->rowno;
 		$tag['name'] = "rowdata[$this->rowno][$id]";
 	}
