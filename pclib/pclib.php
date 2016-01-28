@@ -70,7 +70,7 @@ class Pclib
 		$this->autoloader->addClasses($classes);
 		$this->autoloader->register();
 
-		ini_set('docref_root', 'http://cz.php.net/manual/en/');
+		ini_set('docref_root', 'http://php.net/');
 
 		//%form button hack
 		if (is_array($_REQUEST['pcl_form_submit'])) {
