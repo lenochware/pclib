@@ -97,9 +97,9 @@ function __construct($name)
 function __get($name)
 {
 	switch($name) {
-		case 'controller': return $this->router->currentRoute->controller;
-		case 'action':   return $this->router->currentRoute->action;
-		case 'routestr': return $this->router->currentRoute->toString();
+		case 'controller': return $this->router->action->controller;
+		case 'action':   return $this->router->action->method;
+		case 'routestr': return $this->router->action->path;
 		case 'content':  return $this->layout->values['CONTENT'];
 		case 'language': return $this->getLanguage();
 	}
@@ -111,8 +111,8 @@ function __get($name)
 function __set($name, $value)
 {
 	switch($name) {
-		case 'controller': $this->router->currentRoute->controller = $value; return;
-		case 'action':  $this->router->currentRoute->action = $value; return;
+		case 'controller': $this->router->action->controller = $value; return;
+		case 'action':  $this->router->action->metod = $value; return;
 		case 'content': $this->setContent($value); return;
 		case 'language': $this->setLanguage($value); return;
 	}
@@ -184,13 +184,6 @@ protected function createDefaultService($serviceName) {
 	$canBeDefault = array('logger', 'debugger', 'request', 'router');
 	if (in_array($serviceName, $canBeDefault)) {
 		$className = ucfirst($serviceName);
-		//Router hack
-		if ($serviceName == 'router') {
-			$router = new Router;
-			$router->getRoute();
-			return $router;
-			
-		}
 
 		return new $className;
 	}
@@ -590,18 +583,18 @@ function run($rs = null)
 	if ($this->debugMode) $this->registerDebugBar();
 
 	if ($rs) {
-		$this->router->currentRoute = Route::createFromString($rs);
+		$this->router->action = new Action($rs);
 	}
 	
-	$params = $this->router->currentRoute->params;
+	$action = $this->router->action;
 
 	$event = $this->onBeforeRun();
 	if ($event and !$event->propagate) return;
 
-	$ct = $this->getController($this->controller);
-	if (!$ct) $this->httpError(404, 'Page not found: "%s"', null, $this->controller);
+	$ct = $this->getController($action->controller);
+	if (!$ct) $this->httpError(404, 'Page not found: "%s"', null, $action->controller);
 
-	$html = $ct->run($this->action, $params);
+	$html = $ct->run($action);
 
 	$event = $this->onAfterRun();
 	if ($event and $event->propagate) return;

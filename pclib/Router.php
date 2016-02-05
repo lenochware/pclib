@@ -13,74 +13,67 @@
 # version 2.1 of the License, or (at your option) any later version.
 
 /**
- * Translates URL to instance of Route class.
- * Route contains class and method name (with parameters) which will be called.
+ * Translates URL to instance of Action class.
+ * Action contains class and method name (with parameters) which will be called.
  */
-class Router implements IService
+class Router extends BaseObject implements IService
 {
 	public $friendlyUrl = false;
 	public $baseUrl;
 
-	/** var Route */
-	public $currentRoute;
+	/** var Action */
+	public $action;
+
+	public $onGetAction;
+	public $onCreateUrl;
 
 
 function __construct()
 {
+	parent::__construct();
 	$this->baseUrl = BASE_URL;
+	$this->action = $this->getAction();
 }
 
 /**
- * Read current URL and return route. (URL -> Route translation)
- * It will set currentRoute variable of the router.
+ * Create Action from current request.
  * Override for your own URL format.
- * @return Route $route
+ * @return Action $action
  */
-function getRoute()
+function getAction()
 {
-	list($controller, $action) = explode('/', $_GET['r']);
-	$params = $_GET;
-	unset($params['r']);
+	$action = new Action($_GET);
 
 	//%form button has been pressed, set route accordingly.
 	if ($_REQUEST['pcl_form_submit']) {
-		$action = $_REQUEST['pcl_form_submit'];
+		$action->method = $_REQUEST['pcl_form_submit'];
 	}
 
-	$this->currentRoute = new Route($controller, $action, $params);
-	return $this->currentRoute;
+	$this->onGetAction($action);
+	return $action;
 }
 
 /**
- * Get route and return URL. (Route -> URL translation)
- * Override for your own URL format.
- * @param Route $route
+ * Transform internal action (e.g. 'products/edit/id:1') to URL.
+ * @param string|Action $s
  * @return string $url
  */
-function getUrl(Route $route)
+function createUrl($s)
 {
-	if (!$route->controller) return $this->baseUrl;
+	$action = is_string($s)? new Action($s) : $s;
+	//TODO: test instanceof Action
 
-	$path = $route->controller.($route->action?'/'.$route->action:'');
+	$this->onCreateUrl($action);
+
+	if (!$action->controller) return $this->baseUrl;
 
 	if ($this->friendlyUrl) {
-		$params = $route->params;
-		return $this->baseUrl.$path.($params? '?'.$this->buildQuery($params) : '');
+		$params = $action->params;
+		return $this->baseUrl.$action->path.($params? '?'.$this->buildQuery($params) : '');
 	} else {
-		$params = array('r' => $path) + $route->params;
+		$params = array('r' => $action->path) + $action->params;
 		return $this->baseUrl.'?'.$this->buildQuery($params);
 	}
-}
-
-/**
- * Get string-route and return URL. (Route -> URL translation)
- * @uses getUrl()
- * @param string $route
- * @return string $url
- */
-function createUrl($stringRoute, $paramFunction = null)
-{
-	return $this->getUrl(Route::createFromString($stringRoute, $paramFunction));
 }
 
 
@@ -93,20 +86,25 @@ protected function buildQuery($query_data)
 } //Router
 
 /**
- * It encapsulates call of the object method: $controller->action($params).
- * Can be mapped to URL. Framework will translate URL to Route and call proper method with parameters.
+ * It encapsulates call of the controller's action: $controller->method($params).
+ * It Can be mapped to URL.
  */
-class Route {
-	//public $path; //cesta k souboru s controllerem
+class Action 
+{
+	public $path;
+	public $module;
 	public $controller;
-	public $action;
+	public $method;
 	public $params;
 
-	function __construct($controller = '', $action = '', array $params = array())
+	function __construct($s = null)
 	{
-		$this->controller = $controller;
-		$this->action = $action;
-		$this->params = $params;
+		if (is_string($s)) {
+			$this->fromString($s);
+		}
+		elseif(is_array($s)) {
+			$this->fromArray($s);
+		}
 	}
 
 	/**
@@ -119,20 +117,22 @@ class Route {
 		foreach ($this->params as $key => $value) {
 			$params[] = $key.':'.$value;
 		}
-		return $this->controller.($this->action? '/'.$this->action : '').($params? '/'.implode('/',$params) : '');
+		return $this->path.($params? '/'.implode('/',$params) : '');
+	}
 
+	function __toString() {
+		return $this->toString();
 	}
 
 	/**
 	 * Create new Route object from the string.
 	 * @param string $s string-route e.g. 'orders/edit/id:1'
-	 * @return Route $route
 	 */
-	static function createFromString($s, $paramFunction = null)
+	function fromString($s)
 	{
-		$ra = explode('/', self::replaceParams($s, $paramFunction));
+		$ra = explode('/', $this->replaceParams($s, null));
 
-		$params = array();
+		$params = $path = array();
 
 		foreach($ra as $section) {
 			if ($section == '__GET__') { $params += $_GET; continue; }
@@ -141,20 +141,36 @@ class Route {
 			else $path[] = $section;
 		}
 
-		return new Route($path[0], $path[1], $params);
+		$this->path = implode('/', $path);
+		$this->params = $params;
+
+		$n = count($path);
+		if ($n >= 3) {
+			$path = array_slice($path, -3);
+			$this->module = array_shift($path);
+		}
+		$this->controller = $path[0];
+		$this->method = $path[1];
 	}
 
-	protected static function replaceParams($s, $paramFunction)
+	function fromArray($get)
+	{
+		$this->path = $get['r'];
+		list($this->controller, $this->method) = explode('/', $this->path);
+		unset($get['r']);
+		$this->params = $get;
+	}
+
+	protected function replaceParams($s, $params)
 	{
 		preg_match_all("/{([a-z0-9_.]+)}/i", $s, $found);
 		
-		//dump($found);
 		if ($found[0]) {
 			$values = array();
 			foreach ($found[1] as $name) {
 				if ($name == 'GET') $value = '__GET__';
 				elseif (substr($name,0,4) == 'GET.') $value = $_GET[substr($name,4)];
-				elseif($paramFunction) $value = call_user_func($paramFunction, $name); 
+				elseif($params) $value = $params[$name]; 
 				else $value = '';
 				$values[] = $value;
 			}
@@ -164,4 +180,4 @@ class Route {
 			return $s;
 		}
 	}
-} //Route
+} //Action

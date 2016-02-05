@@ -83,21 +83,20 @@ function findAction($action)
 
 /**
  * Call action method of the controller, feeding it with required parameters.
- * @param string $action Action method name (without postfix)
-*  @param array $params Action parameters (usually coming from url)
+ * @param Action $action called action.
  */
-public function run($action, array $params = array())
+public function run($action)
 {
-	$this->name = substr(get_class($this),0,-strlen($this->app->CONTROLLER_POSTFIX));
-	$this->action = $this->findAction($action);
+	$this->name = $action->controller;
+	$this->action = $this->findAction($action->method);
 	$this->init();
 
 	if (!$this->action) {
-		$this->app->httpError(404, 'Page not found: "%s"', null, $this->name.'/'.$action);
+		$this->app->httpError(404, 'Page not found: "%s"', null, $action->path);
 	}
 
 	$action_method = $this->action.$this->ACTION_POSTFIX;
-	$args = $this->getArgs($action_method, $params);
+	$args = $this->getArgs($action_method, $action->params);
 	return call_user_func_array(array($this, $action_method), $args);
 }
 

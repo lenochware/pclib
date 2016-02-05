@@ -570,11 +570,10 @@ protected function getBaseUrl()
 {
 	$url = $this->getUrl($this->header);
 	if (!$url) {
-		$route = clone $this->service('router')->currentRoute;
-		unset($route->params['sort']);
-		unset($route->params['page']);
-		if (!$this->header['singlepage']) $route->params['grid'] = $this->name;
-		$url = $this->service('router')->getUrl($route);
+		$a = clone $this->service('router')->action;
+		unset($a->params['sort'], $a->params['page']);
+		if (!$this->header['singlepage']) $a->params['grid'] = $this->name;
+		$url = $this->service('router')->createUrl($a);
 	}
 
 	return $url . ((strpos($url,'?') === false)? '?' : '&');
