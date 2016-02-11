@@ -92,7 +92,7 @@ function login($uname, $password)
 		return false;
 	}
 
-	$ip = ip2long($this->app->request->getRemoteIp());
+	$ip = ip2long($this->app->request->getClientIp());
 
 	//O.K. - login!
 
@@ -175,7 +175,7 @@ function loginHttp()
 	$user->data['LOGINTYPE']  = 'httpbasic';
 	$this->setActive($user);
 
-	$ip = ip2long($this->app->request->getRemoteIp());
+	$ip = ip2long($this->app->request->getClientIp());
 	if ($ip != $user->data['IP']) $this->app->log('AUTH_NOTICE', 'IP_CHANGE');
 
 	$now = date('Y-m-d H:i:s');

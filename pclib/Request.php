@@ -54,8 +54,11 @@ function getUrl()
 	return sprintf("%s%s%s", $scheme, $_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI']);
 }
 
-/** Return client IP address. */
-function getRemoteIp()
+/** 
+ * Return client IP address. 
+ * Warning: Can be faked!
+ */
+function getClientIp()
 {
 	if ($_SERVER['HTTP_CLIENT_IP'])
 		$ip = $_SERVER['HTTP_CLIENT_IP'];
@@ -63,11 +66,22 @@ function getRemoteIp()
 		$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
 	else if($_SERVER['REMOTE_ADDR'])
 		$ip = $_SERVER['REMOTE_ADDR'];
-	else $ip = '127.0.0.1';
+	else $ip = '0.0.0.0';
 
 	if (strpos($ip,',')) $ip = substr($ip,0,strpos($ip,','));
 
 	return $ip;
+}
+
+/** Return server IP address (safe). */
+function getServerIp()
+{
+	return array_key_exists('SERVER_ADDR',$_SERVER) ? $_SERVER['SERVER_ADDR'] : $_SERVER['LOCAL_ADDR'];
+}
+
+function isConsole()
+{
+	return (php_sapi_name() == "cli");
 }
 
 /** Return base Url. */
