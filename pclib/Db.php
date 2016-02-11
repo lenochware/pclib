@@ -142,7 +142,7 @@ function connect($dataSource)
 	}
 
 	$drvpath = PCLIB_DIR.'system/database/'.$drvname.'.php';
-	if (!file_exists($drvpath)) throw new DatabaseException("Database driver $drvname not found.");
+	if (!file_exists($drvpath)) throw new DatabaseException("Database driver '%s' not found.", array($dsarray['driver']));
 	require_once($drvpath);
 	$this->drv = new $drvname;
 	$this->drv->verboseErrors = in_array('develop', $this->config['pclib.errors']);

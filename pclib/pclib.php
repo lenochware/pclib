@@ -15,7 +15,7 @@
 /**
  * PClib version string
  */
-define('PCLIB_VERSION', '1.9.10');
+define('PCLIB_VERSION', '1.9.15');
 
 /* Find out where library reside. MUST BE an absolute path. */
 if (!defined('PCLIB_DIR')) {
@@ -28,6 +28,7 @@ if (!defined('BASE_URL')) {
 		rtrim(dirname($_SERVER['PHP_SELF']),"/\\").'/');
 }
 
+require_once PCLIB_DIR . 'system/exceptions.php';
 require_once PCLIB_DIR . 'Func.php';
 require_once PCLIB_DIR . 'system/Autoloader.php';
 
@@ -82,21 +83,6 @@ class Pclib
 
 //Application service
 interface IService {}
-
-//Exceptions
-class NotImplementedException extends Exception {}
-class DatabaseException extends Exception {}
-class AuthException extends Exception {}
-class NoValueException extends Exception {}
-class IOException extends Exception {}
-class MemberAccessException extends Exception {}
-class FileNotFoundException extends IOException {}
-class NoDatabaseException extends NoValueException {
-	public function __construct($message = '', $code = 0/*, Exception $previous = null*/) {
-		if (!$message) $message = 'Database connection required.';
-		parent::__construct($message, $code/*, $previous*/);
-	}
-}
 
 global $pclib;
 $pclib = new Pclib();
