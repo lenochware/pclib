@@ -666,12 +666,12 @@ function print_Class($id, $sub, $value)
 function print_Action($id, $sub, $value)
 {
 	$rs = $this->replaceParams($this->elements[$id]['route']);
-	$route = Route::createFromString($rs);
-	$ct = $this->app->getController($route->controller);
+	$action = new Action($rs);
+	$ct = $this->app->getController($action->controller);
 	if (!$ct) {
-		printf($this->t('Page not found: "%s"'), $route->controller);
+		printf($this->t('Page not found: "%s"'), $action->controller);
 	}
-	else print $ct->run($route->action, $route->params);
+	else print $ct->run($action);
 }
 
 /**
@@ -1108,10 +1108,10 @@ protected function getLkpLookup($lookup)
 
 protected function getDataSource($rs)
 {
-	$route = Route::createFromString($this->replaceParams($rs));
-	$ct = $this->app->getController($route->controller);
-	$args = $ct->getArgs($route->action, $route->params);
-	return call_user_func_array(array($ct, $route->action), $args);
+	$action = new Action($this->replaceParams($rs));
+	$ct = $this->app->getController($action->controller);
+	$args = $ct->getArgs($action->method, $action->params);
+	return call_user_func_array(array($ct, $action->method), $args);
 }
 
 protected function getLkpList($list)

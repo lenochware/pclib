@@ -125,7 +125,7 @@ class Action
 	}
 
 	/**
-	 * Create new Route object from the string.
+	 * Create new Action object from the string.
 	 * @param string $s string-route e.g. 'orders/edit/id:1'
 	 */
 	function fromString($s)
