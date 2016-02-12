@@ -38,7 +38,7 @@ public $layout;
 /** Storage of the global services - Db, Auth, Logger etc. */
 public $services = array();
 
-/** Current enviroment (such as 'develop','test','production'). See setEnviroment() */
+/** Current enviroment (such as 'develop','test','production'). */
 public $enviroment;
 
 /** Enabling debugMode will display debug-toolbar. */
@@ -87,6 +87,14 @@ function __construct($name)
 	$this->errorHandler->register();
 
 	$this->paths = $this->getPaths();
+
+	$this->enviromentIp(
+		array(
+			'127.0.0.1' => 'develop',
+			'*' => 'production',
+		)
+	);
+
 	$this->addConfig( PCLIB_DIR.'Config.php' );
 
 	$this->loadSession();
@@ -145,22 +153,6 @@ function setContent($content)
 function setLayout($path)
 {
 	$this->layout = new App_Layout($path);
-}
-
-/**
- * Set $app->enviroment variable, if any url pattern in $enviroments will
- * match current url. You can use wildcards.
- * Example: $app->setEnviroment(['http://localhost' => 'develop', '*' => 'production']);
- * @param array $enviroments Array of [pattern => enviroment] pairs.
- */
-function setEnviroment(array $enviroments)
-{
-	foreach($enviroments as $pattern => $name) {
-		if ($this->request->urlmatch($pattern)) {
-			$this->enviroment = $name;
-			return $this->enviroment;
-		}
-	}
 }
 
 /**
@@ -237,12 +229,28 @@ function addConfig($source)
 
 	$this->config = array_merge($this->config, (array)$config);
 
-	if (is_array($enviroment))  {
-		$var = $this->setEnviroment($enviroment);
-		$this->config = array_merge($this->config, (array)$$var);
+	$_env = $this->enviroment;
+
+	if (is_string($_env) and is_array($$_env)) {
+		$this->config = array_merge($this->config, $$_env);
 	}
 
 	$this->configure();
+}
+
+/**
+ * Set $app->enviroment variable by server ip-address.
+ * @param array $env Array of ipAddress:enviromentName pairs.
+ */
+function enviromentIp(array $env)
+{
+	$serverIp = $this->request->serverIp;
+	foreach ($env as $ip => $enviroment) {
+		if ($ip == '*' or $ip == $serverIp) {
+			$this->enviroment = $enviroment;
+			return;
+		}
+	}
 }
 
 protected function registerDebugBar()

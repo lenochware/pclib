@@ -88,7 +88,7 @@ function log($category, $message_id, $message = null, $item_id = null)
 		'ACTION'  => $message_id,
 		'MESSAGE' => $message,
 		'ITEM_ID' => $item_id,
-		'IP'       => ip2long($this->app->request->remoteIp),
+		'IP'       => ip2long($this->app->request->clientIp),
 		'UA'       => implode(' ', $this->app->request->userAgent),
 		'DT'       => date("Y-m-d H:i:s"),
 	);
