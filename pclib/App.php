@@ -19,7 +19,8 @@
  * - application configuration: addConfig()
  * - working with controllers: run()
  * - working with services: setService()
- * - layout: setLayout(), routing, and error handling
+ * - layout: setLayout(), message(), error()
+ * - enviroment, log(), language ...
  */
 class App extends BaseObject
 {

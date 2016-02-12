@@ -18,13 +18,19 @@
  */
 class Router extends BaseObject implements IService
 {
+
+	/** Create friendly URL? */
 	public $friendlyUrl = false;
+
 	public $baseUrl;
 
-	/** var Action */
+	/** var Action Current %Action */
 	public $action;
 
+	/** Occurs after Action is created from HTTP request and before dispatch. */ 
 	public $onGetAction;
+
+	/** Occurs when url (link) is created from Action. */ 
 	public $onCreateUrl;
 
 
@@ -54,7 +60,7 @@ function getAction()
 }
 
 /**
- * Transform internal action (e.g. 'products/edit/id:1') to URL.
+ * Transform internal action (for example 'products/edit/id:1') to URL.
  * @param string|Action $s
  * @return string $url
  */
@@ -91,10 +97,19 @@ protected function buildQuery($query_data)
  */
 class Action 
 {
+	/** Complete path such as 'products/edit', 'admin/products/edit'. */
 	public $path;
+
+	/** Name of the module which owns controller. */
 	public $module;
+
+	/** Name of the controller. */
 	public $controller;
+
+	/** Controller's method name. */
 	public $method;
+
+	/** Array of action parameters. */
 	public $params;
 
 	function __construct($s = null)
@@ -126,7 +141,7 @@ class Action
 
 	/**
 	 * Create new Action object from the string.
-	 * @param string $s string-route e.g. 'orders/edit/id:1'
+	 * @param string $s string-route - example: 'orders/edit/id:1'
 	 */
 	function fromString($s)
 	{
@@ -153,6 +168,10 @@ class Action
 		$this->method = $path[1];
 	}
 
+	/**
+	 * Create new Action object from $_GET array.
+	 * @param array $get
+	 */
 	function fromArray($get)
 	{
 		$this->path = $get['r'];
