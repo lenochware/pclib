@@ -92,6 +92,7 @@ function __construct($name)
 	$this->enviromentIp(
 		array(
 			'127.0.0.1' => 'develop',
+			'::1' => 'develop',
 			'*' => 'production',
 		)
 	);

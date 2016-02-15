@@ -41,6 +41,7 @@ function addInline($s)
  */
 public function addMessage($message, $cssClass = null, $params = array())
 {
+	if (!session_id()) throw new RuntimeException('Session is required.');
 	if (!$this->messagesTag) throw new NoValueException('Missing "messages" tag in template.');
 	if (!$cssClass) $cssClass = 'message';
 	$flash = $this->app->getSession('pclib.flash');

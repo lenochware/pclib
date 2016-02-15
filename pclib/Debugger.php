@@ -42,6 +42,12 @@ function __construct()
 	if (version_compare(phpversion(), "5.3.0", "<")) $this->showPrivate = false;
 }
 
+//More unique uniqid()
+protected function uniqId()
+{
+	return 'd-'.substr(md5(uniqid(null,true)),0,10);
+}
+
 //VARDUMP
 
 /**
@@ -53,7 +59,7 @@ protected function dumpArray($name, $variable, $level = 0)
 {
 	$type = gettype($variable);
 	$meta = array(
-	'id' => uniqid('dd'),
+	'id' => $this->uniqId(),
 	'name' => $name,
 	'type' => $type,
 	'level' => $level,
@@ -360,7 +366,7 @@ function errorDump($message, Exception $e = null)
 	$s = ($this->useHtml and $pclib->utf8)? '<meta charset="utf-8">':'';
 	$s .= $message.' ';
 	if ($this->useHtml) {
-		$s .= $this->spanBox(uniqid('dd'), $this->tracePath(2,$e),
+		$s .= $this->spanBox($this->uniqId(), $this->tracePath(2,$e),
 			$this->getTrace($e), false, 'cursor:pointer;border-bottom:1px dotted black;'
 		);
 	}
