@@ -7,6 +7,9 @@
  * @link http://pclib.brambor.net/
  */
 
+namespace pclib\system\database;
+use pclib\system\DatabaseException;
+
 /**
  * Base class for database driver.
  * Any database driver must implement this class.

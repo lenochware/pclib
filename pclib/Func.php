@@ -224,7 +224,7 @@ function mimetype($path)
 **/
 function filedata($path, $force_download = false, $filename = null)
 {
-	if (!file_exists($path)) throw new FileNotFoundException;
+	if (!file_exists($path)) throw new Exception('File not found.'); //FileNotFoundException;
 	if (!$filename) $filename = extractpath($path, '%f.%e');
 
 	if ($force_download) {

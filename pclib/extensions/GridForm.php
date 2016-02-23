@@ -1,5 +1,10 @@
 <?php
 
+namespace pclib\extensions;
+
+use pclib\system\NoDatabaseException;
+use pclib\system\NoValueException;
+
 /**
  * \file
  * Grid with form capabilities.
@@ -14,9 +19,6 @@
 # License as published by the Free Software Foundation; either
 # version 2.1 of the License, or (at your option) any later version.
 
-require_once PCLIB_DIR . 'Grid.php';
-require_once PCLIB_DIR . 'Form.php';
-
 /**
  * \class GridForm
  * Just like grid, but you can use form tags: input, select, check, etc.
@@ -28,7 +30,7 @@ require_once PCLIB_DIR . 'Form.php';
  * file uploads etc. This is just alpha-version.
  * See http://pclib.brambor.net/demo/gridform/ for some example.
  */
-class GridForm extends Grid
+class GridForm extends \PCGrid
 {
 
 /**
@@ -147,7 +149,7 @@ function out($block = null)
 
 	$maxInputs = ini_get('max_input_vars');
 	if ($maxInputs and $this->inputCount > $maxInputs) {
-		throw new Exception(sprintf(
+		throw new \Exception(sprintf(
 			"Php INI directive 'max_input_vars' exceeds. %s inputs used.", $this->inputCount
 		));
 	}
@@ -191,7 +193,7 @@ function update($tab)
 /** \privatesection */
 
 //Helper class for gridform. Do not use directly.
-class GridForm_Form extends Form
+class GridForm_Form extends \PCForm
 {
 	public $rowno;
 

@@ -11,6 +11,8 @@
 # License as published by the Free Software Foundation; either
 # version 2.1 of the License, or (at your option) any later version.
 
+namespace pclib\system;
+
 /**
  * @class AuthBase
  * Base class for all classes of authorization system.
@@ -65,7 +67,7 @@ function __construct()
 
 	parent::__construct();
 
-	if (!$pclib->app) throw new RuntimeException('No instance of application (class app) found.');
+	if (!$pclib->app) throw new \RuntimeException('No instance of application (class app) found.');
 
 	$this->app = $pclib->app;
 	$this->config = $this->app->config;

@@ -1,5 +1,8 @@
 <?php
 
+namespace pclib\system\storage;
+use pclib\system\BaseObject;
+
 /**
  *  This class is responsible for reading/writing of the log.
  * Override if you need different storage.
@@ -17,7 +20,7 @@ public $LOGGER_TAB   = 'LOGGER',
  $LABELS_TAB   = 'LOGGER_LABELS',
  $MESSAGES_TAB = 'LOGGER_MESSAGES';
 
-function __construct(Logger $logger)
+function __construct(\pclib\Logger $logger)
 {
 	parent::__construct();
 	$this->logger = $logger;

@@ -12,11 +12,14 @@
 # License as published by the Free Software Foundation; either
 # version 2.1 of the License, or (at your option) any later version.
 
+namespace pclib;
+use pclib;
+
 /**
  * @class Debugger
  *  Provides API for variable dumps, stack trace and profiling.
  */
-class Debugger extends BaseObject implements IService
+class Debugger extends system\BaseObject implements system\IService
 {
 
 /** Html or plaintext output.*/
@@ -108,7 +111,7 @@ protected function getArray($variable, $level)
 protected function getObject($variable, $level)
 {
 	$nodes = array();
-	$rc = new ReflectionClass($variable);
+	$rc = new \ReflectionClass($variable);
 	$props = $rc->getProperties();
 	foreach ($props as $prop) {
 		$private = $prop->isPrivate()? 1 : ($prop->isProtected()? 2 : 0);
@@ -265,7 +268,7 @@ private function relpath($path)
  * @see gettrace()
  * @return array $strace
  */
-protected function traceArray(Exception $e = null)
+protected function traceArray(\Exception $e = null)
 {
 	$ret = array();
 	if ($e) {
@@ -326,7 +329,7 @@ protected function strArgs($args)
  * Switch text/html output with $app->debugger->usehtml = true/false;
  * @return string $html
  */
-function getTrace(Exception $e = null)
+function getTrace(\Exception $e = null)
 {
 	$nodes = $this->traceArray($e);
 	$maxlen = $nodes[0]['maxlen'];
@@ -345,7 +348,7 @@ function getTrace(Exception $e = null)
  * Return stack trace file:line information - ex: index.php:10 -> db.php:220.
  * Helper for errordump.
  */
-function tracePath($levels = 100, Exception $e = null)
+function tracePath($levels = 100, \Exception $e = null)
 {
 	$path = array();
 	foreach($this->traceArray($e) as $call) {
@@ -360,7 +363,7 @@ function tracePath($levels = 100, Exception $e = null)
  * Print error message $message with stack trace and optionally part of source code
  * where error occured. Used in pclib error handlers and for function dump().
  */
-function errorDump($message, Exception $e = null)
+function errorDump($message, \Exception $e = null)
 {
 	global $pclib;
 	$s = ($this->useHtml and $pclib->utf8)? '<meta charset="utf-8">':'';

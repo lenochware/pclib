@@ -13,7 +13,8 @@
 # License as published by the Free Software Foundation; either
 # version 2.1 of the License, or (at your option) any later version.
 
-require_once PCLIB_DIR . 'Tpl.php';
+namespace pclib;
+use pclib;
 
 /**
  * Create and manage forms.
@@ -88,7 +89,7 @@ protected function _init()
 
 	if ($this->header['csrf']
 		and $_REQUEST['csrf_token'] != $this->getCsrfToken()
-	) throw new AuthException("CSRF authorisation failed.");
+	) throw new system\AuthException("CSRF authorisation failed.");
 
 	//set input file names
 	foreach ((array)$_FILES as $id => $aFile) {
@@ -228,7 +229,7 @@ function create($dsstr, $fileName = null, $template = null)
 
 	if ($fileName) {
 		$ok = file_put_contents($fileName, $html);
-		if (!$ok) throw new IOException("Cannot write file $fileName.");
+		if (!$ok) throw new system\IOException("Cannot write file $fileName.");
 		else @chmod($fileName, 0666);
 	}
 	else {
@@ -828,15 +829,15 @@ function upload($old = array())
 		$elem = $this->elements[$id];
 		if ($aFile['error']) $this->invalid[$id] = 'Upload error ('.$aFile['error'].')';
 		if ($elem['nosave'] or !$aFile['size'] or $aFile['error']) continue;
-		if ($this->fileInBlackList($this->values[$id])) throw new RuntimeException("Illegal file type.");
-		if (!$elem['into']) throw new NoValueException("Missing 'into \"directory\"' attribute for input file.");
+		if ($this->fileInBlackList($this->values[$id])) throw new system\RuntimeException("Illegal file type.");
+		if (!$elem['into']) throw new system\NoValueException("Missing 'into \"directory\"' attribute for input file.");
 		$path = realpath($elem['into']);
-		if (!is_dir($path)) throw new IOException("Path '$path' not found.");
+		if (!is_dir($path)) throw new system\IOException("Path '$path' not found.");
 		if ($old[$id]) @unlink($path.'/'.$old[$id]);
 		$filename = $this->fileName($id);
 		$tmpname = $aFile['tmp_name'];
 		$ok = @move_uploaded_file ($tmpname, "$path/$filename");
-		if (!$ok) throw new IOException("Cannot upload file $path/$filename (permissions problem?)");
+		if (!$ok) throw new system\IOException("Cannot upload file $path/$filename (permissions problem?)");
 		@chmod($path.'/'.$filename, 0666);
 		$this->values[$id] = $filename;
 	}
@@ -1107,7 +1108,7 @@ protected function toSqlDate($dtstr, $fmtstr = '')
 	preg_match_all("/%(.)/", $fmtstr, $fmt, PREG_PATTERN_ORDER);
 	$fmt = $fmt[1];
 
-	$oDT = new stdClass;
+	$oDT = new \stdClass;
 	$oDT->d = $oDT->m = $oDT->H = $oDT->M = $oDT->S = '00'; $oDT->Y = '0000';
 
 	while ($fmtpart = array_shift($fmt)) {
@@ -1134,7 +1135,7 @@ protected function toBitField(array $bitArray)
 	$value = 0;
 	foreach ($bitArray as $bit) {
 		$bit = (integer) $bit;
-		if ($bit > 64 or $bit < 1) throw new OutOfBoundsException('Checkbox index out of bounds.');
+		if ($bit > 64 or $bit < 1) throw new \OutOfBoundsException('Checkbox index out of bounds.');
 		$value += pow (2, $bit - 1);
 	}
 	return $value;
@@ -1218,7 +1219,7 @@ protected function foot()
 
 private function getCsrfToken()
 {
-	if (!session_id()) throw new RuntimeException('Session is required.');
+	if (!session_id()) throw new system\RuntimeException('Session is required.');
 	$token = $this->app->getSession('pclib.csrf_token');
 	if (!$token) {
 		$token = randomstr(10);

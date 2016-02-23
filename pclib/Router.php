@@ -12,11 +12,14 @@
 # License as published by the Free Software Foundation; either
 # version 2.1 of the License, or (at your option) any later version.
 
+namespace pclib;
+use pclib;
+
 /**
  * Translates URL to instance of Action class.
  * Action contains class and method name (with parameters) which will be called.
  */
-class Router extends BaseObject implements IService
+class Router extends system\BaseObject implements system\IService
 {
 
 	/** Create friendly URL? */

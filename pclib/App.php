@@ -12,6 +12,9 @@
 # License as published by the Free Software Foundation; either
 # version 2.1 of the License, or (at your option) any later version.
 
+namespace pclib;
+use pclib;
+
 /**
  * Gives global access to web application.
  * It is facade for application services and general datastructures.
@@ -22,7 +25,7 @@
  * - layout: setLayout(), message(), error()
  * - enviroment, log(), language ...
  */
-class App extends BaseObject
+class App extends system\BaseObject
 {
 /** Name of the aplication */
 public $name;
@@ -82,9 +85,9 @@ function __construct($name)
 	$this->name = $name;
 	$pclib->app = $this;
 
-	BaseObject::defaults('serviceLocator', array($this, 'getService'));
+	system\BaseObject::defaults('serviceLocator', array($this, 'getService'));
 
-	$this->errorHandler = new ErrorHandler;
+	$this->errorHandler = new system\ErrorHandler;
 	$this->errorHandler->register();
 
 	$this->paths = $this->getPaths();
@@ -126,11 +129,11 @@ function __set($name, $value)
 		case 'content': $this->setContent($value); return;
 		case 'language': $this->setLanguage($value); return;
 	}
-	if ($value instanceof IService) {
+	if ($value instanceof system\IService) {
 		$this->setService($name, $value);
 	}
 	else {
-		throw new Exception('Cannot assign '.gettype($value).' to App->'.$name.' property.');
+		throw new \Exception('Cannot assign '.gettype($value).' to App->'.$name.' property.');
 	}
 }
 
@@ -142,7 +145,7 @@ function __set($name, $value)
  */
 function setContent($content)
 {
-	if (!$this->layout) throw new NoValueException('Cannot set content: app->layout does not exists.');
+	if (!$this->layout) throw new system\NoValueException('Cannot set content: app->layout does not exists.');
 	$this->layout->values['CONTENT'] = (string)$content;
 }
 
@@ -177,7 +180,7 @@ function log($category, $message_id, $message = null, $item_id = null)
 protected function createDefaultService($serviceName) {
 	$canBeDefault = array('logger', 'debugger', 'request', 'router');
 	if (in_array($serviceName, $canBeDefault)) {
-		$className = ucfirst($serviceName);
+		$className = '\\pclib\\'.ucfirst($serviceName);
 
 		return new $className;
 	}
@@ -190,7 +193,7 @@ protected function createDefaultService($serviceName) {
  * You can access service as `$app->serviceName` e.g. `$app->db->select("table")`.
  * @param IService $service Service object.
  */
-function setService($name, IService $service)
+function setService($name, system\IService $service)
 {
 	$this->services[$name] = $service;
 }
@@ -224,7 +227,7 @@ function addConfig($source)
 	}
 	else {
 		if (!file_exists($source))
-			throw new FileNotFoundException("Configuration file '$source' not found.");
+			throw new system\FileNotFoundException("Configuration file '$source' not found.");
 		else
 			require $source;
 	}
@@ -257,8 +260,7 @@ function enviromentIp(array $env)
 
 protected function registerDebugBar()
 {
-	require_once PCLIB_DIR . 'extensions/DebugBar.php';
-	$debugbar = new DebugBar;
+	$debugbar = new extensions\DebugBar;
 	$debugbar->register();
 }
 
@@ -320,7 +322,7 @@ function setLanguage($language, $useDefault = true)
 	$trans->language = $language;
 	$transFile = $this->config['pclib.directories']['localization'].$language.'.php';
 	if (file_exists($transFile)) $trans->useFile($transFile);
-	else throw new FileNotFoundException("Translator file '$transFile' not found.");
+	else throw new system\FileNotFoundException("Translator file '$transFile' not found.");
 	if ($useDefault) $trans->usePage('default');
 	if ($language == 'source') $trans->autoUpdate = true;
 	$this->setService('translator', $trans);
@@ -623,7 +625,7 @@ function out()
 	$event = $this->onBeforeOut();
 	if ($event and !$event->propagate) return;
 
-	if (!$this->layout) throw new NoValueException('Cannot show output: app->layout does not exists.');
+	if (!$this->layout) throw new system\NoValueException('Cannot show output: app->layout does not exists.');
 	$this->layout->out();
 	$this->saveSession();
 	$this->onAfterOut();

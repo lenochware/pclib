@@ -11,7 +11,8 @@
 # License as published by the Free Software Foundation; either
 # version 2.1 of the License, or (at your option) any later version.
 
-require_once PCLIB_DIR . 'system/AuthBase.php';
+namespace pclib\extensions;
+use pclib\system\AuthBase;
 
 /**
  * Auth entities (users,roles,rights) management.

@@ -12,7 +12,8 @@
 # License as published by the Free Software Foundation; either
 # version 2.1 of the License, or (at your option) any later version.
 
-require_once PCLIB_DIR . 'Tpl.php';
+namespace pclib;
+use pclib;
 
 /**
  * Displaying tabular data in table layout.
@@ -556,7 +557,7 @@ function create($dsstr, $fileName = null, $template = null)
 
 	if ($fileName) {
 		$ok = file_put_contents($fileName, $html);
-		if (!$ok) throw new IOException("Cannot write file $fileName.");
+		if (!$ok) throw new system\IOException("Cannot write file $fileName.");
 		else @chmod($fileName, 0666);
 	}
 	else {

@@ -12,6 +12,9 @@
 # License as published by the Free Software Foundation; either
 # version 2.1 of the License, or (at your option) any later version.
 
+namespace pclib;
+use pclib;
+
 /**
  * Load tree structure and render it as unordered list (ul).
  * Features:
@@ -21,7 +24,7 @@
  * - Tweak formatting of html output
  */
 
-class Tree extends BaseObject
+class Tree extends system\BaseObject
 {
 
 /** var Db Link to database object. */
@@ -174,7 +177,7 @@ function __toString()
 function load($fileName)
 {
 	if (!file_exists($fileName))
-		throw new FileNotFoundException("File $fileName not found.");
+		throw new system\FileNotFoundException("File $fileName not found.");
 	$this->name = extractpath($fileName, '%f');
 	$this->id = null;
 	$this->setString(file_get_contents($fileName));
@@ -316,7 +319,7 @@ protected function getLastNode($tree_id)
 function addNode($node_id, array $node)
 {
 	if (!$node_id) {
-		if (!$node['TREE_ID']) throw new NoValueException('Missing TREE_ID.');
+		if (!$node['TREE_ID']) throw new system\NoValueException('Missing TREE_ID.');
 
 		$last = $this->getLastNode($node['TREE_ID']);
 		
@@ -529,7 +532,7 @@ protected function expandPath($node_key)
 public function getNode($node_id)
 {
 	$node = $this->db->select($this->table, pri($node_id));
-	if (!$node) throw new Exception('Node '.$node_id.' not found.');
+	if (!$node) throw new \Exception('Node '.$node_id.' not found.');
 	return $node;
 }
 

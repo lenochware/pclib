@@ -1,5 +1,8 @@
 <?php
 
+namespace pclib;
+use pclib;
+
 /**
  * Template extended with 'head' tag, allowing add links to *.js and *.css files.
  * Moreover it contains support of flash messages.
@@ -19,7 +22,7 @@ public $MESSAGE_PATTERN = '<div class="%s">%s</div>';
  */
 public function addScripts()
 {
-	if (!$this->headTag) throw new NoValueException('Missing "head" tag in template.');
+	if (!$this->headTag) throw new system\NoValueException('Missing "head" tag in template.');
 	$scripts = func_get_args();
 	if (is_array($scripts[0])) $scripts = $scripts[0];
 	if (is_array($this->values[$this->headTag])) $this->values[$this->headTag] += $scripts;
@@ -28,7 +31,7 @@ public function addScripts()
 
 function addInline($s) 
 {
-	if (!$this->headTag) throw new NoValueException('Missing "head" tag in template.');
+	if (!$this->headTag) throw new system\NoValueException('Missing "head" tag in template.');
 	$this->elements[$this->headTag]['inline'] .= $s;
 }
 
@@ -41,8 +44,8 @@ function addInline($s)
  */
 public function addMessage($message, $cssClass = null, $params = array())
 {
-	if (!session_id()) throw new RuntimeException('Session is required.');
-	if (!$this->messagesTag) throw new NoValueException('Missing "messages" tag in template.');
+	if (!session_id()) throw new system\RuntimeException('Session is required.');
+	if (!$this->messagesTag) throw new system\NoValueException('Missing "messages" tag in template.');
 	if (!$cssClass) $cssClass = 'message';
 	$flash = $this->app->getSession('pclib.flash');
 	$flash[$cssClass][] = $this->app->t($message, $params);
@@ -60,7 +63,7 @@ function print_Head($id, $sub, $value)
 
 	foreach($scripts as $script) {
 		if (!file_exists($script)) {
-			throw new FileNotFoundException("File '$script' not found.");
+			throw new system\FileNotFoundException("File '$script' not found.");
 		}
 		
 		$version = $this->elements[$id]['noversion']? '' : '?v='.filemtime($script);

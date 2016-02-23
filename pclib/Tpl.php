@@ -12,6 +12,9 @@
 # License as published by the Free Software Foundation; either
 # version 2.1 of the License, or (at your option) any later version.
 
+namespace pclib;
+use pclib;
+
 /**
  * Template engine. Load template, populate it with values and display it.
  * Template is usually html file with template tags {TAGNAME}.
@@ -24,7 +27,7 @@
  *
  * See \ref tpl-tags for description of implemented tags.
  */
-class Tpl extends BaseObject
+class Tpl extends system\BaseObject
 {
 
 /** Occurs on template initialization. */
@@ -101,7 +104,7 @@ function __construct($path = '', $sessName = '')
 
 	parent::__construct();
 
-	if (!$pclib->app) throw new RuntimeException('No instance of application (class app) found.');
+	if (!$pclib->app) throw new system\RuntimeException('No instance of application (class app) found.');
 
 	$this->app = $pclib->app;
 	$this->config = $this->app->config;
@@ -165,7 +168,7 @@ protected function hasType($name)
  */
 function load($path)
 {
-	if (!file_exists($path)) throw new FileNotFoundException("File '$path' not found.");
+	if (!file_exists($path)) throw new system\FileNotFoundException("File '$path' not found.");
 	$tpl_string = file_get_contents ($path);
 	$this->loadString ($tpl_string);
 	$this->onLoad($path);
@@ -430,7 +433,7 @@ function create($dsstr, $fileName = null, $template = null)
 
 	if ($fileName) {
 		$ok = file_put_contents($fileName, $html);
-		if (!$ok) throw new IOException("Cannot write file $fileName.");
+		if (!$ok) throw new system\IOException("Cannot write file $fileName.");
 		else @chmod($fileName, 0666);
 	}
 	else {
@@ -766,7 +769,7 @@ protected function print_BlockRow($block, $rowno = null)
 		}
 		elseif ($strip == TPL_BLOCK) {
 			$subblock = $this->document[++$i];
-			if (!$this->elements[$subblock]) throw new Exception('Template broken.');
+			if (!$this->elements[$subblock]) throw new \Exception('Template broken.');
 			if (!$this->elements[$subblock]['noprint']) $this->print_Block($subblock);
 			$i = $this->elements[$subblock]['end'] + 1;
 		}

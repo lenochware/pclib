@@ -12,6 +12,10 @@
 # License as published by the Free Software Foundation; either
 # version 2.1 of the License, or (at your option) any later version.
 
+namespace pclib;
+use pclib;
+use pclib\system\storage\LoggerDbStorage;
+
 /**
  * This class offers fast and space-saving database logger.
  * You can store any program events (actions) alltogether with user_id,
@@ -21,9 +25,7 @@
  * updated automatically.
  */
 
-require_once PCLIB_DIR . 'system/storage/LoggerDbStorage.php';
-
-class Logger extends BaseObject implements IService
+class Logger extends system\BaseObject implements system\IService
 {
 
 /** Name of the logger */

@@ -64,7 +64,7 @@ class Autoloader
 	public function register()
 	{
 		if (!function_exists('spl_autoload_register')) {
-			throw new Exception('Function spl_autoload not found in this version of PHP.');
+			throw new \Exception('Function spl_autoload not found in this version of PHP.');
 		}
 
 		spl_autoload_register(array($this, 'autoload'));

@@ -6,7 +6,14 @@
  * http://pclib.brambor.net/
  */
 
-require_once PCLIB_DIR . 'system/storage/TranslatorDbStorage.php';
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+
+namespace pclib;
+use pclib;
+use pclib\system\storage\TranslatorDbStorage;
 
 /**
  * Translate strings to another language.
@@ -15,7 +22,7 @@ require_once PCLIB_DIR . 'system/storage/TranslatorDbStorage.php';
  * - Can dig texts from templates and source and fill database table for you.
  * - Texts can be separated to pages, you can load only some pages for better performance.
  */
-class Translator extends BaseObject implements IService
+class Translator extends system\BaseObject implements system\IService
 {
 
 /** string Current language */

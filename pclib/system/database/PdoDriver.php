@@ -8,12 +8,14 @@
  * @link http://pclib.brambor.net/
  */
 
+namespace pclib\system\database;
+use pclib\system\DatabaseException;
+use pclib\system\NotImplementedException;
+
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
 # License as published by the Free Software Foundation; either
 # version 2.1 of the License, or (at your option) any later version.
-
-require_once PCLIB_DIR . 'system/database/AbstractDriver.php';
 
 /**
  * Abstract PDO database driver.
@@ -25,11 +27,11 @@ abstract class PdoDriver extends AbstractDriver
 function pdoConnect($dsn, $user = null, $password = null)
 {
 	try {
-		$pdo = new PDO($dsn, $user, $password);
-		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION /*SILENT?*/);
+		$pdo = new \PDO($dsn, $user, $password);
+		$pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION /*SILENT?*/);
 		$this->connection = $pdo;
 		return $this->connection;
-	} catch (PDOException $e) {
+	} catch (\PDOException $e) {
 		$this->error = $e->getMessage();
 		$msg = $this->verboseErrors? ' '.$this->error : '';
 		throw new DatabaseException('Connection error.'.$msg, 0/*, $e*/);
@@ -56,13 +58,13 @@ function fetch($res = null, $fmt = 'a')
 {
 	if (!$res) return array();
 	switch ($fmt) {
-		case 'f' : $row = $res->fetch(PDO::FETCH_NUM);
+		case 'f' : $row = $res->fetch(\PDO::FETCH_NUM);
 							 return $row[0];
-		case 'o' : return $res->fetch(PDO::FETCH_OBJ);
-		case 'r' : return $res->fetch(PDO::FETCH_NUM);
-		case 'ar': return $res->fetch(PDO::FETCH_BOTH);
+		case 'o' : return $res->fetch(\PDO::FETCH_OBJ);
+		case 'r' : return $res->fetch(\PDO::FETCH_NUM);
+		case 'ar': return $res->fetch(\PDO::FETCH_BOTH);
 		case 'a' :
-		default  : return $res->fetch(PDO::FETCH_ASSOC);
+		default  : return $res->fetch(\PDO::FETCH_ASSOC);
 	}
 }
 

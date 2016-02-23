@@ -12,6 +12,8 @@
 # License as published by the Free Software Foundation; either
 # version 2.1 of the License, or (at your option) any later version.
 
+namespace pclib\system;
+
 /**
  * Ancestor of all pclib classes.
  * Features:
@@ -121,7 +123,7 @@ class BaseObject
 	{
 		if (!is_array($this->$name)) return false;
 
-		$event = new stdClass;
+		$event = new \stdClass;
 		$event->sender = $this;
 		$event->name = $name;
 		$event->data = $args;
@@ -167,7 +169,7 @@ class BaseObject
 				}
 				else {
 					$className = get_class($this);
-					throw new Exception("Required service '$className->$service' is not set.");
+					throw new \Exception("Required service '$className->$service' is not set.");
 				}
 			}
 

@@ -12,11 +12,14 @@
 # License as published by the Free Software Foundation; either
 # version 2.1 of the License, or (at your option) any later version.
 
+namespace pclib;
+use pclib;
+
 /**
  * Provides unified access to HTTP request.
  * Can detect request method, url, user agent, request headers and such.
  */
-class Request extends BaseObject implements IService
+class Request extends system\BaseObject implements system\IService
 {
 
 protected $userAgents = array('Chrome', 'Safari', 'Konqueror', 'Opera', 'Firefox', 'Netscape', 'MSIE');

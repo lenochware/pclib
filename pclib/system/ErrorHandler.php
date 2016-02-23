@@ -12,6 +12,9 @@
 # License as published by the Free Software Foundation; either
 # version 2.1 of the License, or (at your option) any later version.
 
+namespace pclib\system;
+use pclib\Tpl;
+
 /**
  * Catch errors and exceptions and show improved error messages.
  * You can configure behavior of $app->errorHandler with pclib.errors config parameter.
@@ -23,7 +26,9 @@
  */
 class ErrorHandler extends BaseObject
 {
-	public $options;
+	/** var array [log, display, develop, error_reporting, template] */
+	public $options = array();
+
 	public $MESSAGE_PATTERN = "<b>{severity} {code}: {exceptionClass}</b> {message}";
 
 	/** Occurs before Exception handling. */ 
@@ -57,7 +62,7 @@ class ErrorHandler extends BaseObject
 	/**
 	 * Callback for exception handling.
 	 */	
-	function _onException(Exception $e)
+	function _onException(\Exception $e)
 	{
 		// disable error capturing to avoid recursive errors
 		restore_exception_handler();
@@ -89,14 +94,14 @@ class ErrorHandler extends BaseObject
 			if (!error_reporting()) return;
 
 			$this->_onWarning(
-				new ErrorException($message, $code, 0, $file, $line)
+				new \ErrorException($message, $code, 0, $file, $line)
 			);
 			
 			return;
 		}
 
 		$this->_onException(
-			new ErrorException($message, $code, 0, $file, $line)
+			new \ErrorException($message, $code, 0, $file, $line)
 		);
 	}
 
@@ -119,7 +124,7 @@ class ErrorHandler extends BaseObject
 	/**
 	 * Callback for warning handling.
 	 */	
-	function _onWarning(Exception $e)
+	function _onWarning(\Exception $e)
 	{
 		if (in_array('log', $this->options)) $this->logError($e);
 		if (!in_array('develop', $this->options)) return;
@@ -128,7 +133,7 @@ class ErrorHandler extends BaseObject
 		paramStr($this->MESSAGE_PATTERN, $this->getValues($e)),$e);
 	}
 
-	protected function getValues(Exception $e)
+	protected function getValues(\Exception $e)
 	{
 		$values = array(
 			'code' => $e->getCode(),
@@ -143,7 +148,7 @@ class ErrorHandler extends BaseObject
 		return $values;
 	}
 
-	protected function getHtmlTrace(Exception $e)
+	protected function getHtmlTrace(\Exception $e)
 	{
 		return $this->service('debugger')->getTrace($e);
 	}
@@ -151,7 +156,7 @@ class ErrorHandler extends BaseObject
 	/**
 	 * Display error in development mode (with stack trace).
 	 */	
-	function displayError(Exception $e)
+	function displayError(\Exception $e)
 	{
 		try {
 			//throw new Exception('ErrorHandlerDisplayBug');
@@ -159,7 +164,7 @@ class ErrorHandler extends BaseObject
 			paramStr($this->MESSAGE_PATTERN, $this->getValues($e)),$e);
 		}
 		//fallback to most straighforward error message
-		catch(Exception $ex) {
+		catch(\Exception $ex) {
 			print $e->getMessage();
 			print "<br>Error while displaying exception: ".$ex->getMessage();
 		}
@@ -168,7 +173,7 @@ class ErrorHandler extends BaseObject
 	/**
 	 * Display error in production mode (uses template).
 	 */	
-	function displayProductionError(Exception $e)
+	function displayProductionError(\Exception $e)
 	{
 		if (!headers_sent()) {
 			header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
@@ -180,13 +185,13 @@ class ErrorHandler extends BaseObject
 			$t->values = $this->getValues($e);
 			print $t->html();
 		}
-		catch(Exception $ex) {
+		catch(\Exception $ex) {
 			print $e->getMessage();
 			print "<br>Error while displaying exception: ".$ex->getMessage();
 		}
 	}
 
-	function logError(Exception $e)
+	function logError(\Exception $e)
 	{
 		try {
 			$error = $this->getValues($e);
@@ -195,7 +200,7 @@ class ErrorHandler extends BaseObject
 				paramStr("{severity}: {message} in {file} on line {line}", $error)
 			);
 		}
-		catch(Exception $ex) {
+		catch(\Exception $ex) {
 			print "<br>Error while logging exception: ".$ex->getMessage();
 		}
 	}

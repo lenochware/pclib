@@ -1,10 +1,13 @@
 <?php 
 
+namespace pclib\system;
+
+
 /**
  * Base class for all pclib exceptions, allowing message with placeholders suitable for translation.
  * Example: $e = new BaseException("File '%s' not found.", $fileName);
  */ 
-class BaseException extends Exception
+class BaseException extends \Exception
 {
 	public function __construct($message, $args = null, $code = 0, Exception $previous = null)
 	{
@@ -28,5 +31,8 @@ class NoDatabaseException extends NoValueException {
 		parent::__construct($message, $code, $previous);
 	}
 }
+
+//Application service
+interface IService {}
 
 ?>

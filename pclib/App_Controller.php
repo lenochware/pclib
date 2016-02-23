@@ -1,5 +1,8 @@
 <?php
 
+namespace pclib;
+use pclib;
+
 /**
  *  Base class for any application controller.
  *  Define your controller, say 'products', in file controllers/products.php
@@ -8,7 +11,7 @@
  * It will be called on url '?r=products/edit'.
  * @see App::run()
  */
-class App_Controller extends BaseObject
+class App_Controller extends system\BaseObject
 {
 
 /**
@@ -53,7 +56,7 @@ function init()
 function getArgs($actionMethod, array $params)
 {
 	$args = array();
-	$rm = new ReflectionMethod($this, $actionMethod);
+	$rm = new \ReflectionMethod($this, $actionMethod);
 	foreach($rm->getParameters() as $param)  {
 		$param_value = $params[$param->name];
 		if (!strlen($param_value) and !$param->isOptional()) {

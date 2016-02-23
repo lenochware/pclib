@@ -1,5 +1,8 @@
 <?php
 
+namespace pclib\system\storage;
+use pclib\system\BaseObject;
+
 /**
  * Default Translator storage.
  * Save and load multilanguage texts from database table.
@@ -15,7 +18,7 @@ public $db;
 
 public $TRANSLATOR_TAB, $LABELS_TAB;
 
-function __construct(Translator $translator)
+function __construct(\pclib\Translator $translator)
 {
 	parent::__construct();
 	$this->translator = $translator;
@@ -77,7 +80,7 @@ protected function removeUnusedLabel($id)
  */
 function saveDefault($pageName, $s)
 {
-	if (!$pageName) throw new NoValueException("Parameter 'pagename' is empty.");
+	if (!$pageName) throw new \Exception("Parameter 'pagename' is empty.");
 	$params = array(
 		'TRANSLATOR' => $this->getLabelId($this->translator->name, 1),
 		'LANG' => 0,
@@ -108,7 +111,7 @@ function createLanguage($lang)
 		"TRANSLATOR='{0}' AND LANG='{1}'", $translatorId, $langId
 	);
 
-	if ($found) throw new Exception("Language '$lang' already exists.");
+	if ($found) throw new \Exception("Language '$lang' already exists.");
 
 	return $langId;
 }
@@ -124,7 +127,7 @@ function deleteLanguage($lang)
 	/* Check dependencies for source */
 	if ($langId == 0) {
 		if ($this->db->exists($this->TRANSLATOR_TAB, "TRANSLATOR='{0}' AND LANG<>0", $translatorId)) {
-			 throw new Exception("Cannot delete source - remove all other languages first.");
+			 throw new \Exception("Cannot delete source - remove all other languages first.");
 		}
 	}
 
