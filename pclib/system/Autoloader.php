@@ -12,6 +12,8 @@
 # License as published by the Free Software Foundation; either
 # version 2.1 of the License, or (at your option) any later version.
 
+namespace pclib\system;
+
 /**
  * Simple autoloading of the classes.
  * Usually you will use default pclib autoloader: $pclib->autoloader.
@@ -40,8 +42,16 @@ class Autoloader
 		else {
 			$classPath = trim(str_replace('\\', '/', $class), '/');
 			foreach ($this->directories as $directory) {
-				if (!file_exists($directory.'/'.$classPath.'.php')) continue;
-				require $directory.'/'.$classPath.'.php';
+				$opt = $directory['options'];
+				if (isset($opt['namespace'])) {
+					if (startsWith($classPath, $opt['namespace'])) {
+						$classPath = substr($classPath, strlen($opt['namespace'])+1);
+					}
+					else continue;
+				}
+
+				if (!file_exists($directory['dir'].'/'.$classPath.'.php')) continue;
+				require $directory['dir'].'/'.$classPath.'.php';
 				return;
 			}
 		}
@@ -75,7 +85,10 @@ class Autoloader
  	 */
 	function addDirectory($directory, $options = array())
 	{
-		$this->directories[] = $directory;
+		$this->directories[] = array(
+			'dir' => rtrim($directory,"/\\"), 
+			'options' => $options
+		);
 	}
 
 	/**
