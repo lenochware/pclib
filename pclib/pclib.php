@@ -15,7 +15,7 @@
 /**
  * PClib version string
  */
-define('PCLIB_VERSION', '1.9.15');
+define('PCLIB_VERSION', '2.0.0');
 
 /* Find out where library reside. MUST BE an absolute path. */
 if (!defined('PCLIB_DIR')) {
@@ -49,9 +49,7 @@ class Pclib
 	function init()
 	{
 		$classes = array(
-			'ErrorHandler' => PCLIB_DIR.'/system/ErrorHandler.php',
-			'BaseObject' => PCLIB_DIR.'/system/BaseObject.php',
-
+		
 			//for backward compatibility (lcase class names)
 			'app' => PCLIB_DIR.'/App.php',
 			'db' => PCLIB_DIR.'/Db.php',
@@ -65,11 +63,26 @@ class Pclib
 			'app_controller' => PCLIB_DIR.'/App_Controller.php',
 		);
 
+		$aliases = array(
+			'PCApp' => '\pclib\App',
+			'PCDb' => '\pclib\Db',
+			'PCTpl' => '\pclib\Tpl',
+			'PCGrid' => '\pclib\Grid',
+			'PCForm' => '\pclib\Form',
+			'PCAuth' => '\pclib\Auth',
+			'PCTree' => '\pclib\Tree',
+			'PCLogger' => '\pclib\Logger',
+			'PCTranslator' => '\pclib\Translator',
+			'PCController' => '\pclib\App_Controller',
+		);
+
 		$this->version = PCLIB_VERSION;
-		$this->autoloader = new Autoloader;
-		$this->autoloader->addDirectory(PCLIB_DIR);
-		$this->autoloader->addClasses($classes);
-		$this->autoloader->register();
+		$autoload = new \pclib\system\Autoloader;
+		$autoload->addDirectory(PCLIB_DIR, array('namespace' => 'pclib'));
+		//$autoload->addClasses($classes);
+		$autoload->addAliases($aliases);
+		$autoload->register();
+		$this->autoloader = $autoload;
 
 		ini_set('docref_root', 'http://php.net/');
 
@@ -80,9 +93,6 @@ class Pclib
 		}
 	}
 } //class pclib
-
-//Application service
-interface IService {}
 
 global $pclib;
 $pclib = new Pclib();
