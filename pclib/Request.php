@@ -19,7 +19,7 @@ use pclib;
  * Provides unified access to HTTP request.
  * Can detect request method, url, user agent, request headers and such.
  */
-class Request extends system\BaseObject implements system\IService
+class Request extends system\BaseObject implements IService
 {
 
 protected $userAgents = array('Chrome', 'Safari', 'Konqueror', 'Opera', 'Firefox', 'Netscape', 'MSIE');

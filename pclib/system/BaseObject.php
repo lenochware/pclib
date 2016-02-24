@@ -169,7 +169,7 @@ class BaseObject
 				}
 				else {
 					$className = get_class($this);
-					throw new \Exception("Required service '$className->$service' is not set.");
+					throw new \pclib\Exception("Required service '$className->$service' is not set.");
 				}
 			}
 

@@ -557,7 +557,7 @@ function create($dsstr, $fileName = null, $template = null)
 
 	if ($fileName) {
 		$ok = file_put_contents($fileName, $html);
-		if (!$ok) throw new system\IOException("Cannot write file $fileName.");
+		if (!$ok) throw new IOException("Cannot write file $fileName.");
 		else @chmod($fileName, 0666);
 	}
 	else {

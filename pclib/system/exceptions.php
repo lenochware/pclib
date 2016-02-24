@@ -1,15 +1,14 @@
 <?php 
 
-namespace pclib\system;
-
+namespace pclib;
 
 /**
  * Base class for all pclib exceptions, allowing message with placeholders suitable for translation.
- * Example: $e = new BaseException("File '%s' not found.", $fileName);
+ * Example: $e = new Exception("File '%s' not found.", [$fileName]);
  */ 
-class BaseException extends \Exception
+class Exception extends \Exception
 {
-	public function __construct($message, $args = null, $code = 0, Exception $previous = null)
+	public function __construct($message, $args = null, $code = 0, \Exception $previous = null)
 	{
 		if (is_array($args)) {
 			$message = vsprintf($message, $args);
@@ -18,12 +17,12 @@ class BaseException extends \Exception
 	}
 }
 
-class NotImplementedException extends BaseException {}
-class DatabaseException extends BaseException {}
-class AuthException extends BaseException {}
-class NoValueException extends BaseException {}
-class IOException extends BaseException {}
-class MemberAccessException extends BaseException {}
+class NotImplementedException extends Exception {}
+class DatabaseException extends Exception {}
+class AuthException extends Exception {}
+class NoValueException extends Exception {}
+class IOException extends Exception {}
+class MemberAccessException extends Exception {}
 class FileNotFoundException extends IOException {}
 class NoDatabaseException extends NoValueException {
 	public function __construct($message = 'Database connection required.', 

@@ -8,7 +8,7 @@
  */
 
 namespace pclib\system\database;
-use pclib\system\DatabaseException;
+use pclib\DatabaseException;
 
 /**
  * Base class for database driver.

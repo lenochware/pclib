@@ -25,7 +25,7 @@ use pclib;
  * - SQL injection protection
  * - Drivers for different database engines (mysql, pgsql, sqlite, pdo_mysql and pdo_pgsql)
  */
-class Db extends system\BaseObject implements system\IService
+class Db extends system\BaseObject implements IService
 {
 /* Log-level: 1:Errors; 2:Each query @deprecated */
 public $logging = 1;
@@ -147,7 +147,7 @@ function connect($dataSource)
 	try {
 		$this->drv = new $className;
 	} catch (\Exception $e) {
-		throw new system\DatabaseException("Database driver '%s' not found.", array($dsarray['driver']));
+		throw new DatabaseException("Database driver '%s' not found.", array($dsarray['driver']));
 	}
 
 	$this->drv->verboseErrors = in_array('develop', $this->config['pclib.errors']);
@@ -373,7 +373,7 @@ function insertAll($tab, array $data)
 function runDump($fileName, $skipErrors = false)
 {
 	if (!is_file($fileName))
-		throw new system\FileNotFoundException("File '$fileName' not found.");
+		throw new FileNotFoundException("File '$fileName' not found.");
 
 	set_time_limit(0);
 	$sql = '';
@@ -393,7 +393,7 @@ function runDump($fileName, $skipErrors = false)
 		}
 	}
 	fclose($f);
-	if ($err) throw new system\DatabaseException("Dump '$fileName': $err of $n queries failed.");
+	if ($err) throw new DatabaseException("Dump '$fileName': $err of $n queries failed.");
 	return $n;
 }
 
@@ -407,7 +407,7 @@ function runDump($fileName, $skipErrors = false)
 function replace($tab, $data)
 {
 	if (get_class($this->drv) != 'mysql')
-		throw new system\NotImplementedException;
+		throw new NotImplementedException;
 	
 	if (is_array($data)) {
 		$sep = '';

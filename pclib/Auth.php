@@ -27,7 +27,7 @@ use pclib;
  * You must set config parameter `pclib.auth.secret` before using of this class!
  * This class uses database and sessions.
  */
-class Auth extends system\AuthBase implements system\IService
+class Auth extends system\AuthBase implements IService
 {
 
 /** var Auth_User User which is logged in. */
@@ -46,7 +46,7 @@ function __construct(Db $db = null)
 {
 	parent::__construct($db);
 
-	if (!session_id()) throw new system\RuntimeException('Session is required.');
+	if (!session_id()) throw new RuntimeException('Session is required.');
 	$this->activeUser = new Auth_User($this);
 	$this->activeUser->loadSession();
 	$this->activeUser->getRights();
@@ -283,7 +283,7 @@ function testRight($sname, $obj_id = 0)
 		$r_id = $this->sname($sname, 'right');
 
 		$this->app->log('AUTH_ERROR', 'TESTRIGHT', null, $r_id);
-		throw new system\AuthException("Required permission $sname. Access denied.");
+		throw new AuthException("Required permission $sname. Access denied.");
 	}
 }
 
@@ -487,7 +487,7 @@ function loadSession()
 
 	if (!$this->validate()) {
 		$this->app->log('AUTH_ERROR', 'SESSION_INVALID');
-		throw new system\AuthException("Authentication failed. Access denied.");
+		throw new AuthException("Authentication failed. Access denied.");
 	}
 	return true;
 }

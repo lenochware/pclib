@@ -19,7 +19,7 @@ use pclib;
  * @class Debugger
  *  Provides API for variable dumps, stack trace and profiling.
  */
-class Debugger extends system\BaseObject implements system\IService
+class Debugger extends system\BaseObject implements IService
 {
 
 /** Html or plaintext output.*/

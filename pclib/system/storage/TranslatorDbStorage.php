@@ -80,7 +80,7 @@ protected function removeUnusedLabel($id)
  */
 function saveDefault($pageName, $s)
 {
-	if (!$pageName) throw new \Exception("Parameter 'pagename' is empty.");
+	if (!$pageName) throw new \pclib\Exception("Parameter 'pagename' is empty.");
 	$params = array(
 		'TRANSLATOR' => $this->getLabelId($this->translator->name, 1),
 		'LANG' => 0,
@@ -111,7 +111,7 @@ function createLanguage($lang)
 		"TRANSLATOR='{0}' AND LANG='{1}'", $translatorId, $langId
 	);
 
-	if ($found) throw new \Exception("Language '$lang' already exists.");
+	if ($found) throw new \pclib\Exception("Language '$lang' already exists.");
 
 	return $langId;
 }
@@ -127,7 +127,7 @@ function deleteLanguage($lang)
 	/* Check dependencies for source */
 	if ($langId == 0) {
 		if ($this->db->exists($this->TRANSLATOR_TAB, "TRANSLATOR='{0}' AND LANG<>0", $translatorId)) {
-			 throw new \Exception("Cannot delete source - remove all other languages first.");
+			 throw new \pclib\Exception("Cannot delete source - remove all other languages first.");
 		}
 	}
 

@@ -177,7 +177,7 @@ function __toString()
 function load($fileName)
 {
 	if (!file_exists($fileName))
-		throw new system\FileNotFoundException("File $fileName not found.");
+		throw new FileNotFoundException("File $fileName not found.");
 	$this->name = extractpath($fileName, '%f');
 	$this->id = null;
 	$this->setString(file_get_contents($fileName));
@@ -319,7 +319,7 @@ protected function getLastNode($tree_id)
 function addNode($node_id, array $node)
 {
 	if (!$node_id) {
-		if (!$node['TREE_ID']) throw new system\NoValueException('Missing TREE_ID.');
+		if (!$node['TREE_ID']) throw new NoValueException('Missing TREE_ID.');
 
 		$last = $this->getLastNode($node['TREE_ID']);
 		
@@ -532,7 +532,7 @@ protected function expandPath($node_key)
 public function getNode($node_id)
 {
 	$node = $this->db->select($this->table, pri($node_id));
-	if (!$node) throw new \Exception('Node '.$node_id.' not found.');
+	if (!$node) throw new \pclib\Exception('Node '.$node_id.' not found.');
 	return $node;
 }
 

@@ -19,7 +19,7 @@ use pclib;
  * Translates URL to instance of Action class.
  * Action contains class and method name (with parameters) which will be called.
  */
-class Router extends system\BaseObject implements system\IService
+class Router extends system\BaseObject implements IService
 {
 
 	/** Create friendly URL? */

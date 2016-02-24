@@ -22,7 +22,7 @@ use pclib\system\storage\TranslatorDbStorage;
  * - Can dig texts from templates and source and fill database table for you.
  * - Texts can be separated to pages, you can load only some pages for better performance.
  */
-class Translator extends system\BaseObject implements system\IService
+class Translator extends system\BaseObject implements IService
 {
 
 /** string Current language */

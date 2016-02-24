@@ -129,11 +129,11 @@ function __set($name, $value)
 		case 'content': $this->setContent($value); return;
 		case 'language': $this->setLanguage($value); return;
 	}
-	if ($value instanceof system\IService) {
+	if ($value instanceof IService) {
 		$this->setService($name, $value);
 	}
 	else {
-		throw new \Exception('Cannot assign '.gettype($value).' to App->'.$name.' property.');
+		throw new Exception("Cannot assign '%s' to App->%s property.", array(gettype($value), $name));
 	}
 }
 
@@ -145,7 +145,7 @@ function __set($name, $value)
  */
 function setContent($content)
 {
-	if (!$this->layout) throw new system\NoValueException('Cannot set content: app->layout does not exists.');
+	if (!$this->layout) throw new NoValueException('Cannot set content: app->layout does not exists.');
 	$this->layout->values['CONTENT'] = (string)$content;
 }
 
@@ -193,7 +193,7 @@ protected function createDefaultService($serviceName) {
  * You can access service as `$app->serviceName` e.g. `$app->db->select("table")`.
  * @param IService $service Service object.
  */
-function setService($name, system\IService $service)
+function setService($name, IService $service)
 {
 	$this->services[$name] = $service;
 }
@@ -227,7 +227,7 @@ function addConfig($source)
 	}
 	else {
 		if (!file_exists($source))
-			throw new system\FileNotFoundException("Configuration file '$source' not found.");
+			throw new FileNotFoundException("Configuration file '$source' not found.");
 		else
 			require $source;
 	}
@@ -322,7 +322,7 @@ function setLanguage($language, $useDefault = true)
 	$trans->language = $language;
 	$transFile = $this->config['pclib.directories']['localization'].$language.'.php';
 	if (file_exists($transFile)) $trans->useFile($transFile);
-	else throw new system\FileNotFoundException("Translator file '$transFile' not found.");
+	else throw new FileNotFoundException("Translator file '$transFile' not found.");
 	if ($useDefault) $trans->usePage('default');
 	if ($language == 'source') $trans->autoUpdate = true;
 	$this->setService('translator', $trans);
@@ -625,7 +625,7 @@ function out()
 	$event = $this->onBeforeOut();
 	if ($event and !$event->propagate) return;
 
-	if (!$this->layout) throw new system\NoValueException('Cannot show output: app->layout does not exists.');
+	if (!$this->layout) throw new NoValueException('Cannot show output: app->layout does not exists.');
 	$this->layout->out();
 	$this->saveSession();
 	$this->onAfterOut();

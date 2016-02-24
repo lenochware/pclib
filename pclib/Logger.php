@@ -25,7 +25,7 @@ use pclib\system\storage\LoggerDbStorage;
  * updated automatically.
  */
 
-class Logger extends system\BaseObject implements system\IService
+class Logger extends system\BaseObject implements IService
 {
 
 /** Name of the logger */

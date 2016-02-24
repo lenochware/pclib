@@ -2,8 +2,9 @@
 
 namespace pclib\extensions;
 
-use pclib\system\NoDatabaseException;
-use pclib\system\NoValueException;
+use pclib\Exception;
+use pclib\NoValueException;
+use pclib\NoDatabaseException;
 
 /**
  * \file
@@ -149,9 +150,9 @@ function out($block = null)
 
 	$maxInputs = ini_get('max_input_vars');
 	if ($maxInputs and $this->inputCount > $maxInputs) {
-		throw new \Exception(sprintf(
-			"Php INI directive 'max_input_vars' exceeds. %s inputs used.", $this->inputCount
-		));
+		throw new Exception("Php INI directive 'max_input_vars' exceeds. %s inputs used.", 
+			array($this->inputCount)
+		);
 	}
 }
 
