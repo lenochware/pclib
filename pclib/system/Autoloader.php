@@ -56,6 +56,13 @@ class Autoloader
 			}
 		}
 
+		//Alias is used inside namespace.
+		$ca = explode('\\', $class);
+		$classAlias = end($ca);
+		if (isset($this->aliases[$classAlias])) {
+			return class_alias($this->aliases[$classAlias], $class);
+		}
+
 	}
 
 	/**

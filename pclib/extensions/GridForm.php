@@ -31,7 +31,7 @@ use pclib\NoDatabaseException;
  * file uploads etc. This is just alpha-version.
  * See http://pclib.brambor.net/demo/gridform/ for some example.
  */
-class GridForm extends \PCGrid
+class GridForm extends PCGrid
 {
 
 /**
@@ -194,7 +194,7 @@ function update($tab)
 /** \privatesection */
 
 //Helper class for gridform. Do not use directly.
-class GridForm_Form extends \PCForm
+class GridForm_Form extends PCForm
 {
 	public $rowno;
 

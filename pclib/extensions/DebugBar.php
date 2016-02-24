@@ -24,7 +24,7 @@ function __construct()
 	$this->app = $pclib->app;
 
 	//Use logger with independent db connection to avoid conflicts.
-	$this->logger = new \PCLogger('debuglog');
+	$this->logger = new PCLogger('debuglog');
 	$this->logger->storage = new \pclib\system\storage\LoggerDbStorage($this->logger);
 	$this->logger->storage->db = clone $this->app->db;
 
@@ -62,7 +62,7 @@ function register()
 
 function html()
 {
-	$t = new \PCTpl(PCLIB_DIR.'assets/debugbar.tpl');
+	$t = new PCTpl(PCLIB_DIR.'assets/debugbar.tpl');
 	$t->values['POSITION'] = ifnot($this->app->config['pclib.debugbar.position'], $this->positionDefault);
 	$t->values['VERSION'] = PCLIB_VERSION;
 	$t->values['TIME'] = $this->getTime($this->startTime);
@@ -153,7 +153,7 @@ protected function logUrl()
 
 protected function printLogWindow()
 {
-	$grid = new \PCGrid(PCLIB_DIR.'assets/debuglog.tpl');
+	$grid = new PCGrid(PCLIB_DIR.'assets/debuglog.tpl');
 	$data = $this->logger->getLog(100, array('LOGGERNAME' => $this->logger->name));
 	$grid->setArray($data);
 	print $grid;
