@@ -5,13 +5,13 @@ use pclib;
 
 /**
  *  Base class for any application controller.
- *  Define your controller, say 'products', in file controllers/products.php
- *  like class Products_Controller extends App_Controller.
- *  Now you can define actions such as: function edit_Action() { ... return 'your html'; }
+ *  Define your controller, say 'products', in file controllers/ProductsController.php
+ *  like class ProductsController extends Controller.
+ *  Now you can define actions such as: function editAction() { ... return 'your html'; }
  * It will be called on url '?r=products/edit'.
  * @see App::run()
  */
-class App_Controller extends system\BaseObject
+class Controller extends system\BaseObject
 {
 
 /**

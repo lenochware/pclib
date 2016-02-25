@@ -8,7 +8,7 @@ use pclib;
  * Moreover it contains support of flash messages.
  * @see App::setLayout()
  */
-class App_Layout extends Tpl
+class Layout extends Tpl
 {
 protected $headTag;
 protected $messagesTag;

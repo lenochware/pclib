@@ -157,7 +157,7 @@ function setContent($content)
  */
 function setLayout($path)
 {
-	$this->layout = new App_Layout($path);
+	$this->layout = new Layout($path);
 }
 
 /**
@@ -544,7 +544,7 @@ function getNavig($separ = ' / ', $lastLink = false)
 }
 
 /**
- * Return App_Controller object.
+ * Return Controller object.
  * @param string $name Name of the controller's class without postfix
  **/
 function getController($name)

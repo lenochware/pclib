@@ -60,7 +60,7 @@ class Pclib
 			'auth' => PCLIB_DIR.'/Auth.php',
 			'logger' => PCLIB_DIR.'/Logger.php',
 			'translator' => PCLIB_DIR.'/Translator.php',
-			'app_controller' => PCLIB_DIR.'/App_Controller.php',
+			'app_controller' => PCLIB_DIR.'/Controller.php',
 		);
 
 		$aliases = array(
@@ -73,7 +73,7 @@ class Pclib
 			'PCTree' => '\pclib\Tree',
 			'PCLogger' => '\pclib\Logger',
 			'PCTranslator' => '\pclib\Translator',
-			'PCController' => '\pclib\App_Controller',
+			'PCController' => '\pclib\Controller',
 		);
 
 		$this->version = PCLIB_VERSION;

@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Class Auth and Auth_User - Authentication and authorization.
+ * Class Auth and User - Authentication and authorization.
  *
  * @author -dk- <lenochware@gmail.com>
  * http://pclib.brambor.net/
@@ -30,11 +30,11 @@ use pclib;
 class Auth extends system\AuthBase implements IService
 {
 
-/** var Auth_User User which is logged in. */
+/** var User User which is logged in. */
 public $activeUser;
 
 /*
- * var Auth_User Cache for function auth->user()
+ * var User Cache for function auth->user()
  */
 protected $stranger = null;
 
@@ -47,17 +47,15 @@ function __construct(Db $db = null)
 	parent::__construct($db);
 
 	if (!session_id()) throw new RuntimeException('Session is required.');
-	$this->activeUser = new Auth_User($this);
+	$this->activeUser = new User($this);
 	$this->activeUser->loadSession();
 	$this->activeUser->getRights();
 }
 
 /**
  * Take \b $user and log him in. See also #$activeUser.
- *
- * @param Auth_User User object
  */
-function setActive(Auth_User $user)
+function setActive(User $user)
 {
 	unset($user->data['PASSW'], $user->data['DPASSW']);
 	$this->app->setSession('pclib.user', $user->data, $user->realm);
@@ -75,7 +73,7 @@ function setActive(Auth_User $user)
  */
 function login($uname, $password)
 {
-	$user = new Auth_User($this);
+	$user = new User($this);
 	$user->getUser($uname);
 
 	if (!$user->data or !$user->data['ACTIVE']) {
@@ -148,7 +146,7 @@ function loginHttp()
 		die($this->t('This page requires authentication.'));
 	}
 
-	$user = new Auth_User($this);
+	$user = new User($this);
 	$user->getUser($_SERVER['PHP_AUTH_USER']);
 
 	if (!$user->data or !$user->data['ACTIVE']) {
@@ -205,15 +203,15 @@ function getUser()
 }
 
 /**
- * Take username and return Auth_User object.
+ * Take username and return User object.
  * @param string $sname "username" or "#user_id"
- * @return Auth_User $user
+ * @return User $user
  */
 function user($sname)
 {
 	$uid = $this->sname($sname, 'user');
 	if (!$this->stranger or $this->stranger->id != $uid) {
-		$this->stranger = new Auth_User($this);
+		$this->stranger = new User($this);
 		$this->stranger->getUser('#'.$uid);
 	}
 
@@ -307,7 +305,7 @@ function getCfKey($sname, $obj_id = 0)
  * object and store it as Auth::$activeUser.
  * You can get user object for any `username` with Auth::user() method.
  */
-class Auth_User extends system\AuthBase
+class User extends system\AuthBase
 {
 
 /** user ID (primary key in table AUTH_USERS) */
@@ -501,6 +499,6 @@ function validate()
 	return ($this->data['SECURESTRING'] == $this->getSecureString($this->data));
 }
 
-} //class Auth_User
+} //class User
 
 ?>
