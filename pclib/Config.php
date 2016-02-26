@@ -18,9 +18,9 @@ $config = array(
 	'pclib.locale' => array('date' => '%d. %m. %Y', 'datetime' => '%d.%m.%Y %H:%M%:%S'),
 	'pclib.logger' => array(/*'log' => array('ALL')*/),
 	'pclib.compatibility' => array(
-		'tpl_syntax' => true,
-		'sql_syntax' => true,
-		'controller_underscore_postfixes' => true,
+		'tpl_syntax' => false,
+		'sql_syntax' => false,
+		'controller_underscore_postfixes' => false,
 		'legacy_classnames' => false,
 	),
 
