@@ -21,6 +21,7 @@ $config = array(
 		'tpl_syntax' => true,
 		'sql_syntax' => true,
 		'controller_underscore_postfixes' => true,
+		'legacy_classnames' => false,
 	),
 
 	'pclib.directories' => array(

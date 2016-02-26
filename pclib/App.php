@@ -270,6 +270,7 @@ protected function registerDebugBar()
  */
 public function configure()
 {
+	global $pclib;
 	$this->errorHandler->options = $this->config['pclib.errors'];
 	$underscore = $this->config['pclib.compatibility']['controller_underscore_postfixes']? '_' : '';
 	$this->CONTROLLER_POSTFIX = $underscore.'Controller';
@@ -281,7 +282,9 @@ public function configure()
 	foreach ($this->config['pclib.directories'] as $k => $dir) {
 		$this->config['pclib.directories'][$k] = paramstr($dir, $this->paths);
 	}
-	//$this->events->run($this, 'pclib.app.onconfigure');
+	if ($this->config['pclib.compatibility']['legacy_classnames']) {
+		$pclib->autoloader->addAliases($pclib->legacyAliases);
+	}
 }
 
 /**

@@ -1,6 +1,7 @@
 <?php
 
 namespace pclib\extensions;
+use pclib\system\BaseObject;
 
 /**
  * Show DebugBar in your web-application.
@@ -42,11 +43,11 @@ function addEvents($events)
 function register()
 {
 	$events = array(
-		'App.onBeforeOut' => array($this, 'hook'),
-		'App.onBeforeRun' => array($this, 'hook'),
-		'App.onError' => array($this, 'hook'),
-		'Db.onBeforeQuery' => array($this, 'hook'),
-		'Db.onAfterQuery' => array($this, 'hook'),
+		'pclib\App.onBeforeOut' => array($this, 'hook'),
+		'pclib\App.onBeforeRun' => array($this, 'hook'),
+		'pclib\App.onError' => array($this, 'hook'),
+		'pclib\Db.onBeforeQuery' => array($this, 'hook'),
+		'pclib\Db.onAfterQuery' => array($this, 'hook'),
 		//'Func.onLogDump' => array($this, 'onLogDump'),
 	);
 

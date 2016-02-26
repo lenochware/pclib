@@ -45,24 +45,22 @@ class Pclib
 	/** var Autoloader */
 	public $autoloader;
 
+	public $legacyAliases = array(
+		'App' => '\pclib\App',
+		'Db' => '\pclib\Db',
+		'Tpl' => '\pclib\Tpl',
+		'Grid' => '\pclib\Grid',
+		'Form' => '\pclib\Form',
+		'Auth' => '\pclib\Auth',
+		'Tree' => '\pclib\Tree',
+		'Logger' => '\pclib\Logger',
+		'Translator' => '\pclib\Translator',
+		'App_Controller' => '\pclib\Controller',		
+	);
+
 	/** PClib intialization - it's called just once before using %pclib. */
 	function init()
 	{
-		$classes = array(
-		
-			//for backward compatibility (lcase class names)
-			'app' => PCLIB_DIR.'/App.php',
-			'db' => PCLIB_DIR.'/Db.php',
-			'tpl' => PCLIB_DIR.'/Tpl.php',
-			'grid' => PCLIB_DIR.'/Grid.php',
-			'form' => PCLIB_DIR.'/Form.php',
-			'tree' => PCLIB_DIR.'/Tree.php',
-			'auth' => PCLIB_DIR.'/Auth.php',
-			'logger' => PCLIB_DIR.'/Logger.php',
-			'translator' => PCLIB_DIR.'/Translator.php',
-			'app_controller' => PCLIB_DIR.'/Controller.php',
-		);
-
 		$aliases = array(
 			'PCApp' => '\pclib\App',
 			'PCDb' => '\pclib\Db',
@@ -76,10 +74,11 @@ class Pclib
 			'PCController' => '\pclib\Controller',
 		);
 
+		$this->legacyAliases += array_change_key_case($this->legacyAliases, CASE_LOWER);
+
 		$this->version = PCLIB_VERSION;
 		$autoload = new \pclib\system\Autoloader;
 		$autoload->addDirectory(PCLIB_DIR, array('namespace' => 'pclib'));
-		//$autoload->addClasses($classes);
 		$autoload->addAliases($aliases);
 		$autoload->register();
 		$this->autoloader = $autoload;
