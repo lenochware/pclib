@@ -20,15 +20,17 @@ $config = array(
 	'pclib.compatibility' => array(
 		'tpl_syntax' => false,
 		'sql_syntax' => false,
-		'controller_underscore_postfixes' => false,
 		'legacy_classnames' => false,
 	),
 
 	'pclib.directories' => array(
-		'controllers' => 'controllers/',
 		'logs' => 'temp/log/',
 		'assets' => '{pclib}/assets/',
 		'localization' => '{webroot}{pclib}/localization/',
+	),
+
+	'pclib.app.make' => array(
+		'controller' => array('dir' => 'controllers', 'namespace' => '', 'postfix' => 'Controller')
 	),
 
 	'pclib.tpl.escape' => false,

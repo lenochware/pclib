@@ -53,9 +53,6 @@ public $bookmarks = array();
 
 public $indexFile = 'index.php';
 
-public $CONTROLLER_POSTFIX = 'Controller';
-public $MODEL_POSTFIX = 'Model';
-
 /** var ErrorHandler */
 public $errorHandler;
 
@@ -272,9 +269,6 @@ public function configure()
 {
 	global $pclib;
 	$this->errorHandler->options = $this->config['pclib.errors'];
-	$underscore = $this->config['pclib.compatibility']['controller_underscore_postfixes']? '_' : '';
-	$this->CONTROLLER_POSTFIX = $underscore.'Controller';
-	$this->MODEL_POSTFIX = $underscore.'Model';
 
 	if ($this->config['pclib.logger']['log']) {
 		$this->logger->categories = $this->config['pclib.logger']['log'];
@@ -547,44 +541,43 @@ function getNavig($separ = ' / ', $lastLink = false)
 }
 
 /**
- * Return Controller object.
- * @param string $name Name of the controller's class without postfix
- **/
-function getController($name)
+ * Factory of controller objects.
+*/
+function make($className, $factoryName = null)
 {
-	$className = ucfirst($name).$this->CONTROLLER_POSTFIX;
+	if(!$factoryName) return new $className;
 
-	$dir = $this->config['pclib.directories']['controllers'];
+	$options = $this->config['pclib.app.make'][$factoryName];
 
-	$searchPaths = array(
-		$dir.$className.'.php', 
-		$dir.strtolower($className).'.php',
-		$dir.$name.'.php',
-	);
-
-	while ($path = array_shift($searchPaths)) {
-		if (file_exists($path)) break;
-		if (!$searchPaths) return null;
+	if ($this->config['pclib.compatibility']['legacy_classnames']) {
+		$postfix = $options['postfix']? '_'.lcfirst($options['postfix']) : '';
+	}
+	else {
+		$className = ucfirst($className);
+		$postfix = $options['postfix'];
 	}
 
-	require_once($path);
-	$controller = new $className($this);
-	return $controller;
-}
+	$realClassName = $className.$postfix;
 
-/**
- * Return Model object.
- * @param string $name Name of the Model's class without postfix
- **/
-function getModel($name)
-{
-	$className = $name.$this->MODEL_POSTFIX;
-	$dir = $this->config['pclib.directories']['models'];
-	$path = $dir.$className.'.php';
+	if($options['dir']) {
+		$path = $options['dir'].'/'.$realClassName.'.php';
+		if (!file_exists($path)) return null;
+		require_once($path);
+	}
 
-	require_once($path);
-	$model = new $className($this);
-	return $model;
+	if ($options['namespace']) {
+		$realClassName = $options['namespace'].'\\'.$realClassName;
+	}
+
+	$class = new \ReflectionClass($realClassName);
+	$args = $options['args'] ?: array();
+
+	if ($factoryName == 'controller') {
+		$args = array($this);
+	}
+
+	$instance = $class->newInstanceArgs($args);
+	return $instance;
 }
 
 /**
@@ -606,7 +599,7 @@ function run($rs = null)
 	$event = $this->onBeforeRun();
 	if ($event and !$event->propagate) return;
 
-	$ct = $this->getController($action->controller);
+	$ct = $this->make($action->controller, 'controller');
 	if (!$ct) $this->httpError(404, 'Page not found: "%s"', null, $action->controller);
 
 	$html = $ct->run($action);
