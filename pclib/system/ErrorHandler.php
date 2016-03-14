@@ -20,7 +20,7 @@ use pclib\Tpl;
  * You can configure behavior of $app->errorHandler with pclib.errors config parameter.
  * Features:
  * - Development error reporting with stack trace
- * - Customizable error template for production enviroment
+ * - Customizable error template for production environment
  * - Store errors to the log
  * - Hook your own function (e.g. mail) to onException handler
  */

@@ -23,7 +23,7 @@ use pclib;
  * - working with controllers: run()
  * - working with services: setService()
  * - layout: setLayout(), message(), error()
- * - enviroment, log(), language ...
+ * - environment, log(), language ...
  */
 class App extends system\BaseObject
 {
@@ -42,8 +42,8 @@ public $layout;
 /** Storage of the global services - Db, Auth, Logger etc. */
 public $services = array();
 
-/** Current enviroment (such as 'develop','test','production'). */
-public $enviroment;
+/** Current environment (such as 'develop','test','production'). */
+public $environment;
 
 /** Enabling debugMode will display debug-toolbar. */
 public $debugMode = false;
@@ -89,7 +89,7 @@ function __construct($name)
 
 	$this->paths = $this->getPaths();
 
-	$this->enviromentIp(
+	$this->environmentIp(
 		array(
 			'127.0.0.1' => 'develop',
 			'::1' => 'develop',
@@ -231,7 +231,7 @@ function addConfig($source)
 
 	$this->config = array_merge($this->config, (array)$config);
 
-	$_env = $this->enviroment;
+	$_env = $this->environment;
 
 	if (is_string($_env) and is_array($$_env)) {
 		$this->config = array_merge($this->config, $$_env);
@@ -241,15 +241,15 @@ function addConfig($source)
 }
 
 /**
- * Set $app->enviroment variable by server ip-address.
- * @param array $env Array of ipAddress:enviromentName pairs.
+ * Set $app->environment variable by server ip-address.
+ * @param array $env Array of ipAddress:environmentName pairs.
  */
-function enviromentIp(array $env)
+function environmentIp(array $env)
 {
 	$serverIp = $this->request->serverIp;
-	foreach ($env as $ip => $enviroment) {
+	foreach ($env as $ip => $environment) {
 		if ($ip == '*' or $ip == $serverIp) {
-			$this->enviroment = $enviroment;
+			$this->environment = $environment;
 			return;
 		}
 	}
