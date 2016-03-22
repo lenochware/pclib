@@ -317,11 +317,17 @@ function setLanguage($language, $useDefault = true)
 {
 	$trans = new Translator($this->name);
 	$trans->language = $language;
-	$transFile = $this->config['pclib.directories']['localization'].$language.'.php';
-	if (file_exists($transFile)) $trans->useFile($transFile);
-	else throw new FileNotFoundException("Translator file '$transFile' not found.");
+	
+	if ($language == 'source') {
+		$trans->autoUpdate = true;
+	}
+	else {
+		$transFile = $this->config['pclib.directories']['localization'].$language.'.php';
+		if (file_exists($transFile)) $trans->useFile($transFile);		
+		else throw new FileNotFoundException("Translator file '$transFile' not found.");
+	}
+
 	if ($useDefault) $trans->usePage('default');
-	if ($language == 'source') $trans->autoUpdate = true;
 	$this->setService('translator', $trans);
 }
 
