@@ -87,8 +87,8 @@ class Autoloader
 
 	/**
  	 * Add directory, where search for the class will be performed.
- 	 * @param string $directory
- 	 * @param string $options Unused - for future extension
+ 	 * @param string $directory Directory path
+ 	 * @param array $options Array of options, e.g.: ['namespace' => 'RootNamespace']
  	 */
 	function addDirectory($directory, $options = array())
 	{

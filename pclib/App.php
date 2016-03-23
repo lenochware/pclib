@@ -547,7 +547,7 @@ function getNavig($separ = ' / ', $lastLink = false)
 }
 
 /**
- * Factory of controller objects.
+ * Factory of controller's object.
 */
 function make($className, $factoryName = null)
 {
@@ -588,8 +588,8 @@ function make($className, $factoryName = null)
 
 /**
  * Execute method of the controller.
- * Without parameters, route is read from current url - i.e. from #$route variable.
- * Route ['products','add'] means: call method Products_Controller->add_action();
+ * Without parameters, route is read from current url.
+ * Route 'products/add' means: call method ProductsController->addAction();
  * @param string $rs Route string. See @ref pcl-route
  **/
 function run($rs = null)

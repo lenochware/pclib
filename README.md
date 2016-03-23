@@ -30,19 +30,19 @@ found sql-dump in `install/pclib_*.sql`. Import this sql-dump into your database
 **Render form**
 ```php
 require 'pclib/pclib.php';
-$app = new App('test-app');
+$app = new PCApp('test-app');
 
-$form = new Form('tpl/form-template.tpl');
+$form = new PCForm('tpl/form-template.tpl');
 print $form;
 ```
 
 **Connect to database and show datagrid with data**
 ```php
 require 'pclib/pclib.php';
-$app = new App('test-app');
-$app->db = new Db('mysql://root@localhost/test');
+$app = new PCApp('test-app');
+$app->db = new PCDb('mysql://root@localhost/test');
 
-$grid = new Grid('tpl/grid-template.tpl');
+$grid = new PCGrid('tpl/grid-template.tpl');
 $grid->setQuery('SELECT * FROM products');
 print $grid;
 ```

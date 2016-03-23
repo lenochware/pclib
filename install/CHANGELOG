@@ -386,3 +386,18 @@
 - App->enviroment rewritten, now it is based on server IP address
 - Exceptions moved to system/exceptions.php
 - various bugfixes
+
+2.0.0
+- Added namespaces: Most used classes (App, Grid, Form, Auth,...) are in namespace pclib
+  i.e. pclib\App, pclib\Grid, ...
+- Added aliases: As alternative, you can use non-namespaced version of class name 
+  with 'PC' prefix: $app = new PCApp()
+- It is possible use legacy classnames (i.e. App) by setting pclib.compatibility config param 
+'legacy_classnames' to true
+- Added 'pclib.app.make' factory configuration (used when controller objects are created)
+  It is used by App->make() function
+- Backward compatibility is disabled by default. To enable, edit pclib.compatibility config param
+- renamed: Auth_User -> pclib\User, App_Controller -> pclib\Controller, App_Layout -> pclib\Layout
+- renamed: App->enviroment, App->enviromentIp -> App->environment, App->environmentIp
+- Added function App->make(), removed App->getController()
+- Bugfixes
