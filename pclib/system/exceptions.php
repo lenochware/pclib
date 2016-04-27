@@ -18,6 +18,7 @@ class Exception extends \Exception
 }
 
 class NotImplementedException extends Exception {}
+class RuntimeException extends Exception {}
 class DatabaseException extends Exception {}
 class AuthException extends Exception {}
 class NoValueException extends Exception {}

@@ -58,8 +58,13 @@ public function addMessage($message, $cssClass = null, $params = array())
  */
 function print_Head($id, $sub, $value)
 {
-	$scripts = explode(',', $this->elements[$id]['scripts']);
-	if (is_array($value)) $scripts = array_merge($scripts, $value);
+	$scripts = array();
+	if ($this->elements[$id]['scripts']) {
+		$scripts = array_merge($scripts, explode(',', $this->elements[$id]['scripts']));
+	}
+	if ($value) {
+		$scripts = array_merge($scripts, (array)$value);
+	}
 
 	foreach($scripts as $script) {
 		if (!file_exists($script)) {
