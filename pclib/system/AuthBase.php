@@ -78,7 +78,7 @@ function __construct()
 	
 	$this->realm = ifnot($this->config['pclib.auth.realm'], $this->app->name);
 	$this->secret = $this->config['pclib.auth.secret'];
-	if (!$this->secret) throw new NoValueException('Parameter auth->secret required.');
+	if (!$this->secret) throw new \pclib\NoValueException('Parameter auth->secret required.');
 }
 
 /**

@@ -7,6 +7,7 @@
   cursor:pointer;
   border-radius: 2px;
   opacity: 0.8;
+  z-index: 2000;
 }
 
 #pc-overlay {
