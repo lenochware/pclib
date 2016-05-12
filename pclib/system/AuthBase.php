@@ -61,7 +61,7 @@ public $defaultPasswordLength = 8;
 /**
  * Constructor - load config parameters.
  */
-function __construct()
+function __construct($db = null)
 {
 	global $pclib;
 
@@ -71,6 +71,7 @@ function __construct()
 
 	$this->app = $pclib->app;
 	$this->config = $this->app->config;
+	if ($db) $this->db = $db;
 
 	$this->service('db');
 
