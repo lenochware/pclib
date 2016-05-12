@@ -18,8 +18,11 @@ protected $startTime;
 protected $positionDefault = 'position:absolute;top:10px;right:10px;';
 
 protected $updating = false;
+public $registered = false;
 
-function __construct()
+private static $instance;
+
+private function __construct()
 {
 	global $pclib;
 	$this->app = $pclib->app;
@@ -29,7 +32,15 @@ function __construct()
 	$this->logger->storage = new \pclib\system\storage\LoggerDbStorage($this->logger);
 	$this->logger->storage->db = clone $this->app->db;
 
-	$this->logUrl();
+	$this->logUrl();	
+}
+
+public static function getInstance()
+{
+  if (self::$instance === null) {
+      self::$instance = new self;
+  }
+  return self::$instance;
 }
 
 function addEvents($events)
@@ -40,25 +51,30 @@ function addEvents($events)
 	}
 }
 
-function register()
+public static function register()
 {
+	$that = self::getInstance();
+
+	if ($that->registered) return;
+
 	$events = array(
-		'pclib\App.onBeforeOut' => array($this, 'hook'),
-		'pclib\App.onBeforeRun' => array($this, 'hook'),
-		'pclib\App.onError' => array($this, 'hook'),
-		'pclib\Db.onBeforeQuery' => array($this, 'hook'),
-		'pclib\Db.onAfterQuery' => array($this, 'hook'),
-		//'Func.onLogDump' => array($this, 'onLogDump'),
+		'pclib\App.onBeforeOut' => array($that, 'hook'),
+		'pclib\App.onBeforeRun' => array($that, 'hook'),
+		'pclib\App.onError' => array($that, 'hook'),
+		'pclib\Db.onBeforeQuery' => array($that, 'hook'),
+		'pclib\Db.onAfterQuery' => array($that, 'hook'),
+		//'Func.onLogDump' => array($that, 'onLogDump'),
 	);
 
-	$this->addEvents($events);
+	$that->addEvents($events);
 	
-	$this->app->loadDefaults();
-	if ($this->app->db) {
-		$this->app->db->loadDefaults();
+	$that->app->loadDefaults();
+	if ($that->app->db) {
+		$that->app->db->loadDefaults();
 	}
 
-	$this->startTime = microtime(true);
+	$that->startTime = microtime(true);
+	$that->registered = true;
 }
 
 function html()
@@ -74,6 +90,8 @@ function html()
 
 function hook($event)
 {
+	if(strpos($event->data[0], 'debuglog')) dump($this->updating,$event->data);
+
 	if ($this->updating) return;
 
 	$this->updating = true;
@@ -137,7 +155,9 @@ function onLogDump($event)
 
 protected function logUrl()
 {
-	if ($this->app->routestr == 'pclib/debuglog') return;
+	if (strpos($this->app->routestr, 'pclib/debuglog') === 0) return;
+
+	$this->updating = true;
 
 	$request = $this->app->request;
 	$message = '<b>'
@@ -150,6 +170,7 @@ protected function logUrl()
 		$message .= '<br>'.$this->app->debugger->getDump(array($_POST));
 
 	$this->logger->log('DEBUG', 'url', $message);
+	$this->updating = false;
 }
 
 protected function printLogWindow()

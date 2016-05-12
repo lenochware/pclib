@@ -257,8 +257,7 @@ function environmentIp(array $env)
 
 protected function registerDebugBar()
 {
-	$debugbar = new extensions\DebugBar;
-	$debugbar->register();
+	extensions\DebugBar::register();
 }
 
 /*

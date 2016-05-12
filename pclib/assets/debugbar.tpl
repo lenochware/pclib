@@ -34,7 +34,14 @@
   border:1px solid blue;
   padding: 8px;
   font-family: monospace;
+  font-size: 12px;
+  z-index: 2000;
 }
+
+.pc-debugbar-window table td {
+  padding:2px;
+}
+
 </style>
 <div id="pc-overlay" onclick="pclib.hideModal()"></div>
 <div id="pc-debugbar" onclick="pclib.showModal('pcwin0','?r=pclib/debuglog')">
