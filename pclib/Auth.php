@@ -64,6 +64,17 @@ function setActive(User $user)
 }
 
 /**
+ * Verify password for the user.
+ * @param $userData Array of user values (row from AUTH_USERS table)
+ * @param string $password Password
+ * @return bool $isValid
+ */
+function verifyPassword(array $userData, $password) {
+	$passw_db = ifnot($userData['PASSW'], $this->hashFunction($userData['DPASSW'], $this->secret));
+	return ($passw_db == $this->hashFunction($password, $this->secret));
+}
+
+/**
  * Authenticate user \b $uname with password \b $password. If user passed,
  * log him in. See also #$activeUser.
  *
@@ -81,9 +92,8 @@ function login($uname, $password)
 		$this->setError('User does not exists!');
 		return false;
 	}
-	$passw_db = ifnot($user->data['PASSW'], $this->hashFunction($user->data['DPASSW'], $this->secret));
-
-	if ($passw_db != $this->hashFunction($password, $this->secret)) {
+	
+	if (!$this->verifyPassword($user->data, $password)) {
 		$this->activeUser = null;
 		$this->setError('Invalid password!');
 		$this->db->update($this->USERS_TAB, "LOGINFAIL=LOGINFAIL+1", pri($user->id));
@@ -157,9 +167,7 @@ function loginHttp()
 		exit();
 	}
 
-	$passw_db = ifnot($user->data['PASSW'], $this->hashFunction($user->data['DPASSW'], $this->secret));
-
-	if ($passw_db != $this->hashFunction($_SERVER['PHP_AUTH_PW'], $this->secret)) {
+	if (!$this->verifyPassword($user->data, $_SERVER['PHP_AUTH_PW'])) {
 		$this->activeUser = null;
 		$this->setError('Invalid password!');
 		$this->db->update($this->USERS_TAB, "LOGINFAIL=LOGINFAIL+1", pri($user->id));
