@@ -1184,8 +1184,7 @@ protected function head()
 	if ($action) $tag['action'] = $this->header['action'] = $action;
 
 	if ($jsvalid = $this->header['jsvalid']) {
-		 $strict = ($jsvalid == "nostrict") ? 'false':'true';
-		 $tag['onsubmit'] = "return pclib.validate(this,$strict);";
+		 $tag['onsubmit'] = "return pclib.validate(this);";
 		 $hidden['pclib_jsvalid'] = $this->getValidationString();
 	}
 

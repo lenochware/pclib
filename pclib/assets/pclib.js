@@ -19,7 +19,13 @@
 var pclib = {
 
 xhr: null,
-ajaxComplete: null,
+
+/** Occurs after ajax call is complete. */
+onAjaxComplete: null,
+
+/** Occurs when form is validated. */
+onValidate: null,
+
 ajax_id: null,
 modalWin: null,
 
@@ -33,33 +39,46 @@ strings: {
 	'form-err-pattern' : ' Chybně zadaná hodnota!'
 },
 
-/**
-* Form validation. Alert error messages if form is invalid.
-* It is called at form.onsubmit when form has attribute 'jsvalid'.
-*
-* @param {Object} form source form object
-* @param {bool} is_strict When true, it will stop submitting form on errors
-*/
-validate: function (form, is_strict) {
-	var messages = [];
-	var valid_data = form.pclib_jsvalid.value.split('|');
+/** @private */
+getFormElements: function(form) {
+	var data = form.pclib_jsvalid.value.split('|');
+	var elements = [];
 
 	var i = 0;
-	while(i < valid_data.length) {
-
-		var elem = {
-			id: valid_data[i++],
-			lb: valid_data[i++],
-			required: (valid_data[i++] == 1),
-			rule: valid_data[i++],
-			options: valid_data[i++],
-			value: ''
+	while(i < data.length) {
+			var elem = {
+			id: data[i++],
+			lb: data[i++],
+			required: (data[i++] == 1),
+			rule: data[i++],
+			options: data[i++],
 		};
 
 		elem.value = this.getValue(elem.id);
 
+		elements.push(elem);
+	}
+
+	return elements;
+},
+
+/**
+* Validate form and return result.
+*
+* @param {Object} form Source DOM object
+* @return {Object} result {isValid, elements}
+*/
+validateForm: function(form) {
+	var elements = this.getFormElements(form);
+	var isValid = true;
+
+	for (i in elements) {
+
+		var elem = elements[i];
+
 		if (elem.required && !elem.value) {
-			messages.push([elem.lb,'form-err-req']);
+			elem.message = 'form-err-req';
+			isValid = false;
 		}
 
 		if (!elem.value) continue;
@@ -67,7 +86,8 @@ validate: function (form, is_strict) {
 		switch (elem.rule) {
 			case 'email':
 				if (!elem.value.match(/^[^@]+@[^.]+\..+$/)) {
-					messages.push([elem.lb,'form-err-mail']);
+					elem.message = 'form-err-mail';
+					isValid = false;
 				}
 				break;
 			case 'date':
@@ -86,12 +106,14 @@ validate: function (form, is_strict) {
 				}
 
 				if (!elem.value.match('^' + pp + '$')) {
-					messages.push([elem.lb,'form-err-date']);
+					elem.message = 'form-err-date';
+					isValid = false;
 				}
 				break;
 			case 'number':
 				if (!elem.value.match(/^[0-9]+\.?[0-9]*$/)) {
-					messages.push([elem.lb,'form-err-number']);
+					elem.message = 'form-err-number';
+					isValid = false;
 				}
 				break;
 			case 'password':
@@ -99,7 +121,11 @@ validate: function (form, is_strict) {
 				var options = elem.options.split(',');
 				if (options[0] && elem.value.length < parseInt(options[0])) result = false;
 				if (options[1] && /^[a-z0-9]+$/i.test(elem.value)) result = false;
-				if (!result) messages.push([elem.lb,'form-err-passw']);
+
+				if (!result) {
+					elem.message = 'form-err-passw';
+					isValid = false;
+				}
 				break;
 			case 'file':
 				var result = false;
@@ -107,25 +133,61 @@ validate: function (form, is_strict) {
 				for (var j in patterns) {
 					if (elem.value.match('^' + patterns[j] + '$')) {result = true; break;}
 				}
-				if (!result) messages.push([elem.lb,'form-err-file']);
+				if (!result) {
+					elem.message = 'form-err-file';
+					isValid = false;
+				}
 				break;
 			case 'pattern':
 				if (!elem.value.match('^' + elem.options + '$')) {
-					messages.push([elem.lb,'form-err-pattern']);
+					elem.message = 'form-err-pattern';
+					isValid = false;
 				}
 				break;
 		}
+		elements[i] = elem;
 	}
 
-	if (messages.length > 0) {
-		var message = '';
-		for (var j in messages) {
-			message += messages[j][0]+' '+this.strings[messages[j][1]]+"\n";
+	return {isValid: isValid, elements};
+},
+
+/**
+* Form validation. Alert error messages, if form is invalid.
+* It is called at form.onsubmit event when form has attribute 'jsvalid'.
+*
+* @param {Object} form Source DOM object
+*/
+validate: function(form)
+{
+	if (this.onValidate) {
+		var ret = this.onValidate(form);
+	}
+	else {
+		var ret = this.validateForm(form);
+	}
+
+	if (!ret.isValid) {
+		this.showErrors(form, ret.elements);
+	}
+
+	return ret.isValid;
+},
+
+/** 
+ * Show validation errors using alert().
+ * @param {Object} form Source DOM object
+ * @param {Array} elements Validation rules and messages for form fields - see getFormElements()
+ */
+showErrors: function(form, elements) {
+	var message = '';
+
+	for(i in elements) {
+		if (elements[i].message) {
+			message += elements[i].lb +' '+this.strings[elements[i].message]+"\n";
 		}
-
-		alert(message);
 	}
-	return (is_strict? (messages.length === 0) : true);
+
+	alert(message);
 },
 
 /** @private */
@@ -198,7 +260,7 @@ ajaxSync: function() {
 		if (!elem) continue;
 		elem.innerHTML = responseArray[id];
 	}
-	if (this.ajaxComplete) this.ajaxComplete(this.ajax_id);
+	if (this.onAjaxComplete) this.onAjaxComplete(this.ajax_id);
 },
 
 /**
