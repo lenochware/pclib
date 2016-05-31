@@ -900,6 +900,9 @@ private function initBlocks()
 			}
 
 			$this->document[$key+1] = $block;
+			if ($this->elements[$block]['id']) {
+				throw new Exception("Block name '%s' is already used.", [$block]);
+			}
 			$this->elements[$block]['id']    = $block;
 			$this->elements[$block]['type']  = 'block';
 			$this->elements[$block]['block'] = end($bstack);
