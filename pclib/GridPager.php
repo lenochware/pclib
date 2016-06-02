@@ -1,11 +1,9 @@
 <?php
 
-//vyresit ->t()
-
 namespace pclib;
 use pclib;
 
-class GridPager
+class GridPager extends system\BaseObject
 {
 	protected $page = 1;
 	protected $maxPage = 1;
@@ -17,10 +15,15 @@ class GridPager
 	public $pattern = '%s | %s | %s';
 	public $patternItem = '<span class="%s">%s</span>';
 
+	/** var Translator */
+	public $translator;
+
 	function __construct($length, $baseUrl)
 	{
+		parent::__construct();
 		$this->setLength($length);
 		$this->baseUrl = $baseUrl;
+		$this->service('translator', false);
 	}
 
 	protected function clamp($num, $min, $max)
@@ -121,7 +124,9 @@ class GridPager
 		return implode(' ', $pages);
 	}
 
-	function t($s) { return $s; }
+	function t($s) { 
+		 return $this->translator? $this->translator->translate($s) : $s;
+	}
 
 	function html()
 	{
