@@ -42,8 +42,8 @@ public $multiSort = false;
 
 public $renderSortIcons = true;
 
-/** array pager - Configuration and state of %grid pager. */
-public $pager = array();
+/** var GridPager */
+public $pager;
 
 /** Array of values for array-based %grid. */
 protected $dataArray;
@@ -62,6 +62,8 @@ protected $baseUrl;
 /** Name of the 'class' element */
 protected $className = 'grid';
 
+protected $page;
+
 private $hash;
 
 /**
@@ -73,16 +75,50 @@ protected function _init()
 
 	$this->baseUrl = $this->getBaseUrl();
 
-	$pgid = ifnot($this->header['pager'], 'pager');
-	$this->pager += (array)$this->elements[$pgid];
-
 	if ($_GET['grid'] == $this->name or !$_GET['grid']) {
 		if ($_GET['page']) {
-			$page = $_GET['page'];
-			$this->pager['page'] = ($page === 'all')? 'all' : (int)$page;
+			$this->page = $_GET['page'];
 		}
-		if (isset($_GET['sort'])) $this->setSort($_GET['sort']);
 	}
+	if (isset($_GET['sort'])) $this->setSort($_GET['sort']);
+
+	$this->initPager();
+}
+
+function initPager()
+{
+	$pager = $this->getPager();
+
+	$el = $this->elements['pager'];
+
+	if ($el['ul']) {
+		$pager->pattern = '%1$s%3$s%2$s';
+		$pager->patternItem = '<li class="%s">%s</li>';
+	}
+	if ($el['pglen']) {
+		$pager->setPageLen($el['pglen']);
+	}
+	if ($el['size']) {
+		$pager->linkNumber = $el['size'];
+	}
+
+	$pager->setPage($this->page);
+
+	$this->pager = $pager;
+}
+
+/**
+ * Return instance of GridPager.
+ */
+function getPager()
+{
+	return new GridPager($this->length, $this->baseUrl);
+}
+
+function setPage($page)
+{
+	$this->page = $page;
+	$this->pager->setPage($page);
 }
 
 /**
@@ -91,7 +127,6 @@ protected function _init()
  */
 protected function _out($block = null)
 {
-	$this->getPager();
 	$this->values['items'] = $this->getValues();
 
 	if ($this->config['pclib.compatibility']['tpl_syntax'] and !$this->elements['items']['else']) {
@@ -126,7 +161,7 @@ function setQuery($sql)
 	$sql = $this->db->setParams($sql, $args + (array)$this->filter);
 	$sql = str_replace("\n", " \n ", strtr($sql, "\r\t","  "));
 
-	$this->length = $this->db->count($sql);
+	$this->setLength($this->db->count($sql));
 
 	if ($lpos = stripos($sql, ' limit ')) $sql = substr($sql, 0, $lpos);
 	$this->sql = $sql;
@@ -144,7 +179,7 @@ function setQuery($sql)
 function setArray(array $dataArray, $totalLength = 0)
 {
 	$this->dataArray = $this->applyFilter($dataArray);
-	$this->length = $totalLength? $totalLength : count($this->dataArray);
+	$this->setLength($totalLength ?: count($this->dataArray));
 }
 
 /**
@@ -186,11 +221,6 @@ function setSort($s)
 	}
 }
 
-function setPage($page)
-{
-	$this->pager['page'] = $page;
-}
-
 /**
  * Load %grid object from session.
  * Called when $sessname in constructor is set. Do not call directly.
@@ -207,7 +237,7 @@ function loadSession()
 	$this->length = $s['length'];
 	$this->filter = $s['filter'];
 	$this->sortArray = $s['sortarray'];
-	$this->pager['page'] = $s['page'];
+	$this->page = $s['page'];
 }
 
 /**
@@ -224,7 +254,7 @@ function saveSession()
 		'hash'   => $this->hash,
 		'length' => $this->length,
 		'filter' => $this->filter,
-		'page'   => $this->pager['page'],
+		'page'   => $this->pager->getValue('active'),
 		'sortarray' => $this->sortArray,
 	);
 
@@ -286,77 +316,15 @@ function print_Element($id, $sub, $value)
  */
 function print_Pager($id, $sub)
 {
-	if ($this->pager['hidden']) return;
+	$el = $this->elements['pager'];
 
-	//default pager
-	if (!$sub) {
-		if ($this->pager['ul']) {
-			$this->print_Pager($id, 'first');
-			$this->print_Pager($id, 'pages');
-			$this->print_Pager($id, 'last');
-		}
-		else {
-			$this->print_Pager($id, 'first');
-			print " | ";
-			$this->print_Pager($id, 'last');
-			print " | ";
-			$this->print_Pager($id, 'pages');
-		}
-		return;
-	}
+	if ($this->pager->getValue('maxpage') < 2 and !$el['nohide']) return;
 
-	//list of pages
-	if ($sub == 'pages') {
-		$page  = $this->pager['page'];
-		if ($page == 'all') return;
-		$begin = $this->pager['begin'];
-		$end   = $this->pager['end'];
-
-		$activefmt = $this->pager['active'];
-
-		for ($i = $begin; $i <= $end; $i++) {
-			if ($i == $page) {
-				$activepage = $activefmt? sprintf ($activefmt, $i) : $i;
-				$this->printPagerItem($activepage, $sub, null, true);
-			}
-			else {
-				$url = $this->pagerUrl($i);
-				$this->printPagerItem($i, $sub, $url);
-			}
-		}
-		return;
-	}
-
-	switch ($sub) {
-			case "total":   print $this->length;           break;
-			case "maxpage": print $this->pager['maxpage']; break;
-			case "page":    print $this->pager['page'];    break;
-			case "first":  $url = $this->pagerUrl(1);     break;
-			case "last":   $url = $this->pagerUrl($this->pager['maxpage']); break;
-			case "next":   $url = $this->pagerUrl($this->pager['next']);    break;
-			case "all":    $url = $this->pagerUrl('all');  break;
-			case "prev":
-			case "previous": $url = $this->pagerUrl($this->pager['prev']); break;
-	} //switch
-
-	if ($url) {
-		$lb = $this->t(ucfirst($sub));
-		$this->printPagerItem($lb, $sub, $url);
-	}
-}
-
-protected function printPagerItem($lb, $sub, $url = null, $active = false)
-{
-	$cls = '';
-	if ($active) $cls .= ' active';
-	if (!$url)   $cls .= ' disabled';
-	if ($cls) $cls = ' class="'.trim($cls).'"';
-	if ($this->pager['ul']) {
-		print "<li$cls><a href=\"$url\">$lb</a></li>";
+	if ($sub) {
+		print $this->pager->getHtml($sub);
 	}
 	else {
-		$s = $url? "<a href=\"$url\">$lb</a>" : $lb;
-		print $this->pager['separ']."<span$cls>$s</span>";
+		print $this->pager->html();
 	}
 }
 
@@ -425,17 +393,23 @@ protected function getValues()
 	if ($this->dataArray) return $this->getDataArray();
 
 	$q = $this->getQuery();
-	if (!$q) {$this->length = 0; return array(); }
+	if (!$q) {$this->setLength(0); return array(); }
 
 	$rows = $this->db->fetchAll($q);
 
 	//sumgrid hack...
-	if (count($rows) > $this->pager['pglen']) $last = array_pop($rows);
+	if (count($rows) > $this->pager->getValue('pglen')) $last = array_pop($rows);
 	if ($this->sumArray) $this->sumArray['items']['last'] = $last;
 
 	return $rows;
 }
 
+protected function setLength($length)
+{
+	$this->length = $length;
+	$this->pager->setLength($length);
+	$this->pager->setPage($this->page);
+}
 
 /**
  * Load values for current page from dataarray (array-based %grid).
@@ -443,9 +417,8 @@ protected function getValues()
  */
 protected function getDataArray()
 {
-	$pglen = $this->pager['pglen'];
-
-	$begin = ($this->pager['page'] - 1) * $this->pager['pglen'];
+	$pglen = $this->pager->getValue('pglen');
+	$begin = ($this->pager->getValue('active') - 1) * $this->pager->getValue('pglen');
 
 	if ($this->sortArray) {
 		if (!isset($this->dataArray[0])) $begin = 0; //fix reseting keys in usort
@@ -515,8 +488,8 @@ protected function getQuery()
 		if ($orderby) $sql .= ' order by '.substr($orderby, 1);
 	}
 
-	$page  = $this->pager['page'];
-	$pglen = $this->pager['pglen'];
+	$page  = $this->pager->getValue('active');
+	$pglen = $this->pager->getValue('pglen');
 
 	if ($page != 'all')
 		$this->db->setLimit($pglen + 1, ((int)$page-1) * $pglen);
@@ -580,77 +553,13 @@ protected function getBaseUrl()
 	return $url . ((strpos($url,'?') === false)? '?' : '&');
 }
 
-/**
- * Fill #$pager array with up-to-date values.
- * @see print_pager()
- */
-function getPager()
-{
-	if (!$this->pager['page'])  $this->pager['page'] = 1;
-	if (!$this->pager['size'])  $this->pager['size'] = 10;
-	if (!$this->pager['separ']) $this->pager['separ'] = ' ';
-	if (!$this->pager['pglen']) $this->pager['pglen'] = $this->length;
-
-	if (!$this->pager['pglen']) $this->pager['maxpage'] = 0;
-	else $this->pager['maxpage'] = ceil($this->length / $this->pager['pglen']);
-
-	if ($this->pager['page'] > $this->pager['maxpage'])
-		$this->pager['page'] = $this->pager['maxpage'];
-
-	if ($this->pager['maxpage'] < 2 and !$this->pager['nohide'])
-		$this->pager['hidden'] = true;
-	else
-		$this->pager['hidden'] = false;
-
-	if ((string)$this->pager['page'] == 'all') {
-		$this->pager['pglen'] = $this->length;
-	}
-
-	list($this->pager['begin'], $this->pager['end'])
-		= $this->pagerRange($this->pager['page'], $this->pager['size']);
-
-	$this->pager['prev'] = $this->pager['page'] - 1;
-	$this->pager['next'] = $this->pager['page'] + 1;
-	if ($this->pager['prev'] < 1) $this->pager['prev'] = 1;
-	if ($this->pager['next'] > $this->pager['maxpage'])
-		$this->pager['next'] = $this->pager['maxpage'];
-}
-
-/** Return \<begin,end> interval of pages around $page, with $size = end - begin.
- * Interval is always inside total range of pages.
- * @see getpager()
- */
-protected function pagerRange($page, $size)
-{
-	$maxpage = $this->pager['maxpage'];
-	$middle = floor($size / 2);
-
-	if ($maxpage > $size) {
-		if ($page > $middle) $begin = $page - $middle + 1; else $begin = 1;
-		if ($maxpage - $page <= $middle) $begin = $maxpage - $size + 1;
-		$end = $begin + $size - 1;
-		return array($begin, $end);
-	}
-	else return array(1, $this->pager['maxpage']);
-
-}
-
-/** Return %grid url for page $page.
- * @see print_pager()
- */
-protected function pagerUrl($page)
-{
-	return $this->baseUrl."page=$page";
-}
-
-
 private function sumFieldEquals(array $sum)
 {
 	$rowno = $this->elements['items']['rowno'];
 	if ($this->sumArray['items']['pos'] > $sum['pos']) $rowno--;
 	$v1 = $this->values['items'][$rowno][$sum['field']];
 	$v2 = $this->values['items'][$rowno+1][$sum['field']];
-	if ($rowno == $this->pager['pglen']-1) $v2 = $this->sumArray['items']['last'][$sum['field']];
+	if ($rowno == $this->pager->getValue('pglen')-1) $v2 = $this->sumArray['items']['last'][$sum['field']];
 	return ($v1 == $v2);
 }
 
@@ -680,8 +589,11 @@ protected function print_BlockRow($block, $rowno = null)
 protected function parseLine($line)
 {
 	$id = parent::parseLine($line);
-	if ($this->elements[$id]['type'] == 'pager')
-		$this->header['pager'] = $id;
+
+	if ($this->elements[$id]['type'] == 'pager' and $id != 'pager') {
+		throw new Exception("Only allowed name for pager element is 'pager'.");
+	}
+
 	return $id;
 }
 
