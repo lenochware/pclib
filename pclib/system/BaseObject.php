@@ -14,6 +14,7 @@
 
 namespace pclib\system;
 use pclib\MemberAccessException;
+use pclib\Exception;
 
 /**
  * Ancestor of all pclib classes.
@@ -122,7 +123,12 @@ class BaseObject
 	 */
 	protected function fireEvent($name, array $args = array())
 	{
-		if (!is_array($this->$name)) return false;
+		if (!$this->$name) return false;
+
+		if (!is_array($this->$name)) {
+			$class = get_class($this);
+			throw new Exception("Invalid $class->$name value - must be array.");
+		};
 
 		$event = new \stdClass;
 		$event->sender = $this;
