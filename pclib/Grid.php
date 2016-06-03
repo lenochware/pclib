@@ -326,6 +326,11 @@ function print_Pager($id, $sub)
 
 	if ($this->pager->getValue('maxpage') < 2 and !$el['nohide']) return;
 
+	if ($this->values['pager']) {
+		print $this->values['pager'];
+		return;
+	}
+
 	if ($sub) {
 		print $this->pager->getHtml($sub);
 	}
