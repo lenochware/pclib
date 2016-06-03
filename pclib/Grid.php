@@ -85,7 +85,10 @@ protected function _init()
 	$this->initPager();
 }
 
-function initPager()
+/**
+ * Create and configure grid pager.
+ */
+protected function initPager()
 {
 	$pager = $this->getPager();
 
@@ -110,11 +113,15 @@ function initPager()
 /**
  * Return instance of GridPager.
  */
-function getPager()
+protected function getPager()
 {
 	return new GridPager($this->length, $this->baseUrl);
 }
 
+/**
+ * Set active (selected) page.
+ * @param int $page Page number
+ */
 function setPage($page)
 {
 	$this->page = $page;
@@ -311,7 +318,6 @@ function print_Element($id, $sub, $value)
 /**
  * Print %grid pager.
  * {pager} tag will show default pager, for modificators - see \ref grid-tags.
- * You can reimplement this in descendant for your own pager.
  * @copydoc tag-handler
  */
 function print_Pager($id, $sub)
@@ -404,6 +410,10 @@ protected function getValues()
 	return $rows;
 }
 
+/**
+ * Set grid->length (total number of rows).
+ * @param int $length Number of rows
+ */
 protected function setLength($length)
 {
 	$this->length = $length;

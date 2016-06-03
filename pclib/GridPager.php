@@ -1,8 +1,23 @@
 <?php
+/**
+ * @file
+ * Grid pagination.
+ *
+ * @author -dk- <lenochware@gmail.com>
+ * http://pclib.brambor.net/
+ */
+
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
 
 namespace pclib;
 use pclib;
 
+/**
+ * Provides paginator calculations and rendering of the grid pager.
+ */
 class GridPager extends system\BaseObject
 {
 	protected $page = 1;
@@ -10,14 +25,26 @@ class GridPager extends system\BaseObject
 	protected $length = 0;
 	protected $pageLen = 20;
 
+	/** Number of page-links shown in pager. */
 	public $linkNumber = 10;
+
+	/** Base url for pager links. */
 	public $baseUrl = '/?';
+
+	/** Pattern for rendering. "first | last | pages" by default. */
 	public $pattern = '%s | %s | %s';
+
+	/** Pattern for rendering of the pager item. */
 	public $patternItem = '<span class="%s">%s</span>';
 
 	/** var Translator */
 	public $translator;
 
+	/**
+	 * Create pager.
+	 * @param int $length Total number of rows.
+	 * @param string $baseUrl
+	 */
 	function __construct($length, $baseUrl)
 	{
 		parent::__construct();
@@ -26,6 +53,10 @@ class GridPager extends system\BaseObject
 		$this->service('translator', false);
 	}
 
+	/**
+	 * Shift $num value into interval \<$min, $max\>.
+	 * @return int $num Value in specified interval.
+	 */
 	protected function clamp($num, $min, $max)
 	{
 		if ($max < $min) $max = $min;
@@ -34,6 +65,10 @@ class GridPager extends system\BaseObject
 		return (int)$num;
 	}
 
+	/**
+	 * Set active (selected) page.
+	 * @param int $page
+	 */
 	function setPage($page)
 	{
 		if ($page === 'all') {
@@ -45,6 +80,10 @@ class GridPager extends system\BaseObject
 		$this->page = $this->clamp($page, 1, $this->maxPage);
 	}
 
+	/**
+	 * Set total number of rows.
+	 * @param int $length
+	 */
 	function setLength($length)
 	{
 		$this->maxPage = ceil($length / $this->pageLen);
@@ -56,6 +95,10 @@ class GridPager extends system\BaseObject
 		$this->length = $length;
 	}
 
+	/**
+	 * Set number of rows of the page.
+	 * @param int $pageLen
+	 */
 	function setPageLen($pageLen)
 	{
 		$this->pageLen = ($pageLen > 0)? $pageLen : 20;
@@ -65,6 +108,10 @@ class GridPager extends system\BaseObject
 		}
 	}
 
+	/**
+	 * Return value of the pager item.
+	 * @param string $id Id of pager item
+	 */
 	function getValue($id)
 	{
 		if (is_numeric($id)) return $id;
@@ -86,11 +133,22 @@ class GridPager extends system\BaseObject
 		throw new Exception("Unknown pager value '%s'", [$id]);
 	}
 
+	/**
+	 * Return pager url for the $page.
+	 * @param int $page
+	 * @return string $url
+	 */
 	function getUrl($page)
 	{
 		return $this->baseUrl."page=$page";
 	}
 
+	/**
+	 * Return HTML for the pager link or other item.
+	 * @param string $id Id of pager item
+	 * @param string $cssClass
+	 * @return string $html
+	 */
 	function getHtml($id, $cssClass = 'page-item')
 	{
 		$plainValues = ['maxpage','pglen','total','page','active'];
@@ -108,6 +166,10 @@ class GridPager extends system\BaseObject
 		return sprintf($this->patternItem, $cssClass, $val);
 	}
 
+	/**
+	 * Return links to all pages.
+	 * @return string $html
+	 */
 	protected function getPagesHtml()
 	{
 		$pages = [];
@@ -124,10 +186,14 @@ class GridPager extends system\BaseObject
 		return implode(' ', $pages);
 	}
 
-	function t($s) { 
+	protected function t($s) { 
 		 return $this->translator? $this->translator->translate($s) : $s;
 	}
 
+	/**
+	 * Return pager html.
+	 * @return string $html
+	 */
 	function html()
 	{
 		return sprintf($this->pattern, 
@@ -137,6 +203,12 @@ class GridPager extends system\BaseObject
 		);
 	}
 
+	/**
+	 * Return array of page numbers arround active page.
+	 * @param int $page Active page
+	 * @param int $size Size of returned array
+	 * @return array Page numbers
+	 */
 	protected function pagerRange($page, $size)
 	{
 		if ($this->maxPage <= 0) return [];
