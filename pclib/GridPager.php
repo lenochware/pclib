@@ -130,7 +130,7 @@ class GridPager extends system\BaseObject
 				case "page": return $this->page;
 		}
 
-		throw new Exception("Unknown pager value '%s'", [$id]);
+		throw new Exception("Unknown pager value '%s'", array($id));
 	}
 
 	/**
@@ -151,7 +151,7 @@ class GridPager extends system\BaseObject
 	 */
 	function getHtml($id, $cssClass = 'page-item')
 	{
-		$plainValues = ['maxpage','pglen','total','page','active'];
+		$plainValues = array('maxpage','pglen','total','page','active');
 
 		if ($id == 'pages') return $this->getPagesHtml();
 		if (in_array($id, $plainValues)) {
@@ -172,7 +172,7 @@ class GridPager extends system\BaseObject
 	 */
 	protected function getPagesHtml()
 	{
-		$pages = [];
+		$pages = array();
 
 		foreach ($this->pagerRange($this->page, $this->linkNumber) as $page) {
 			if ($this->page == $page) {
@@ -211,7 +211,7 @@ class GridPager extends system\BaseObject
 	 */
 	protected function pagerRange($page, $size)
 	{
-		if ($this->maxPage <= 0) return [];
+		if ($this->maxPage <= 0) return array();
 
 		$middle = floor($size / 2);
 
