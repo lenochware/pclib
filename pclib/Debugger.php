@@ -153,13 +153,14 @@ protected function spanBox($id, $title, $content, $opened = true, $css_title = '
 protected function strDump(array $meta, array $options = array())
 {
 	$html = '';
-	$opened = isset($options['opened'])? $options['opened'] : true;
 	$lpad = str_repeat(' ',$this->INDENT_WIDTH*$meta[0]['level']);
 	foreach($meta as $node) {
 		$html .= $lpad;
 		$name = $node['name'];
 		$value = $node['value'];
 		$nodes = $node['nodes'];
+		$opened = isset($options['opened'])? $options['opened'] : ($node['type'] == 'array');
+
 
 		if ($node['indexed'] and !$node['nested'] and $node['printsize'] < 500) {
 			$html .= $name.': '.$value;
