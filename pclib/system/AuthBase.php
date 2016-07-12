@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Class AuthBase - PClib authentication and authorization system.
+ * Base class for most classes of authorization system.
  * @author -dk-
  * http://pclib.brambor.net/
  */
@@ -12,154 +12,110 @@
 # version 2.1 of the License, or (at your option) any later version.
 
 namespace pclib\system;
+use pclib\AuthException;
 
 /**
- * @class AuthBase
- * Base class for all classes of authorization system.
- * Contains common functions and variables. Do not use directly.
+ * Base class for most classes of authorization system.
  */
 class AuthBase extends BaseObject
 {
 
-/** var Db */	
-public $db;
+/** var App */
+protected $app;
 
 /** var Translator */
 public $translator;
 
-/** var App */
-protected $app;
-
-public $realm;
-
-/** Link to array of configuration parameters. See config.php. */
-protected $config = array();
-
 /** Array of error messages (if any) */
 public $errors = array();
 
-public $USERS_TAB = 'AUTH_USERS',
-	$REGISTER_TAB = 'AUTH_REGISTER',
-	$ROLES_TAB    = 'AUTH_ROLES',
-	$RIGHTS_TAB   = 'AUTH_RIGHTS',
-	$USERROLE_TAB = 'AUTH_USER_ROLE';
-
-
-/**
- * Secret string added to passwords for increasing safety.
- * Use some kind of random string e.g. "a8XwZ21$/p".
- * @note
- * Setting this variable is required!
- */
+/** Secret string used for enpowerment of md5 hash */
 public $secret;
 
-/* Password hash algorithm. */
-public $hashFunction;
+/** Password algorhitm - can be 'md5' or 'bcrypt' */
+public $passwordAlgo;
 
-public $defaultPasswordLength = 8;
+/** Bcrypt cost. */
+public $passwordCost = 10;
+
+/** Throws exceptions instead of just collecting errors in ->errors */
+public $throwsExceptions = false;
+
+/** Occurs on auth error. */
+public $onError;
 
 /**
  * Constructor - load config parameters.
  */
-function __construct($db = null)
+function __construct()
 {
 	global $pclib;
-
+	
 	parent::__construct();
 
-	if (!$pclib->app) throw new \RuntimeException('No instance of application (class app) found.');
-
 	$this->app = $pclib->app;
-	$this->config = $this->app->config;
-	if ($db) $this->db = $db;
 
-	$this->service('db');
-
-	$this->hashFunction = array($this, 'passwordHash');
-	
-	$this->realm = ifnot($this->config['pclib.auth.realm'], $this->app->name);
-	$this->secret = $this->config['pclib.auth.secret'];
-	if (!$this->secret) throw new \pclib\NoValueException('Parameter auth->secret required.');
+	$this->passwordAlgo = $this->app->config['pclib.auth']['algo'];
+	$this->secret = $this->app->config['pclib.auth']['secret'];
 }
 
 /**
- * Translate "system name" of auth entity to numeric ID.
- * Entity can be role, right or user. For system name see column SNAME
- * in AUTH_* tables - ID is primary key from relevant db-table.
- *
- * @param string $sname "entity_name" or "#entity_id"
- * @param enum $type ("user", "role", "right")
- */
-function sname($sname, $type)
-{
-	if (substr($sname,0,1) == '#') return (int)substr($sname, 1);
-	$sname = strtolower($sname);
-
-	switch($type) {
-		case 'user':
-		list($id) = $this->db->select($this->USERS_TAB.':ID',
-			"USERNAME='{0}'", $sname);
-		break;
-
-		case 'role':
-		list($id) = $this->db->select($this->ROLES_TAB.':ID',
-			"SNAME='{0}'", $sname);
-		break;
-
-		case 'right':
-		list($id) = $this->db->select($this->RIGHTS_TAB.':ID',
-			"SNAME='{0}'", $sname);
-		break;
-	}
-
-	if (!$id) $this->setError('%s not found.', $sname);
-	return (int)$id;
-}
-
-/**
- * A default hash algorihtm wrapper (md5 with auth::$secret).
- * @param Auth $o Auth object
+ * Return password hash.
  * @param string $password
- * @return string $md5Hash
+ * @return string $hash
 **/
-function passwordHash($password, $secret)
+function passwordHash($password)
 {
-	return md5($secret.$password);
+	switch ($this->passwordAlgo) {
+		case 'md5': 
+			return md5($this->secret.$password);
+		case 'bcrypt': 
+			return password_hash($password , PASSWORD_BCRYPT, array('cost' => $this->passwordCost));
+		default:
+			throw new AuthException('Unknown password-hash algorihtm');
+	}	
 }
 
 /**
- * Generate string for session integrity check.
- * @param string $user - current user array ( see auth::getuser() )
- * @return security hash
+ * Verify password hash.
+ * @param string $password
+ * @param string $hash
+ * @return bool $valid
 **/
-function getSecureString($user)
+function passwordHashVerify($password, $hash)
 {
-	 return md5(
-		 $_SERVER['REMOTE_ADDR']    //We fight against session stealing
-		 .$this->realm
-		 .$user['ID']               //Forbid changing user or role
-		 .$user['ROLES']
-		 .$this->secret
-		 );
+	switch ($this->passwordAlgo) {
+		case 'md5': 
+			return (md5($this->secret.$password) == $hash);		
+		case 'bcrypt': 
+			return password_verify($password, $hash);
+		default:
+			throw new AuthException('Unknown password-hash algorihtm');
+	}
+}
+
+/** log security issue using App->logger. */
+protected function log($category, $messageId, $message = null, $itemId = null)
+{
+	$this->app->log($category, $messageId, $message, $itemId);
 }
 
 /**
- * Generate random password.
- * @return string $password
-**/
-function genPassw()
-{
-	return randomstr($this->defaultPasswordLength);
-}
-
-/**
- * Set error message into auth_base::$errors
- * @param string $message - message with %s placeholders
+ * Add error message into ->errors variable.
+ * @param string $message Message with %s placeholders
 **/
 function setError($message)
 {
 	$args = array_slice(func_get_args(), 1) ;
-	$this->errors[] = vsprintf($this->t($message), $args);
+	$message = vsprintf($this->t($message), $args);
+
+	if ($this->throwsExceptions) {
+		throw new AuthException($message);
+	}
+	else {
+		$this->errors[] = $message;
+		$this->onError($message);
+	}
 }
 
 protected function t($s) {
