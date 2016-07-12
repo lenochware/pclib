@@ -1,4 +1,4 @@
-<?php
+<?php 
 /**
  * @file
  * Class AuthManager - Auth entities (users,roles,rights) management.
@@ -20,18 +20,77 @@ use pclib\system\AuthBase;
  * - Manage auth entities: user, role and right (permission).
  * - You can create entity (mk), delete entity (rm), set entity, or 
  * assign one entity to another (grant).
- * - Support of auth console. See \ref aterm-cmds for more info.
  */
 class AuthManager extends AuthBase
 {
 
-/* Helper for execute() */
-private $masterCmd = array();
-
-/** Array of AuthManager messages */
-public $messages = array();
+/** var Db */
+public $db;
 
 public $USERNAME_PATTERN = "/^[a-z0-9\._-]+$/i";
+
+public $defaultPasswordLength = 8;
+
+public $USERS_TAB = 'AUTH_USERS',
+	$REGISTER_TAB = 'AUTH_REGISTER',
+	$ROLES_TAB    = 'AUTH_ROLES',
+	$RIGHTS_TAB   = 'AUTH_RIGHTS',
+	$USERROLE_TAB = 'AUTH_USER_ROLE';
+
+function __construct()
+{
+	parent::__construct();
+	$this->service('db');
+}
+
+/**
+ * Translate "system name" of auth entity to numeric ID.
+ * Entity can be role, right or user. For system name see column SNAME
+ * in AUTH_* tables - ID is primary key from relevant db-table.
+ *
+ * @param string $sname "entity_name" or "#entity_id"
+ * @param enum $type ("user", "role", "right")
+ */
+public function sname($sname, $type)
+{
+	if (substr($sname,0,1) == '#') return (int)substr($sname, 1);
+	$sname = strtolower($sname);
+
+	switch($type) {
+		case 'user':
+		list($id) = $this->db->select($this->USERS_TAB.':ID',
+			"USERNAME='{0}'", $sname);
+		break;
+
+		case 'role':
+		list($id) = $this->db->select($this->ROLES_TAB.':ID',
+			"SNAME='{0}'", $sname);
+		break;
+
+		case 'right':
+		list($id) = $this->db->select($this->RIGHTS_TAB.':ID',
+			"SNAME='{0}'", $sname);
+		break;
+	}
+
+	if (!$id) $this->setError("'%s' not found.", $sname);
+	return (int)$id;
+}
+
+protected function modified($table, $id)
+{
+	$now = date('Y-m-d H:i:s');
+	$this->db->update($table, "LASTMOD='$now'", pri($id));
+}
+
+/**
+ * Generate random password.
+ * @return string $password
+**/
+function genPassw()
+{
+	return randomstr($this->defaultPasswordLength);
+}
 
 /**
  * Make user $sname. If user exists, throw error.
@@ -165,6 +224,11 @@ function rmRight($sname, $force = false)
 	return true;
 }
 
+/**
+ * Change right values (SNAME, ANNOT, ...)
+ * @param array $right
+ * @return bool $ok
+ */
 function setRight($right)
 {
 	$id = $right['ID'];
@@ -450,26 +514,21 @@ function setUser($sname, array $user)
  */
 function setPassw($sname, $passw)
 {
-	/*if (strlen($passw) > 0 and strlen($passw) < 6) {
-		$this->seterror(0, 'Password is too short!');
-		return false;
-	}*/
 	$uid = $this->sname($sname, 'user');
 	if (!$uid) return false;
-	if (strlen($passw) > 0) $passw = $this->hashFunction($passw, $this->secret);
+	if (strlen($passw) > 0) $passw = $this->passwordHash($passw);
 	$this->db->update($this->USERS_TAB, "PASSW='$passw'", pri($uid));
 	$this->modified($this->USERS_TAB, $uid);
 	return true;
 }
+
 /**
- * Caution! Empty all AUTH tables! Cannot be reversed!
- * @param string $confirm Confirm delete
+ * Caution! Empty all AUTH tables!
  * @return bool $ok
  */
-function removeAll($confirm = false)
+function deleteAllAuthData()
 {
-	if (!$confirm) return false;
-	
+	//sqlite doesn't know TRUNCATE
 	$this->db->query('DELETE FROM '.$this->REGISTER_TAB );
 	$this->db->query('DELETE FROM '.$this->ROLES_TAB    );
 	$this->db->query('DELETE FROM '.$this->RIGHTS_TAB   );
@@ -479,448 +538,6 @@ function removeAll($confirm = false)
 	return true;
 }
 
-/*function mkobject($ext_id, $sname = '', $annot = '') {}
-function rmobject ($id, $force = false) {}*/
-
-/**
- * Execute ATERM batch file. Generated messages are stored in $this->messages.
- * @param string $fileName Filename of batch file
- * @return bool $ok
- * See \ref aterm-cmds for description of aterm language.
- */
-function executeFile($fileName)
-{
-	$batch = file($fileName);
-	if (!$batch) return false;
-	$ok = true;
-	foreach($batch as $line) {
-		if (!$this->execute($line)) $ok = false;
-	}
-	return $ok;
 }
 
-/**
- * Execute ATERM commands. Generated messages are stored in $this->messages.
- * @param string $line ATERM commands
- * @return bool $ok
- * See \ref aterm-cmds for description of aterm language.
- */
-function execute($line)
-{
-	$line = trim($line);
-	if ($line{0} == ';' or $line == '') return true;
-	if ($line{0} == '&') {
-		if (!$this->masterCmd) {
-			$this->setError('Runtime error.');
-			return false;
-		}
-		$line = substr($line,1);
-	}
-	else $this->masterCmd = null;
-
-	if ($pos = utf8_strpos($line, ';')) $line = utf8_substr($line, 0, $pos);
-
-	$keywords = "user|role|right|active|passw|dpassw";
-	$patt = '/([+-\? ])\s*('.$keywords.')\s(\s*([\w\/\*]+))?(\s*\"([^\"]+)\")?/i';
-	//utf8_preg_match_all()?
-	$terms_n = preg_match_all($patt, ' '.$line.' ', $terms, PREG_SET_ORDER);
-	if (!$terms_n) {
-			$this->setError('Syntax error in `%s`', $line);
-			return false;
-	}
-	if ($terms[0][1] == '?') {
-		$this->query($terms);
-		return true;
-	}
-
-	if (!$this->masterCmd) {
-		$master = array_shift($terms);
-		$ok = $this->executeCmd($master);
-		if (!$ok) return false;
-		$this->masterCmd = $master;
-	}
-	if ($terms)
-		foreach($terms as $term) {
-			$ok = $this->executeCmd($term);
-			if (!$ok) return false;
-		}
-}
-
-/** Helper for query() */
-private function addHtmlClass($value, $clsid)
-{
-	return "<span class=\"$clsid\">$value</span>";
-}
-
-/** Build filter for querying users. Return filter array. Used in query(). */
-protected function userFilter(array $terms)
-{
-	if (!$terms) return array();
-
-	$filter = array();
-	foreach ($terms as $cmd) {
-		$op    = trim($cmd[1]);
-		$ty   = $cmd[2];
-		$name  = $cmd[4];
-		switch ($ty) {
-			case 'active':  $filter['ACTIVE'] = ($op == '+')? 1:0; break;
-			case 'dpassw':
-				if ($op == '+') $filter['DPASSW'] = 1;
-				else $filter['PASSW'] = 1;
-			break;
-			case 'right':
-				$rid = $this->sname($name, 'right');
-				if (!$rid) break;
-				if ($filter['RIGHT'] or $op != '+') {
-					$this->setError('Runtime error in `%s`', $cmd[0]);
-					break;
-				}
-
-				$roles = $this->db->selectOne(
-					$this->REGISTER_TAB.':ROLE_ID',
-					"RIGHT_ID='{0}' and RVAL<>'0' and ROLE_ID is not NULL", $rid
-				);
-				$filter['RIGHT'] = $rid;
-				if ($roles) {
-					$filter['RROLES'] = implode(',', $roles);
-					$filter['RRIGHT'] = $filter['RIGHT'];
-					unset($filter['RIGHT']);
-				}
-			break;
-			case 'role':
-				$rid = $this->sname($name, 'role');
-				if (!$rid) break;
-				if ($filter['ROLE'] or $op != '+') {
-					$this->setError('Runtime error in `%s`', $cmd[0]);
-					break;
-				}
-				$filter['ROLE'] = $rid;
-			break;
-			default: $this->setError('Runtime error in `%s`', $cmd[0]); break;
-		}
-
-	}
-	return $filter;
-}
-
-/**
- * Perform '?entity' commands. Store result in $this->messages.
- * Used in function execute().
- */
-protected function query(array $terms)
-{
-	$master = array_shift($terms);
-	$op    = trim($master[1]);
-	$ty   = $master[2];
-	$name  = strtr($master[4],'*','%');
-	$annot = $master[6];
-	
-	$pgsql = (get_class($this->db->drv) == 'pgsql')? $this->db->drv : null;
-
-	if ($op != '?') return false;
-	switch ($ty) {
-	case 'user':
-		$user_n = $this->db->count($this->USERS_TAB, "USERNAME like '{0}'", $name);
-		if ($user_n > 1) {
-			$filter = $this->userFilter($terms);
-			if ($this->errors) break;
-			$filter['USERNAME'] = $name;
-			$users = $this->db->selectOne(
-				"select distinct U.USERNAME from $this->USERS_TAB U
-				~ left join $this->REGISTER_TAB REG on REG.USER_ID=U.ID
-				~ left join $this->USERROLE_TAB UR on UR.USER_ID=U.ID
-				where U.USERNAME like '{USERNAME}'
-				~ AND U.ACTIVE='{ACTIVE}'
-				~ AND (U.PASSW='' OR U.PASSW is NULL) {?DPASSW}
-				~ AND LENGTH(U.PASSW)>0 {?PASSW}
-				~ AND REG.RIGHT_ID='{RIGHT}' AND REG.RVAL<>'0'
-				~ AND ((REG.RIGHT_ID='{RRIGHT}' AND REG.RVAL<>'0') OR UR.ROLE_ID in ({RROLES}))
-				~ AND UR.ROLE_ID='{ROLE}'", $filter
-			);
-			if ($users) $this->messages[] = wordwrap(implode(' ', $users), 60, '<br>');
-			$this->messages[] = "\nFound ".count($users)." users.";
-		}
-		elseif ($user_n == 1) {
-			if ($pgsql) $pgsql->ucase++;
-			$user = $this->db->select($this->USERS_TAB, "USERNAME like '{0}'", $name);
-			if ($pgsql) $pgsql->ucase--;
-			if ($user['PASSW']) $user['PASSW'] = '########';
-			foreach($user as $k => $v) {
-				$msg .= strtolower($k). ': '.$this->addHtmlClass($v, 'console-value').'<br>';
-			}
-			$this->messages[] = $msg;
-			$roles = $this->db->selectOne(
-				"select R.SNAME from $this->ROLES_TAB R
-				inner join $this->USERROLE_TAB UR on R.ID=UR.ROLE_ID
-				where UR.USER_ID='{0}'
-				order by UR.R_PRIORITY desc", (int)$user['ID']
-			);
-			$this->messages[] = 'user roles: '
-				.($roles? implode(', ', $roles) : '');
-
-			$rights = $this->db->selectPair(
-				"select SNAME,REG.RVAL from $this->RIGHTS_TAB R
-				inner join $this->REGISTER_TAB REG on REG.RIGHT_ID=R.ID
-				where REG.USER_ID='{0}'", (int)$user['ID']
-			);
-
-			if ($rights) {
-				$r = null; foreach($rights as $k => $v) {$r[] = "$k ($v)";}
-				$this->messages[] = 'user rights:<br>'.implode('<br>', $r);
-			}
-			else $this->messages[] = 'user rights: -';
-		}
-		else {
-			$this->setError('User %s not exists.', $name);
-			return false;
-		}
-	break;
-	case 'role':
-		$role_n = $this->db->count($this->ROLES_TAB, "SNAME like '{0}'", $name);
-		if ($role_n > 1) {
-			$roles = $this->db->selectOne(
-				$this->ROLES_TAB.':SNAME',"SNAME like '{0}'", $name);
-			$this->messages[] = wordwrap(implode(' ', $roles), 60, '<br>');
-			$this->messages[] = "\nFound ".count($roles)." roles.";
-		}
-		elseif ($role_n == 1) {
-			$msg = '';
-			if ($pgsql) $pgsql->ucase++;
-			$role = $this->db->select($this->ROLES_TAB, "SNAME like '{0}'", $name);
-			if ($pgsql) $pgsql->ucase--;
-			foreach($role as $k => $v) {$msg .= strtolower($k). ": $v<br>";}
-			$this->messages[] = $msg;
-
-			$rights = $this->db->selectPair(
-				"select SNAME,REG.RVAL from $this->RIGHTS_TAB R
-				inner join $this->REGISTER_TAB REG on REG.RIGHT_ID=R.ID
-				where REG.ROLE_ID='{#0}'",$role['ID']
-			);
-
-			$msg = '';
-			foreach((array)$rights as $k => $v) {$msg .= "$k ($v)<br>";}
-			$this->messages[] = 'Rights:<br>'.$msg;
-
-			$role_n = $this->db->count(
-				$this->USERROLE_TAB, "ROLE_ID='{#0}'", $role['ID']);
-			$this->messages[] = "Assigned to $role_n users.";
-		}
-		else {
-			$this->setError('Role %s not exists.', $name);
-			return false;
-		}
-	break;
-
-	case 'right':
-		$right_n = $this->db->count($this->RIGHTS_TAB, "SNAME like '{0}'", $name);
-		if ($right_n > 1) {
-			$rights = $this->db->selectOne(
-				$this->RIGHTS_TAB.':SNAME',"SNAME like '{0}'", $name);
-			$this->messages[] = implode('<br>', $rights);
-			$this->messages[] = "\nFound ".count($rights)." rights.";
-		}
-		elseif ($right_n == 1) {
-			$msg = '';
-			$right = $this->db->select($this->RIGHTS_TAB, "SNAME like '{0}'", $name);
-			foreach($right as $k => $v) { $msg .= "$k: $v<br>";}
-			$this->messages[] = $msg;
-
-			$roles = $this->db->selectOne(
-				"select SNAME from $this->ROLES_TAB RO
-				inner join $this->REGISTER_TAB REG on REG.ROLE_ID=RO.ID
-				where REG.RIGHT_ID='{#0}'", $right['ID']
-			);
-
-			if ($roles)
-				$this->messages[] = 'In roles: '
-					.wordwrap(implode(' ', $roles), 60, '<br>');
-
-		}
-		else {
-			$this->setError('Right %s not exists.', $name);
-			return false;
-		}
-
-	break;
-	case 'dpassw':
-	$uid = $this->sname($name, 'user');
-	if (!$uid) return false;
-	$user = $this->db->select($this->USERS_TAB, pri($uid));
-	$msg = "dpassw: ".$this->addHtmlClass($user['DPASSW'],'console-value')." enabled: ";
-	$msg .= $user['PASSW']? 'no.':'yes.';
-	$this->message($msg);
-	break;
-
-	default: return false;
-	}
-	return true;
-}
-
-/** Execute one ATERM command. */
-protected function executeCmd($cmd)
-{
-	$op    = trim($cmd[1]);
-	$opt   = $cmd[1].$cmd[2];
-	$name  = $cmd[4];
-	$annot = $cmd[6];
-
-	if (!$op) return true;
-
-	if (!$this->masterCmd) {
-		switch ($opt) {
-			case '+role':
-				$ok = $this->mkRole($name, $annot);
-				if ($ok) $this->message("Role `%s` added.", $name);
-			break;
-			case '-role':
-				$force = ($annot == 'force');
-				$ok = $this->rmRole($name, $force);
-				if ($ok) $this->message("Role `%s` removed.", $name);
-			break;
-			case '+right':
-				$ok = $this->mkRight($name, $annot);
-				if ($ok) $this->message("Right `%s` added.", $name);
-			break;
-			case '-right':
-				$force = ($annot == 'force');
-				$ok = $this->rmRight($name, $force);
-				if ($ok) $this->message("Right `%s` removed.", $name);
-			break;
-			case '+user':
-				if (strpos($annot, '|')) {
-					list ($fullname,$annot) = explode('|', $annot);
-					$fullname = trim($fullname);
-					$annot = trim($annot);
-				}
-				else {
-					$fullname = $annot;
-					$annot = null;
-				}
-
-				$ok = $this->mkUser($name, $fullname, null, $annot);
-				if ($ok) $this->message("User `%s` added.", $name);
-				break;
-			case '-user':
-				$ok = $this->rmUser($name);
-				if ($ok) $this->message("User `%s` removed.", $name);
-			break;
-
-			default:
-				$ok = false;
-				$this->setError('Syntax error in `%s`', $cmd[0]);
-				break;
-		}
-		return $ok;
-	}
-
-	$m_ty = $this->masterCmd[2];
-	$m_name = $this->masterCmd[4];
-
-	$ok = false;
-	switch ($opt) {
-		case '+role':
-			if ($m_ty == 'user') $ok = $this->uRole($m_name, $name);
-			else $this->setError('Runtime error in `%s`', $cmd[0]);
-			if ($ok) $this->message("Granted role `%s` to user `%s`.", array($name, $m_name));
-			break;
-
-		case '-role':
-			if ($m_ty == 'user') $ok = $this->uRole($m_name, $name, false);
-			else $this->setError('Runtime error in `%s`', $cmd[0]);
-			if ($ok) $this->message("Revoked role `%s` from user `%s`.", array($name, $m_name));
-		break;
-
-		case '+right':
-			$rval = isset($annot)? $annot : '1';
-			if ($m_ty == 'user') $ok = $this->uGrant($m_name, $name, $rval);
-			elseif ($m_ty == 'role') $ok = $this->rGrant($m_name, $name, $rval);
-			else $this->setError('Runtime error in `%s`', $cmd[0]);
-			if ($ok) $this->message("Granted right `%s` to %s `%s`.",
-				array($name, $m_ty, $m_name));
-		break;
-
-		case '-right':
-			if ($m_ty == 'user') $ok = $this->uGrant($m_name, $name, null);
-			elseif ($m_ty == 'role') $ok = $this->rGrant($m_name, $name, null);
-			else $this->setError('Runtime error in `%s`', $cmd[0]);
-			if ($ok) $this->message("Revoked right `%s` from %s `%s`.",
-				array($name, $m_ty, $m_name));
-		break;
-
-		case '+user':
-			if ($m_ty == 'role') $ok = $this->uRole($name, $m_name);
-			else $this->setError('Runtime error in `%s`', $cmd[0]);
-			if ($ok) $this->message("Granted role `%s` to user `%s`.", array($m_name, $name));
-	 break;
-
-		case '-user':
-			if ($m_ty == 'role') $ok = $this->uRole($name, $m_name, false);
-			else $this->setError('Runtime error in `%s`', $cmd[0]);
-			if ($ok) $this->message("Revoked role `%s` from user `%s`.", array($m_name, $name));
-		break;
-
-		case '+active':
-			if ($m_ty == 'user') {
-				$user = array();
-				$uid = $this->sname($m_name, 'user');
-				$user['ACTIVE'] = 1;
-				$ok = $this->setUser('#'.$uid, $user);
-				if ($ok) $this->message("User `%s` enabled.", $m_name);
-			}
-			else $this->setError('Runtime error in `%s`', $cmd[0]);
-		break;
-
-		case '-active':
-			if ($m_ty == 'user') {
-				$user = array();
-				$uid = $this->sname($m_name, 'user');
-				$user['ACTIVE'] = 0;
-				$ok = $this->setUser('#'.$uid, $user);
-				if ($ok) $this->message("User `%s` disabled.", $m_name);
-			}
-			else $this->setError('Runtime error in `%s`', $cmd[0]);
-		break;
-
-		case '+dpassw':
-			if ($m_ty == 'user') {
-				$passw = $name? $name : $annot;
-				$user = array();
-
-				$uid = $this->sname($m_name, 'user');
-				$user['DPASSW'] = $passw? $passw : $this->genPassw();
-				$ok = $this->setUser('#'.$uid, $user);
-				if ($ok) $this->setPassw($m_name, '');
-				if ($ok) $this->message("Default password enabled: %s", $user['DPASSW']);
-			}
-			else $this->setError('Runtime error in `%s`', $cmd[0]);
-		break;
-
-		case '+passw':
-			$passw = $name? $name : $annot;
-			if ($m_ty == 'user') $ok = $this->setPassw($m_name, $passw);
-			else $this->setError('Runtime error in `%s`', $cmd[0]);
-			if ($ok) $this->message("Password set for user `%s`.", $m_name);
-		break;
-
-		default:
-			$this->setError('Syntax error in `%s`', $cmd[0]);
-		break;
-	}
-	return $ok;
-}
-
-/**Set message to $this->messages. */
-protected function message($message, $params)
-{
-	$this->messages[] = vsprintf($this->t($message), $params);
-}
-
-
-//sqlite doesn't know NOW()
-protected function modified($table, $id)
-{
-	$now = date('Y-m-d H:i:s');
-	$this->db->update($table, "LASTMOD='$now'", pri($id));
-}
-
-}
+?>
