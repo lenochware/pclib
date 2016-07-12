@@ -34,7 +34,7 @@ $config = array(
 	),
 
 	'pclib.tpl.escape' => false,
-	'pclib.auth.secret' => '',
+	'pclib.auth' => array('algo' => 'md5', 'secret' => 'write any random string!', 'realm' => ''),
 );
 
 ?>
