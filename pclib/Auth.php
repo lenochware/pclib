@@ -74,7 +74,9 @@ protected function getUserIp(pclib\AuthUser $user)
 function getUser($userName = null)
 {
 	if (!$userName) return $this->loggedUser;
-	return $this->getStorage()->getUser($userName);
+	$user = $this->getStorage()->getUser($userName);
+	if ($user) $user->auth = $this;
+	return $user;
 }
 
 /**
