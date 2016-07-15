@@ -100,7 +100,7 @@ function __construct()
 {
 	parent::__construct();
 
-	if (!session_id()) throw new RuntimeException('Session is required.');
+	if (!session_id()) throw new RuntimeException('Session is not initialized. Perhaps missing session_start()?');
 
 	$this->realm = $this->app->config['pclib.auth']['realm'] ?: $this->app->name;
 	$this->loggedUser = $this->getSessionUser();
