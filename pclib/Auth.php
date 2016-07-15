@@ -89,16 +89,7 @@ function exists($userName)
 	return (bool)$this->getUser($userName);
 }
 
-/**
- * Set database with auth data (if it is different from application db).
- * @param Db $db
- */
-function setDb(Db $db)
-{
-	$this->getStorage()->db = $db;
-}
-
-function __construct()
+function __construct(Db $db = null)
 {
 	parent::__construct();
 
@@ -106,6 +97,7 @@ function __construct()
 
 	$this->realm = $this->app->config['pclib.auth']['realm'] ?: $this->app->name;
 	$this->loggedUser = $this->getSessionUser();
+	if ($db) $this->getStorage()->db = $db;
 }
 
 /** Return storage object - if not exists, create one. */
@@ -185,6 +177,7 @@ protected function getSessionUser()
 
 	$user = new AuthUser;
 	$user->values = $data;
+	$user->auth = $this;
 	return $user;
 }
 

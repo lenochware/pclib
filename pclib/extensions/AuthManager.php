@@ -37,10 +37,10 @@ public $USERS_TAB = 'AUTH_USERS',
 	$RIGHTS_TAB   = 'AUTH_RIGHTS',
 	$USERROLE_TAB = 'AUTH_USER_ROLE';
 
-function __construct()
+function __construct($db = null)
 {
 	parent::__construct();
-	$this->service('db');
+	$this->db = $db ?: $this->service('db');
 }
 
 /**
