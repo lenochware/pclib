@@ -117,8 +117,8 @@ function getStorage()
  */
 function login($userName, $password)
 {
-	if (!$userName or !is_string($userName)) {
-		throw new AuthException("Invalid username: '%s'", $userName);
+	if (!is_string($userName) or !is_string($password)) {
+		throw new AuthException("Invalid username or password.");
 	}
 
 	$user = $this->getUser($userName);
