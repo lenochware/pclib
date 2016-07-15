@@ -173,9 +173,9 @@ protected function query(array $terms)
 			if ($this->errors) break;
 			$filter['USERNAME'] = $name;
 			$users = $this->db->selectOne(
-				"select distinct U.USERNAME from $this->mng->USERS_TAB U
-				~ left join $this->mng->REGISTER_TAB REG on REG.USER_ID=U.ID
-				~ left join $this->mng->USERROLE_TAB UR on UR.USER_ID=U.ID
+				"select distinct U.USERNAME from {$this->mng->USERS_TAB} U
+				~ left join {$this->mng->REGISTER_TAB} REG on REG.USER_ID=U.ID
+				~ left join {$this->mng->USERROLE_TAB} UR on UR.USER_ID=U.ID
 				where U.USERNAME like '{USERNAME}'
 				~ AND U.ACTIVE='{ACTIVE}'
 				~ AND (U.PASSW='' OR U.PASSW is NULL) {?DPASSW}
@@ -197,8 +197,8 @@ protected function query(array $terms)
 			}
 			$this->messages[] = $msg;
 			$roles = $this->db->selectOne(
-				"select R.SNAME from $this->mng->ROLES_TAB R
-				inner join $this->mng->USERROLE_TAB UR on R.ID=UR.ROLE_ID
+				"select R.SNAME from {$this->mng->ROLES_TAB} R
+				inner join {$this->mng->USERROLE_TAB} UR on R.ID=UR.ROLE_ID
 				where UR.USER_ID='{0}'
 				order by UR.R_PRIORITY desc", (int)$user['ID']
 			);
@@ -206,8 +206,8 @@ protected function query(array $terms)
 				.($roles? implode(', ', $roles) : '');
 
 			$rights = $this->db->selectPair(
-				"select SNAME,REG.RVAL from $this->mng->RIGHTS_TAB R
-				inner join $this->mng->REGISTER_TAB REG on REG.RIGHT_ID=R.ID
+				"select SNAME,REG.RVAL from {$this->mng->RIGHTS_TAB} R
+				inner join {$this->mng->REGISTER_TAB} REG on REG.RIGHT_ID=R.ID
 				where REG.USER_ID='{0}'", (int)$user['ID']
 			);
 
@@ -239,8 +239,8 @@ protected function query(array $terms)
 			$this->messages[] = $msg;
 
 			$rights = $this->db->selectPair(
-				"select SNAME,REG.RVAL from $this->mng->RIGHTS_TAB R
-				inner join $this->mng->REGISTER_TAB REG on REG.RIGHT_ID=R.ID
+				"select SNAME,REG.RVAL from {$this->mng->RIGHTS_TAB} R
+				inner join {$this->mng->REGISTER_TAB} REG on REG.RIGHT_ID=R.ID
 				where REG.ROLE_ID='{#0}'",$role['ID']
 			);
 
@@ -273,8 +273,8 @@ protected function query(array $terms)
 			$this->messages[] = $msg;
 
 			$roles = $this->db->selectOne(
-				"select SNAME from $this->mng->ROLES_TAB RO
-				inner join $this->mng->REGISTER_TAB REG on REG.ROLE_ID=RO.ID
+				"select SNAME from {$this->mng->ROLES_TAB} RO
+				inner join {$this->mng->REGISTER_TAB} REG on REG.ROLE_ID=RO.ID
 				where REG.RIGHT_ID='{#0}'", $right['ID']
 			);
 
