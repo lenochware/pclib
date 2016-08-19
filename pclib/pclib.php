@@ -72,6 +72,9 @@ class Pclib
 			'PCLogger' => '\pclib\Logger',
 			'PCTranslator' => '\pclib\Translator',
 			'PCController' => '\pclib\Controller',
+			'PCModel' => '\pclib\Model',
+			'PCValidator' => '\pclib\Validator',
+			'PCSelection' => '\pclib\Selection',
 		);
 
 		$this->legacyAliases += array_change_key_case($this->legacyAliases, CASE_LOWER);

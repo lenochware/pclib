@@ -17,6 +17,7 @@ class Exception extends \Exception
 	}
 }
 
+class SqlQueryException extends Exception {}
 class NotImplementedException extends Exception {}
 class RuntimeException extends Exception {}
 class DatabaseException extends Exception {}

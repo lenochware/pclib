@@ -1,0 +1,323 @@
+<?php
+/**
+ * @file
+ * Selection of records in database.
+ * @author -dk-
+ * http://pclib.brambor.net/
+ */
+
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+
+namespace pclib;
+use pclib;
+
+/**
+ * Selection of records in database.
+ * It represents any selection on database table and will return Model instances as records.
+ * It does not load records from the database before they are really requested.
+ *
+ * Features:
+ * - Fluent interface: $sel->from('PEOPLE')->order('SURNAME desc');
+ * - Using in foreach: foreach ($sel as $person) {..}
+ * - Return models: $person1 = $sel->from('PEOPLE')->find(1); print $person1->posts;
+ */
+class Selection implements \Iterator {
+
+/** var Db */
+protected $db;
+
+/** Array of sql query clausules. */
+protected $query = array();
+
+/** Result of underlying sql query. */
+protected $result = null;
+
+/** Data of the current row. */
+protected $data = array();
+
+protected $position = 0;
+
+protected $cachedTemplate;
+
+function __construct(Db $db) {
+	$this->db = $db;
+}
+
+/** Iterator.rewind() implementation. */
+function rewind() {
+	$this->execute();
+	$this->next();
+}
+
+/** Iterator.current() implementation. */
+function current() {
+	return $this->newModel($this->data);
+}
+
+/** Iterator.key() implementation. */
+function key() {
+	return $this->position;
+}
+
+/** Iterator.next() implementation. */
+function next() {
+	$data = $this->db->fetch($this->result);
+	if ($data === false) {
+		$this->result = null;
+		$this->position = 0;
+	}
+
+	$this->data = $data;
+	$this->position++;
+}
+
+/** Iterator.valid() implementation. */
+function valid() {
+	return ($this->result !== null);
+}
+
+/**
+ * Create model instance, fill its values with $data and return it.
+ * @return Model $model
+ */
+protected function newModel($data) {
+	$modelClass = $this->getModelClass();
+	$model = new $modelClass($this->db, $this->query['from']);
+	if (!$this->cachedTemplate) {
+		$this->cachedTemplate = $model->getTemplate();
+	}
+	$model->setTemplate($this->cachedTemplate);
+	if ($data) $model->setValues($data);
+	$model->setPrimaryId($data['ID']);
+	return $model;
+}
+
+/** Create name of the model class from 'query from' clause. */
+protected function getModelName()
+{
+	return ucfirst(strtolower($this->query['from'])).'Model';
+}
+
+/**
+ * Resolve className of the model, based on the database table name, 
+ * include model class and return className.
+ * @return string $className
+ */
+protected function getModelClass() {
+	$modelName = $this->getModelName();
+	$fileName = 'models/'.$modelName.'.php';
+	if (file_exists($fileName)) {
+		require_once($fileName);
+		return $modelName;
+	}
+	else return '\pclib\Model';
+
+}
+
+/**
+ * PHP magic method.
+ * Redirect unknown method call to underlying model class.
+ */
+public function __call($name, $args) {
+	$modelClass = $this->getModelClass();
+	array_unshift($args, $this);
+	return call_user_func_array(array($modelClass, $name), $args); 
+	//parent::__call($name, $args);
+}
+
+/**
+ * Return first record in the selection.
+ * @return Model $model
+ */
+function first() {
+	$this->rewind();
+	return $this->current();
+}
+
+/**
+ * Find record by primary key.
+ * @return Model $model
+ */
+function find($id) {
+	$model = $this->newModel(null);
+	return $model->find($id);
+}
+
+/*
+
+function first($n = 1) {
+}
+
+//totez co toArray()?
+function all() {
+}
+*/
+
+/**
+ * Execute query to the database and set $this->result.
+ * @return $result
+ */
+protected function execute() {
+	$this->result = $this->db->query($this->getSql());
+	$this->position = 0;
+	$this->data = array();
+
+	//$this->reset();
+	return $this->result;
+}
+
+/**
+ * Set selection limit. Fluent interface.
+ * @return Selection $this
+ */
+function limit($limit, $offset) {
+	$this->query['limit'] = array($limit, $offset);
+	return $this;
+}
+
+/*
+function select() {
+	$args = func_get_args();
+	if (is_array($args[0])) $args = $args[0];
+	if (!$args) $args = array('*');
+	
+	$this->query['command'] = 'select';
+	$this->query['columns'] = $args;
+	return $this;
+}
+*/
+
+/**
+ * Set source table $s. Fluent interface.
+ * @return Selection $this
+ */
+function from($s) {
+	$this->query['from'] = $s;
+	$this->cachedTemplate = null;
+	return $this;
+}
+
+/**
+ * Set where condition. Fluent interface.
+ * @return Selection $this
+ */
+function where($s) {
+	if(!isset($this->query['where'])) $this->query['where'] = array();
+	if (is_array($s)) $s = $this->createFieldList(' AND ', $s);
+	$this->query['where'][] = $s;
+	return $this;
+}
+
+/**
+ * Set order by clausule. Fluent interface.
+ * @return Selection $this
+ */
+function order($s) {
+	$args = func_get_args();
+	if (is_array($args[0])) $args = $args[0];
+	
+	$this->query['order'] = $args;
+	return $this;
+}
+
+
+/**
+ * Set group by clausule. Fluent interface.
+ * @return Selection $this
+ */
+function group($s) {
+	$this->query['group'] = $s;
+	return $this;
+}
+
+/**
+ * Set having clausule. Fluent interface.
+ * @return Selection $this
+ */
+function having($s) {
+	if(!isset($this->query['having'])) $this->query['having'] = array();
+	if (is_array($s)) $s = $this->createFieldList(' AND ', $s);
+	$this->query['having'][] = $s;
+	return $this;
+}
+
+/**
+ * Reset selection. Remove all conditions and loaded data.
+ * @return Selection $this
+ */
+function reset() {
+	$this->query = array();
+	$this->position = 0;
+	$this->data = array();  
+	$this->result = null;
+	return $this;
+}
+
+/**
+ * Build sql query for current selection.
+ * @return string $sql
+ */
+function getSql() {
+	extract($this->query, EXTR_SKIP);
+	$columns = array('*'); //always '*' for now
+	
+	if (!$columns or !$from)
+		throw new SqlQueryException('Invalid command.');
+	
+	$sql = 'SELECT '.implode(',', $columns).' FROM '.$from;
+	if ($where)  $sql .= ' WHERE '.implode(' AND ', $where);
+	if ($group)  $sql .= ' GROUP BY '.$group;
+	if ($having) $sql .= ' HAVING '.implode(' AND ', $having);
+	if ($order)  $sql .= ' ORDER BY '.implode(',', $order);
+	if ($limit)  $sql .= ' LIMIT '.$limit[0].' OFFSET '.$limit[1];
+	return $sql;
+}
+
+protected function createFieldList($separ, array $fieldsArray) {
+	//escape keys?
+	foreach($fieldsArray as $k => $v) {
+		$output[] = $k.'='.$this->escape($v);
+	}
+	return implode($separ, $output);
+}
+
+function escape($s) {
+	return "'".$this->db->escape($s)."'";
+}
+
+/**
+ * Return current selection as array.
+ * @return array $rows Array of models.
+ */
+function toArray() {
+	$rows = array();
+	foreach ($this as $model) {
+		$rows[] = $model;
+	}
+	return $rows;
+}
+
+/**
+ * Return string representation of selection for debugging purposes.
+ */
+function __toString() {
+	try {
+		$s = 'Object.Selection<br>';
+		$s .= $this->getSql().'<br>';
+		foreach ($this->toArray() as $key => $value) {
+			$s.= "$key: $value<br>";
+		}
+		return $s;
+	} catch (Exception $e) {
+		trigger_error($e->getMessage(), E_USER_ERROR);
+	}
+
+	//return json_encode($this->toArray());
+}
+
+}
+
+?>
