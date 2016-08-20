@@ -171,12 +171,7 @@ public function __get($name)
 		return $this->related($name);
 	}
 
-	if (!$this->hasColumn($name)) {
-		$class = get_class($this);
-		throw new MemberAccessException("Cannot read an undeclared property $class->$name.");    
-	}
-
-	return $this->values[$name];
+	return $this->getValue($name);
 }
 
 /**
@@ -186,12 +181,7 @@ public function __get($name)
  */
 public function __set($name, $value)
 {
-	if (!$this->hasColumn($name)) {
-		$class = get_class($this);
-		throw new MemberAccessException("Cannot write to an undeclared property $class->$name.");    
-	}
-
-	$this->values[$name] = $value;
+	$this->setValue($name, $value);
 }
 
 /**
@@ -211,7 +201,7 @@ function related($name) {
 
 	//cache?
 	$sel = new Selection($this->db);
-	$sel->from($table)->where(array($foreignKey => $this->values[$this->primary]));
+	$sel->from($table)->where(array($foreignKey => $this->getPrimaryId()));
 
 	if ($def['many']) {
 		return $sel;    
@@ -271,6 +261,7 @@ function delete()
 	return $ok;
 }
 
+/** Occurs on validation error. */
 function onError() {}
 
 /** 
@@ -328,6 +319,11 @@ function toArray()
  */
 function setValue($name, $value)
 {
+	if (!$this->hasColumn($name)) {
+		$class = get_class($this);
+		throw new MemberAccessException("Cannot write to an undeclared property $class->$name.");    
+	}
+
 	$this->values[$name] = $value;
 }
 
@@ -336,6 +332,11 @@ function setValue($name, $value)
  */
 function getValue($name)
 {
+	if (!$this->hasColumn($name)) {
+		$class = get_class($this);
+		throw new MemberAccessException("Cannot read an undeclared property $class->$name.");    
+	}
+
 	return $this->values[$name];
 }
 
