@@ -42,6 +42,8 @@ protected $validator;
 /** Array of model values. */
 protected $values;
 
+protected static $columnsCache = array();
+
 /**
  * Create empty model.
  * @param Db $db
@@ -49,6 +51,7 @@ protected $values;
  */
 function __construct(Db $db, $tableName) {
 	$this->db = $db;
+
 	if (!$tableName) {
 		throw new Exception("Empty table name.");
 		
@@ -119,12 +122,7 @@ protected function createTemplate()
 protected function createDefaultTemplate()
 {
 	if (!$this->tableName) throw new Exception('Missing table name.');
-	$columns = array_keys($this->db->columns($this->tableName));
 	$t = new Tpl;
-	foreach ($columns as $id) {
-		$t->elements[$id]['type'] = 'column';
-		$t->elements[$id]['id'] = $key;
-	}
 	return $t;
 }
 
@@ -151,12 +149,23 @@ function find($id) {
 	return $this;
 }
 
+function getColumns()
+{
+	$cols = self::$columnsCache[$this->tableName];
+	if (!$cols) {
+		$cols = $this->db->columns($this->tableName);
+		self::$columnsCache[$this->tableName] = $cols;
+	}
+	return $cols;
+}
+
 /** 
  * Check if model has column $name. 
  * @return bool $yes
  */
 function hasColumn($name) {
-	return ($this->getTemplate()->elements[$name]['type'] == 'column');
+	$cols = $this->getColumns();
+	return $cols[$name];
 }
 
 /**
