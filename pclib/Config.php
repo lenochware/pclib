@@ -29,8 +29,9 @@ $config = array(
 		'localization' => '{webroot}{pclib}/localization/',
 	),
 
-	'pclib.app.make' => array(
-		'controller' => array('dir' => 'controllers', 'namespace' => '', 'postfix' => 'Controller')
+	'pclib.loader' => array(
+		'controller' => array('dir' => 'controllers', 'namespace' => '', 'postfix' => 'Controller'),
+		'model' => array('dir' => 'models', 'namespace' => '', 'postfix' => 'Model', 'default' => '\pclib\Model'),
 	),
 
 	'pclib.tpl.escape' => false,

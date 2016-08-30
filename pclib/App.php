@@ -545,44 +545,44 @@ function getNavig($separ = ' / ', $lastLink = false)
 	return implode($separ, (array)$navig);
 }
 
-/**
- * Factory of controller's object.
-*/
-function make($className, $factoryName = null)
+function getClassName($name, $loaderName)
 {
-	if(!$factoryName) return new $className;
-
-	$options = $this->config['pclib.app.make'][$factoryName];
+	$options = $this->config['pclib.loader'][$loaderName];
+	if (!$options) throw new Exception("Loader '%s' is not defined in configuration.", array($loaderName));
 
 	if ($this->config['pclib.compatibility']['legacy_classnames']) {
 		$postfix = $options['postfix']? '_'.lcfirst($options['postfix']) : '';
 	}
 	else {
-		$className = ucfirst($className);
+		$name = ucfirst($name);
 		$postfix = $options['postfix'];
 	}
 
-	$realClassName = $className.$postfix;
+	$className = $name.$postfix;
 
 	if($options['dir']) {
-		$path = $options['dir'].'/'.$realClassName.'.php';
-		if (!file_exists($path)) return null;
+		$path = $options['dir'].'/'.$className.'.php';
+		if (!file_exists($path)) return $options['default'];
 		require_once($path);
 	}
 
 	if ($options['namespace']) {
-		$realClassName = $options['namespace'].'\\'.$realClassName;
+		$className = $options['namespace'].'\\'.$className;
 	}
 
-	$class = new \ReflectionClass($realClassName);
-	$args = $options['args'] ?: array();
+	return $className;
+}
 
-	if ($factoryName == 'controller') {
-		$args = array($this);
-	}
+function newController($name)
+{
+	$className = $this->getClassName($name, 'controller');
+	return $className? new $className($this) : null;
+}
 
-	$instance = $class->newInstanceArgs($args);
-	return $instance;
+function newModel($name)
+{
+	$className = $this->getClassName($name, 'model');
+	return $className? new $className($this, $name) : null;
 }
 
 /**
@@ -604,7 +604,7 @@ function run($rs = null)
 	$event = $this->onBeforeRun();
 	if ($event and !$event->propagate) return;
 
-	$ct = $this->make($action->controller, 'controller');
+	$ct = $this->newController($action->controller);
 	if (!$ct) $this->httpError(404, 'Page not found: "%s"', null, $action->controller);
 
 	$html = $ct->run($action);

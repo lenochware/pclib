@@ -670,7 +670,7 @@ function print_Action($id, $sub, $value)
 {
 	$rs = $this->replaceParams($this->elements[$id]['route']);
 	$action = new Action($rs);
-	$ct = $this->app->make($action->controller, 'controller');
+	$ct = $this->app->newController($action->controller);
 	if (!$ct) {
 		printf($this->t('Page not found: "%s"'), $action->controller);
 	}
@@ -1115,7 +1115,7 @@ protected function getLkpLookup($lookup)
 protected function getDataSource($rs)
 {
 	$action = new Action($this->replaceParams($rs));
-	$ct = $this->app->make($action->controller, 'controller');
+	$ct = $this->app->newController($action->controller);
 	$args = $ct->getArgs($action->method, $action->params);
 	return call_user_func_array(array($ct, $action->method), $args);
 }
