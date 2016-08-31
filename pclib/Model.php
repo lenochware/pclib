@@ -276,7 +276,7 @@ function delete()
 }
 
 /** Occurs on validation error. */
-function onError() {}
+function onError($action) {}
 
 /** 
  * Validate values of the model against template.
@@ -287,7 +287,7 @@ function onError() {}
 function validate($action = '')
 {
 	$ok = $this->getValidator()->validate($this->values);
-	if (!$ok) $this->onError();
+	if (!$ok) $this->onError($action);
 	return $ok;
 }
 
@@ -297,7 +297,7 @@ function validate($action = '')
  */
 function getErrors()
 {
-	return $this->getValidator()->errors;
+	return $this->getValidator()->getErrors();
 }
 
 
@@ -360,7 +360,11 @@ function getValue($name)
  */
 function __toString()
 {
-	return json_encode($this->getValues());
+	try {
+		return json_encode($this->getValues());
+	} catch (Exception $e) {
+		trigger_error($e->getMessage(), E_USER_ERROR);
+	}	
 }
 
 }
