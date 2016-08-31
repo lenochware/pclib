@@ -21,8 +21,10 @@ use pclib;
 class Model extends system\BaseObject
 {
 
+protected $app;	
+
 /** var Db */
-protected $db;
+public $db; //must be public because of service()
 
 /** Name of source database table. */
 protected $tableName;
@@ -49,13 +51,18 @@ protected static $columnsCache = array();
  * @param Db $db
  * @param string $tableName Database table
  */
-function __construct(Db $db, $tableName) {
-	$this->db = $db;
+function __construct(App $app, $tableName)
+{
+	parent::__construct();
+
+	$this->app = $app;
+
+	$this->service('db');
 
 	if (!$tableName) {
 		throw new Exception("Empty table name.");
-		
 	}
+
 	$this->tableName = $tableName;
 }
 
@@ -206,10 +213,8 @@ function related($name) {
 		throw new Exception("Missing table or key name.");
 	}
 
-	//$prim = strtoupper($this->primary); //hack
-
 	//cache?
-	$sel = new Selection($this->db);
+	$sel = new Selection($this->app);
 	$sel->from($table)->where(array($foreignKey => $this->getPrimaryId()));
 
 	if ($def['many']) {

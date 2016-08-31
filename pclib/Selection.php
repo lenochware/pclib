@@ -26,6 +26,8 @@ use pclib;
  */
 class Selection implements \Iterator {
 
+protected $app;
+
 /** var Db */
 protected $db;
 
@@ -42,8 +44,9 @@ protected $position = 0;
 
 protected $cachedTemplate;
 
-function __construct(Db $db) {
-	$this->db = $db;
+function __construct(App $app) {
+	$this->app = $app;
+	$this->db = $this->app->getService('db');
 }
 
 /** Iterator.rewind() implementation. */
@@ -84,37 +87,25 @@ function valid() {
  * @return Model $model
  */
 protected function newModel($data) {
-	$modelClass = $this->getModelClass();
-	$model = new $modelClass($this->db, $this->query['from']);
+	$model = $this->app->newModel($this->query['from']);
+
 	if (!$this->cachedTemplate) {
 		$this->cachedTemplate = $model->getTemplate();
 	}
+
 	$model->setTemplate($this->cachedTemplate);
-	if ($data) $model->setValues($data);
-	$model->setPrimaryId($data['ID']);
+
+	if ($data) {
+		$model->setValues($data);
+		$model->setPrimaryId($data['ID']);
+	}
+
 	return $model;
 }
 
-/** Create name of the model class from 'query from' clause. */
 protected function getModelName()
 {
-	return ucfirst(strtolower($this->query['from'])).'Model';
-}
-
-/**
- * Resolve className of the model, based on the database table name, 
- * include model class and return className.
- * @return string $className
- */
-protected function getModelClass() {
-	$modelName = $this->getModelName();
-	$fileName = 'models/'.$modelName.'.php';
-	if (file_exists($fileName)) {
-		require_once($fileName);
-		return $modelName;
-	}
-	else return '\pclib\Model';
-
+	return $this->app->getClassName($this->query['from'], 'model');
 }
 
 /**
@@ -122,7 +113,7 @@ protected function getModelClass() {
  * Redirect unknown method call to underlying model class.
  */
 public function __call($name, $args) {
-	$modelClass = $this->getModelClass();
+	$modelClass = $this->getModelName();
 	array_unshift($args, $this);
 	return call_user_func_array(array($modelClass, $name), $args); 
 	//parent::__call($name, $args);
