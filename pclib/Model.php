@@ -44,6 +44,8 @@ protected $validator;
 /** Array of model values. */
 protected $values;
 
+protected $modified = array();
+
 protected static $columnsCache = array();
 
 /**
@@ -232,9 +234,26 @@ function related($name) {
  */
 function save()
 {
+	if (!$this->modified) return true;
 	$ok = $this->inDb? $this->update() : $this->insert();
-	if ($ok) $this->inDb = true;
+	if ($ok) {
+		$this->inDb = true;
+		$this->modified = array();
+	}
 	return $ok;
+}
+
+protected function getValuesForSave()
+{
+	$values = array();
+	$elem = $this->getTemplate()->elements;
+
+	foreach ($this->modified as $name) {
+		if ($elem[$name]['nosave']) continue;
+		$values[$name] = $this->values[$name];
+	}
+	
+	return $values;
 }
 
 /** Insert new row into table with model values. */
@@ -242,7 +261,8 @@ protected function insert()
 {
 	if (!$this->validate('insert')) return false;
 
-	$id = $this->db->insert($this->tableName, $this->values);
+	$id = $this->db->insert($this->tableName, $this->getValuesForSave());
+
 	$this->setPrimaryId($id);
 	return $id;
 }
@@ -255,7 +275,7 @@ protected function update()
 
 	if (!$this->validate('update')) return false;
 
-	return $this->db->update($this->tableName, $this->values, array($this->primary => $id));
+	return $this->db->update($this->tableName, $this->getValuesForSave(), array($this->primary => $id));
 }
 
 /** 
@@ -272,7 +292,11 @@ function delete()
 	if (!$this->validate('delete')) return false;
 
 	$ok = $this->db->delete($this->tableName, array($this->primary => $id));
-	if ($ok) $this->inDb = false;
+	if ($ok) {
+		$this->inDb = false;
+		$this->modified = array_keys($this->values);
+	}
+
 	return $ok;
 }
 
@@ -308,7 +332,12 @@ function getErrors()
  */
 function getValues()
 {
-	return $this->values;
+	$values = array();
+	foreach ($this->values as $k => $v) {
+		$values[$k] = $this->getValue($k);
+	}
+
+	return $values;
 }
 
 /** 
@@ -317,7 +346,9 @@ function getValues()
  */
 function setValues(array $values)
 {
-	$this->values = $values;
+	foreach ($values as $k => $v) {
+		$this->setValue($k, $v);
+	}
 }
 
 /** 
@@ -340,6 +371,7 @@ function setValue($name, $value)
 	}
 
 	$this->values[$name] = $value;
+	if (!in_array($name, $this->modified)) $this->modified[] = $name;
 }
 
 /** 
