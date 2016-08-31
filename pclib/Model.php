@@ -172,7 +172,8 @@ function getColumns()
  */
 function hasColumn($name) {
 	$cols = $this->getColumns();
-	return $cols[$name];
+	$elem = $this->getTemplate()->elements;
+	return $cols[$name] ?: ($elem[$name]['type'] == 'column');
 }
 
 /**
