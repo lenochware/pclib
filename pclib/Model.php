@@ -46,6 +46,9 @@ protected $values;
 
 protected $modified = array();
 
+/** Role used by model for data access. */
+protected $accessRole;
+
 protected static $columnsCache = array();
 
 /**
@@ -234,6 +237,8 @@ function related($name) {
  */
 function save()
 {
+	if (!$this->testRight('save')) return false;
+
 	if (!$this->modified) return true;
 	$ok = $this->inDb? $this->update() : $this->insert();
 	if ($ok) {
@@ -256,9 +261,45 @@ protected function getValuesForSave()
 	return $values;
 }
 
+function setRole($role)
+{
+	$el = $this->getTemplate()->elements[$role];
+	if ($el['type'] != 'role') {
+		throw new Exception("Unknown role '%s'", array($role));
+	}
+
+	$this->accessRole = $role;
+}
+
+function hasRight($action)
+{
+	if (!$this->accessRole) return true;
+	$el = $this->getTemplate()->elements[$this->accessRole];
+
+	if (is_array($action)) {
+		$cols = $el[$action[0].'_array'];
+		return (in_array($action[1], $cols) or in_array('*', $cols));
+	}
+	else {
+		return in_array($action, $el['rights_array']);
+	}
+}
+
+protected function testRight($action)
+{
+	if (!$this->hasRight($action)) {
+		if (is_array($action)) { $action = implode(' ', $action); }
+		throw new Exception("Access denied while '%s'", array($action));
+		//return false;
+	}
+	else return true;
+}
+
 /** Insert new row into table with model values. */
 protected function insert()
 {
+	if (!$this->testRight('insert')) return false;
+
 	if (!$this->validate('insert')) return false;
 
 	$id = $this->db->insert($this->tableName, $this->getValuesForSave());
@@ -270,6 +311,8 @@ protected function insert()
 /** Update model values in database with actual state. */
 protected function update()
 {
+	if (!$this->testRight('update')) return false;
+
 	$id = $this->getPrimaryId();
 	if (!$id) throw new Exception('Missing primary key.');
 
@@ -284,6 +327,8 @@ protected function update()
  */
 function delete()
 {
+	if (!$this->testRight('delete')) return false;
+
 	if (!$this->inDb) return false;
 
 	$id = $this->getPrimaryId();
@@ -325,7 +370,6 @@ function getErrors()
 	return $this->getValidator()->getErrors();
 }
 
-
 /** 
  * Get model values.
  * @return array $values
@@ -334,6 +378,7 @@ function getValues()
 {
 	$values = array();
 	foreach ($this->values as $k => $v) {
+		if (!$this->hasRight(array('read', $k))) continue;
 		$values[$k] = $this->getValue($k);
 	}
 
@@ -370,6 +415,9 @@ function setValue($name, $value)
 		throw new MemberAccessException("Cannot write to an undeclared property $class->$name.");    
 	}
 
+	if ($this->values[$name] === $value) return;
+	if ( !$this->testRight(array('write', $name)) ) return false;
+
 	$this->values[$name] = $value;
 	if (!in_array($name, $this->modified)) $this->modified[] = $name;
 }
@@ -383,6 +431,8 @@ function getValue($name)
 		$class = get_class($this);
 		throw new MemberAccessException("Cannot read an undeclared property $class->$name.");    
 	}
+
+	if ( !$this->testRight(array('read', $name)) ) return false;
 
 	return $this->values[$name];
 }
