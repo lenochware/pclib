@@ -44,29 +44,34 @@ protected $position = 0;
 
 protected $cachedTemplate;
 
-function __construct(App $app) {
+function __construct(App $app)
+{
 	$this->app = $app;
 	$this->db = $this->app->getService('db');
 }
 
 /** Iterator.rewind() implementation. */
-function rewind() {
+function rewind()
+{
 	$this->execute();
 	$this->next();
 }
 
 /** Iterator.current() implementation. */
-function current() {
+function current()
+{
 	return $this->newModel($this->data);
 }
 
 /** Iterator.key() implementation. */
-function key() {
+function key()
+{
 	return $this->position;
 }
 
 /** Iterator.next() implementation. */
-function next() {
+function next()
+{
 	$data = $this->db->fetch($this->result);
 	if ($data === false) {
 		$this->result = null;
@@ -78,7 +83,8 @@ function next() {
 }
 
 /** Iterator.valid() implementation. */
-function valid() {
+function valid()
+{
 	return ($this->result !== null);
 }
 
@@ -86,7 +92,8 @@ function valid() {
  * Create model instance, fill its values with $data and return it.
  * @return Model $model
  */
-protected function newModel($data) {
+protected function newModel($data)
+{
 	$model = $this->app->newModel($this->query['from']);
 
 	if (!$this->cachedTemplate) {
@@ -112,7 +119,8 @@ protected function getModelName()
  * PHP magic method.
  * Redirect unknown method call to underlying model class.
  */
-public function __call($name, $args) {
+public function __call($name, $args)
+{
 	$modelClass = $this->getModelName();
 	array_unshift($args, $this);
 	return call_user_func_array(array($modelClass, $name), $args); 
@@ -123,7 +131,8 @@ public function __call($name, $args) {
  * Return first record in the selection.
  * @return Model $model
  */
-function first() {
+function first()
+{
 	$this->rewind();
 	return $this->current();
 }
@@ -132,7 +141,8 @@ function first() {
  * Find record by primary key.
  * @return Model $model
  */
-function find($id) {
+function find($id)
+{
 	$model = $this->newModel(null);
 	return $model->find($id);
 }
@@ -151,7 +161,8 @@ function all() {
  * Execute query to the database and set $this->result.
  * @return $result
  */
-protected function execute() {
+protected function execute()
+{
 	$this->result = $this->db->query($this->getSql());
 	$this->position = 0;
 	$this->data = array();
@@ -164,7 +175,8 @@ protected function execute() {
  * Set selection limit. Fluent interface.
  * @return Selection $this
  */
-function limit($limit, $offset) {
+function limit($limit, $offset)
+{
 	$this->query['limit'] = array($limit, $offset);
 	return $this;
 }
@@ -185,7 +197,8 @@ function select() {
  * Set source table $s. Fluent interface.
  * @return Selection $this
  */
-function from($s) {
+function from($s)
+{
 	$this->query['from'] = $s;
 	$this->cachedTemplate = null;
 	return $this;
@@ -195,7 +208,8 @@ function from($s) {
  * Set where condition. Fluent interface.
  * @return Selection $this
  */
-function where($s) {
+function where($s)
+{
 	if(!isset($this->query['where'])) $this->query['where'] = array();
 	if (is_array($s)) $s = $this->createFieldList(' AND ', $s);
 	$this->query['where'][] = $s;
@@ -206,7 +220,8 @@ function where($s) {
  * Set order by clausule. Fluent interface.
  * @return Selection $this
  */
-function order($s) {
+function order($s)
+{
 	$args = func_get_args();
 	if (is_array($args[0])) $args = $args[0];
 	
@@ -219,7 +234,8 @@ function order($s) {
  * Set group by clausule. Fluent interface.
  * @return Selection $this
  */
-function group($s) {
+function group($s)
+{
 	$this->query['group'] = $s;
 	return $this;
 }
@@ -228,7 +244,8 @@ function group($s) {
  * Set having clausule. Fluent interface.
  * @return Selection $this
  */
-function having($s) {
+function having($s)
+{
 	if(!isset($this->query['having'])) $this->query['having'] = array();
 	if (is_array($s)) $s = $this->createFieldList(' AND ', $s);
 	$this->query['having'][] = $s;
@@ -239,7 +256,8 @@ function having($s) {
  * Reset selection. Remove all conditions and loaded data.
  * @return Selection $this
  */
-function reset() {
+function reset()
+{
 	$this->query = array();
 	$this->position = 0;
 	$this->data = array();  
@@ -251,7 +269,8 @@ function reset() {
  * Build sql query for current selection.
  * @return string $sql
  */
-function getSql() {
+function getSql()
+{
 	extract($this->query, EXTR_SKIP);
 	$columns = array('*'); //always '*' for now
 	
@@ -267,7 +286,8 @@ function getSql() {
 	return $sql;
 }
 
-protected function createFieldList($separ, array $fieldsArray) {
+protected function createFieldList($separ, array $fieldsArray)
+{
 	//escape keys?
 	foreach($fieldsArray as $k => $v) {
 		$output[] = $k.'='.$this->escape($v);
@@ -283,7 +303,8 @@ function escape($s) {
  * Return current selection as array.
  * @return array $rows Array of models.
  */
-function toArray() {
+function toArray()
+{
 	$rows = array();
 	foreach ($this as $model) {
 		$rows[] = $model;
@@ -294,7 +315,8 @@ function toArray() {
 /**
  * Return string representation of selection for debugging purposes.
  */
-function __toString() {
+function __toString()
+{
 	try {
 		$s = 'Object.Selection<br>';
 		$s .= $this->getSql().'<br>';

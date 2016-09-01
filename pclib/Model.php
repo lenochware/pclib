@@ -170,7 +170,8 @@ function getPrimaryId()
  * @param int $id primary key
  * @return App_Model $this
  */
-function find($id) {
+function find($id)
+{
 	$this->values = $this->db->select($this->tableName, array($this->primary => $id));
 	if ($this->values) $this->inDb = true;
 	return $this;
@@ -190,7 +191,8 @@ function getColumns()
  * Check if model has column $name. 
  * @return bool $yes
  */
-function hasColumn($name) {
+function hasColumn($name)
+{
 	$cols = $this->getColumns();
 	$elem = $this->getTemplate()->elements;
 	return $cols[$name] ?: ($elem[$name]['type'] == 'column');
