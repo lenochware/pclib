@@ -42,8 +42,9 @@ protected $template;
 protected $validator;
 
 /** Array of model values. */
-protected $values;
+protected $values = array();
 
+/** Array of modified column names. */
 protected $modified = array();
 
 /** Role used by model for data access. */
@@ -120,11 +121,14 @@ protected function createTemplate()
 {  
 	$fileName = $this->getTemplatePath();
 	if (file_exists($fileName)) {
-		return new Tpl($fileName);
+		$t = new Tpl($fileName);
 	}
 	else {
-		return $this->createDefaultTemplate();
+		$t = $this->createDefaultTemplate();
 	}
+
+	$this->prepareTemplate($t);
+	return $t;
 }
 
 /**
@@ -137,6 +141,17 @@ protected function createDefaultTemplate()
 	$t = new Tpl;
 	return $t;
 }
+
+protected function prepareTemplate(Tpl $t)
+{
+	foreach ($t->elements as $id => $el) {
+		if ($el['type'] != 'role') continue;
+		foreach (array('rights', 'read', 'write') as $k) {
+			$t->elements[$id][$k.'_array'] = $el[$k]? explode(',', $el[$k]) : array();
+		}
+	}
+}
+
 
 //nastavi propojeni s recordem v databazi (pk se nesmi jinak menit)
 function setPrimaryId($id)
