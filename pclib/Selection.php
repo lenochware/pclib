@@ -147,6 +147,13 @@ function find($id)
 	return $model->find($id);
 }
 
+function delete()
+{
+	foreach ($this as $model) {
+		$model->delete();
+	}
+}
+
 /*
 
 function first($n = 1) {

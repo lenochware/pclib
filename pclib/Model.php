@@ -152,6 +152,18 @@ protected function prepareTemplate(Tpl $t)
 	}
 }
 
+protected function getRelations()
+{
+	$rel = array();
+
+	foreach ($this->getTemplate()->elements as $id => $el) {
+		if ($el['type'] != 'relation') continue;
+		$rel[$id] = $el;
+	}
+
+	return $rel;
+}
+
 
 //nastavi propojeni s recordem v databazi (pk se nesmi jinak menit)
 function setPrimaryId($id)
@@ -241,7 +253,7 @@ function related($name) {
 	$sel->from($table)->where(array($foreignKey => $this->getPrimaryId()));
 
 	if ($def['many']) {
-		return $sel;    
+		return $sel;
 	}
 	else {
 		return $sel->first();
@@ -353,6 +365,7 @@ function delete()
 
 	if (!$this->validate('delete')) return false;
 
+	$this->deleteRelated();
 	$ok = $this->db->delete($this->tableName, array($this->primary => $id));
 	if ($ok) {
 		$this->inDb = false;
@@ -360,6 +373,25 @@ function delete()
 	}
 
 	return $ok;
+}
+
+protected function deleteRelated()
+{
+	foreach ($this->getRelations() as $rel) {
+		if (!$rel['cascade']) continue;
+
+		$found = $this->related($rel['id']);
+		if (!$found) continue;
+		switch($rel['cascade']) {
+			case 'delete':
+				$found->delete();
+			break;
+			case 'error':
+			default:
+				throw new Exception("Record cannot be deleted, related records found: '%s'", array($rel['id']));
+			break;
+		}
+	}
 }
 
 /** Occurs on validation error. */
