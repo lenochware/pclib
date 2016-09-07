@@ -311,8 +311,9 @@ protected function saveSession()
  * You can access current language as $app->language.
  * @param string $language Language code such as 'en' or 'source'.
  * @param bool $useDefault Preload default texts?
+ * @param bool $useFile Try load texts from php file?
  */
-function setLanguage($language, $useDefault = true)
+function setLanguage($language, $useDefault = true, $useFile = true)
 {
 	$trans = new Translator($this->name);
 	$trans->language = $language;
@@ -320,13 +321,21 @@ function setLanguage($language, $useDefault = true)
 	if ($language == 'source') {
 		$trans->autoUpdate = true;
 	}
-	else {
+	elseif($useFile) {
 		$transFile = $this->config['pclib.directories']['localization'].$language.'.php';
-		if (file_exists($transFile)) $trans->useFile($transFile);		
+		if (file_exists($transFile)) $trans->useFile($transFile);
 		else throw new FileNotFoundException("Translator file '$transFile' not found.");
 	}
 
-	if ($useDefault) $trans->usePage('default');
+	if ($useDefault) {
+		try {
+			$trans->usePage('default');
+		} catch (Exception $e) {
+			throw new Exception('Cannot load texts for translator - '.$e->getMessage());
+		}
+
+	}
+
 	$this->setService('translator', $trans);
 }
 
