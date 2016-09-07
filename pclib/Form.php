@@ -76,6 +76,11 @@ public $useButtonTag = false;
 protected function _init()
 {
 	parent::_init();
+
+	if ($this->header['table']) {
+		$this->dbSync($this->header['table']);
+	}
+
 	if ($_REQUEST['submitted'] != $this->name) return;
 
 	if ($_REQUEST['ajax_id']) {
@@ -816,6 +821,15 @@ function prepare($skipEmpty = false)
 	$this->prepared = true;
 }
 
+private function getTableName($tab)
+{
+	$tableName = $this->header['table'] ?: $tab;
+	if ($tab and $tab != $tableName) {
+		throw new Exception('Database table name mismatch.');
+	}
+	return $tableName;
+}
+
 /**
  * Upload form files.
  * @param array $old List of previous versions of files - will be deleted
@@ -850,8 +864,9 @@ function upload($old = array())
  * @param string $tab database table name
  * @return int $inserted_id
  */
-function insert($tab = null)
+function insert($tab)
 {
+	$tab = $this->getTableName($tab);
 	$event = $this->onSave('insert', $tab);
 	if ($event and !$event->propagate) return;
 
@@ -871,6 +886,7 @@ function insert($tab = null)
  */
 function update($tab, $cond)
 {
+	$tab = $this->getTableName($tab);
 	$event = $this->onSave('update', $tab, $cond);
 	if ($event and !$event->propagate) return;
 
@@ -896,6 +912,7 @@ function update($tab, $cond)
  */
 function delete($tab, $cond)
 {
+	$tab = $this->getTableName($tab);
 	$event = $this->onDelete('delete', $tab, $cond);
 	if ($event and !$event->propagate) return;
 
@@ -1018,6 +1035,7 @@ function ajaxSync($elemList = null)
 function dbSync($tab)
 {
 	$columns = $this->service('db')->columns($tab);
+	if (!$columns) throw new Exception("Database table '$tab' not found.");
 	foreach($this->elements as $id => $el) {
 		if (!$this->isEditable($id)) continue;
 		if (!$columns[$id]) {
