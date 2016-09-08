@@ -10,9 +10,79 @@ use pclib;
  */
 class Layout extends Tpl
 {
+
+/* Store bookmarks for breadcrumb navigator. */
+public $bookmarks = array();
+
 protected $headTag;
 protected $messagesTag;
 public $MESSAGE_PATTERN = '<div class="%s">%s</div>';
+
+/** Load application state from session. */
+function loadSession()
+{
+	$this->bookmarks = $this->app->getSession('pclib.bookmarks');
+}
+
+/** Save application state to session. */
+function saveSession()
+{
+	if (isset($this->bookmarks))
+		$this->app->setSession('pclib.bookmarks', $this->bookmarks);
+}
+
+/*
+ * Bookmark (store in session) current URL as $title.
+ * Next you can build breadcrumb navigator from bookmarked url adresses.
+ * Ex: app->bookmark(1, 'Main page'); app->bookmark(2, 'Subpage');
+ * @see getNavig()
+ *
+ * @param string $level Level of this item in history/breadcrumb tree.
+ * @param string $title Label of the link shown in navigator
+ * @param string $route If set, it will bookmark this route instead of current url
+ * @param string $url If set, it will bookmark this url instead of current url
+ */
+function bookmark($level, $title, $route = null, $url = null)
+{
+	if ($route) list($temp, $url) = explode('?', $this->app->router->createUrl($route));
+
+	$maxlevel =& $this->bookmarks[-1]['maxlevel'];
+	for ($i = $maxlevel; $i > $level; $i--) { unset($this->bookmarks[$i]); }
+	$maxlevel = $level;
+
+	$this->bookmarks[$level]['url'] = isset($url)? $url : $_SERVER['QUERY_STRING'];
+	$this->bookmarks[$level]['title'] = $title;
+}
+
+/*
+ * Return HTML (breadcrumb) navigator: bookmark1 / bookmark2 / bookmark3 ...
+ * It is generated from bookmarked pages.
+ * @see bookmark()
+ * @param string $separ link separator
+ * @param bool $lastLink current page is link in navigator
+ */
+function getNavig($separ = ' / ', $lastLink = false)
+{
+	$maxlevel = $this->bookmarks[-1]['maxlevel'];
+	for($i = 0; $i <= $maxlevel; $i++) {
+		$url   = $this->bookmarks[$i]['url'];
+		$title = $this->bookmarks[$i]['title'];
+		$alt = '';
+		if (!$title) continue;
+
+		if (utf8_strlen($title) > 30) {
+			$alt = 'title="'.$title.'"';
+			$title = utf8_substr($title, 0, 30). '...';
+		}
+
+		if ($i == $maxlevel and !$lastLink)
+			$navig[] = "<span $alt>$title</span>";
+		else
+			$navig[] = "<a href=\"".$this->app->indexFile."?$url\" $alt>$title</a>";
+
+	}
+	return implode($separ, (array)$navig);
+}
 
 /**
  * Add links to *.css, *.js scripts into template.
@@ -125,6 +195,12 @@ protected function parseLine($line)
 	if ($this->elements[$id]['type'] == 'head') $this->headTag = $id;
 	if ($this->elements[$id]['type'] == 'messages') $this->messagesTag = $id;
 	return $id;
+}
+
+protected function _out($block = null)
+{
+	parent::_out($block);
+	$this->saveSession();
 }
 
 }
