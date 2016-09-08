@@ -168,9 +168,13 @@ function print_Messages($id, $sub, $value)
 	$this->app->setSession('pclib.flash', null);
 }
 
-function __construct($path = '', $sessName = '')
+/**
+ * Print flash messages.
+ * @copydoc tag-handler
+ */
+function print_Navigator($id, $sub, $value)
 {
-	parent::__construct($path, $sessName);
+	print $this->getNavig();
 }
 
 function print_Element($id, $sub, $value)
@@ -182,6 +186,9 @@ function print_Element($id, $sub, $value)
 			break;
 		case 'messages':
 			$this->print_Messages($id,$sub,$value);
+			break;
+		case 'navigator':
+			$this->print_Navigator($id,$sub,$value);
 			break;
 		default:
 			parent::print_Element($id, $sub, $value);
