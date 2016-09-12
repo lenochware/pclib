@@ -169,7 +169,7 @@ function print_Messages($id, $sub, $value)
 }
 
 /**
- * Print flash messages.
+ * Print breadcrumb navigator.
  * @copydoc tag-handler
  */
 function print_Navigator($id, $sub, $value)
