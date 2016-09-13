@@ -144,12 +144,11 @@ function connect($dataSource)
 		$className = '\\pclib\\system\\database\\'.ucfirst($drvname).'Driver';
 	}
 
-	try {
-		$this->drv = new $className;
-	} catch (\Exception $e) {
+	if (!class_exists($className)) {
 		throw new DatabaseException("Database driver '%s' not found.", array($dsarray['driver']));
 	}
 
+	$this->drv = new $className;
 	$this->drv->verboseErrors = in_array('develop', $this->config['pclib.errors']);
 	$this->drv->forceReconnect = $this->forceReconnect;
 	$this->drv->connect($dsarray);
