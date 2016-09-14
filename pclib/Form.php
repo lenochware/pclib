@@ -1091,27 +1091,26 @@ protected function ieFix($id, $name, $value)
  */
 protected function fileName($id)
 {
-	$path = realpath($this->elements[$id]['into']);
-	$format = $this->elements[$id]['rename'];
-	$maxlength = $this->elements[$id]['maxlength'];
+	//$format = $this->elements[$id]['rename'];
+	$elem = $this->elements[$id];
 
-	$filename = $this->values[$id];
-	if ($maxlength) {
-		$ext   = extractpath($filename, '.%e');
-		$bname = extractpath($filename, '%f');
-		if (utf8_strlen($ext) > 6) {$bname .= $ext; $ext = '';} //sanity check
-		$filename = utf8_substr($bname,0,$maxlength-utf8_strlen($ext)).$ext;
+	$fileName = $this->values[$id];
+	$baseName = extractPath($fileName, '%f');
+	$ext = extractPath($fileName, '.%e');
+
+	if (utf8_strlen($ext) > 6) {
+		$baseName .= $ext; 
+		$ext = '';
 	}
 
-	$i = 1; $fn = $filename;
-	while (file_exists($path.'/'.$filename)) {
-		if ($maxlength)
-			$filename = substr(extractpath($fn,'%f'),0,-strlen($i)).($i++).extractpath($fn,'.%e');
-		else
-			$filename = extractpath($fn,'%f').($i++).extractpath($fn,'.%e');
+	$baseName = substr(mkident($baseName, '-'), 0, 80);
+
+	while (true) {
+		$fileName = $baseName.'-'.randomstr(8).$ext;
+		if (!file_exists(realpath($elem['path']).'/'.$fileName)) break;
 	}
 
-	return $filename;
+	return $fileName;
 }
 
 
