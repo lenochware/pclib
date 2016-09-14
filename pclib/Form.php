@@ -81,6 +81,10 @@ protected function _init()
 		$this->dbSync($this->header['table']);
 	}
 
+	if ($this->config['pclib.security']['csrf']) {
+		$this->header['csrf'] = true;
+	}
+
 	if ($_REQUEST['submitted'] != $this->name) return;
 
 	if ($_REQUEST['ajax_id']) {
@@ -94,7 +98,7 @@ protected function _init()
 
 	if ($this->header['csrf']
 		and $_REQUEST['csrf_token'] != $this->getCsrfToken()
-	) throw new AuthException("CSRF authorisation failed.");
+	) throw new AuthException("CSRF authorization failed.");
 
 	//set input file names
 	foreach ((array)$_FILES as $id => $aFile) {

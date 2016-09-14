@@ -471,7 +471,7 @@ function print_Element($id, $sub, $value)
 		return;
 	}
 
-	if ($this->config['pclib.tpl.escape'] and !$elem["noescape"] and is_string($value)) {
+	if ($this->config['pclib.security']['tpl-escape'] and !$elem["noescape"] and is_string($value)) {
 		$value = $this->escapeHtmlFunction($value);
 	}
 
