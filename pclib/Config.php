@@ -34,7 +34,7 @@ $config = array(
 		'model' => array('dir' => 'models', 'namespace' => '', 'postfix' => 'Model', 'default' => '\pclib\Model'),
 	),
 
-	'pclib.security' => array('tpl-escape' => false, 'csrf' => false),
+	'pclib.security' => array('tpl-escape' => false, 'csrf' => false, 'form-prevent-mass' => false),
 	'pclib.auth' => array('algo' => 'md5', 'secret' => 'write any random string!', 'realm' => ''),
 );
 

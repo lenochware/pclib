@@ -73,6 +73,8 @@ public $uploadBlackList = array('*.php','*.php?','*.phtml','*.exe','.htaccess');
 /** Generate buttons with html button tag or as input type=button. */
 public $useButtonTag = false;
 
+protected $editables = array('input', 'check', 'radio', 'text', 'select', 'listinput');
+
 protected function _init()
 {
 	parent::_init();
@@ -94,18 +96,12 @@ protected function _init()
 
 	//get values
 	$this->submitted = ifnot($_REQUEST['pcl_form_submit'], true);
-	$this->values = $this->header['get']? $_GET['data'] : $_POST['data'];
+	$this->values = $this->getHttpData();
 
 	if ($this->header['csrf']
 		and $_REQUEST['csrf_token'] != $this->getCsrfToken()
 	) throw new AuthException("CSRF authorization failed.");
 
-	//set input file names
-	foreach ((array)$_FILES as $id => $aFile) {
-		if($this->elements[$id]['file'] and $aFile['size']) {
-			$this->values[$id] = $aFile['name'];
-		}
-	}
 	//set empty checkbox values, call onsave, apply formating
 	foreach ($this->elements as $id=>$elem) {
 		$value = $this->values[$id];
@@ -198,10 +194,9 @@ function saveSession()
 **/
 function isEditable($id, $testAttr = true)
 {
-	$editables = array ('input', 'check', 'radio', 'text', 'select', 'listinput');
 	$elem = $this->elements[$id];
 	if (!$elem) return false;
-	if (!in_array($elem['type'], $editables)) return false;
+	if (!in_array($elem['type'], $this->editables)) return false;
 	if ($testAttr and ($this->getAttr($id, 'noprint') or $this->getAttr($id, 'noedit'))) return false;
 	return true;
 }
@@ -266,6 +261,31 @@ private function columnToElementStr(array $col)
 	if (stripos('-'.$col['name'], 'MAIL')) $s .= ' email';
 	if (!$col['nullable']) $s .= ' required';
 	return $s."\n";
+}
+
+/**
+ * Return data sent through http.
+ * @return array $data
+ **/
+protected function getHttpData()
+{
+	$data = $this->header['get']? $_GET['data'] : $_POST['data'];
+
+	if ($this->config['pclib.security']['form-prevent-mass']) {
+		foreach ($data as $id => $value) {
+			if (!in_array($this->elements[$id]['type'], $this->editables)) {
+				unset($data[$id]);
+			}
+		}
+	}
+
+	foreach ((array)$_FILES as $id => $aFile) {
+		if($this->elements[$id]['file'] and $aFile['size']) {
+			$data[$id] = $aFile['name'];
+		}
+	}
+
+	return $data;
 }
 
 /** 
@@ -1239,7 +1259,7 @@ protected function foot()
 
 private function getCsrfToken()
 {
-	if (!session_id()) throw new RuntimeException('Session is required.');
+	if (!session_id()) return '';
 	$token = $this->app->getSession('pclib.csrf_token');
 	if (!$token) {
 		$token = randomstr(10);
