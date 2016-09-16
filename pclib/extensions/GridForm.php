@@ -40,13 +40,17 @@ class GridForm extends PCGrid
  */
 public $submitted = false;
 
-public $form = null;
+protected $form;
+
 private $pk = null;
 
 /** Name of the 'class' element */
 protected $className = 'gridform';
 
 protected $inputCount = 0;
+
+protected $editables = array('input', 'check', 'radio', 'text', 'select', 'listinput', 'primary');
+
 
 /**
  * Constructor - load formgrid template
@@ -63,12 +67,42 @@ function __construct($path = '', $sessName = '')
 	
 	if ($_REQUEST['submitted'] == $this->name) {
 		$this->submitted = ifnot($_REQUEST['pcl_form_submit'], true);
-		$this->values = $_REQUEST['data']; //TODO GET/POST instead REQUEST
-
-		/*if (count($_FILES)) foreach ($_FILES as $id => $aFile)
-			if($this->elements[$id]['file'])
-				$this->values[$id] = $aFile['name'];*/
+		$this->values = $this->getHttpData();
 	}
+}
+
+
+/**
+ * Return data sent through http.
+ * @return array $data
+ **/
+protected function getHttpData()
+{
+	$data = $this->header['get']? $_GET['data'] : $_POST['data'];
+	$rowdata = $this->header['get']? $_GET['rowdata'] : $_POST['rowdata'];
+
+
+	if ($this->config['pclib.security']['form-prevent-mass']) {
+		$validKeys = $this->getEditables();
+
+		$data = array_intersect_key($data, $validKeys);
+
+		foreach ($rowdata as $i => $row) {
+			$rowdata[$i] = array_intersect_key($row, $validKeys);
+		}
+	}
+
+	$data['items'] = $rowdata;
+	return $data;
+}
+
+private function getEditables()
+{
+	$ed = array();
+	foreach ($this->elements as $id => $elem) {
+		if (in_array($elem['type'], $this->editables)) $ed[$id] = $id;
+	}
+	return $ed;
 }
 
 protected function getValues()
@@ -76,7 +110,7 @@ protected function getValues()
 	$rows = parent::getValues();
 	if ($this->submitted) {
 		foreach ($rows as $i => $row) {
-			$rows[$i] = array_merge($rows[$i],$_REQUEST['rowdata'][$i]);
+			$rows[$i] = array_merge($rows[$i],$this->values['items'][$i]);
 		}
 	}
 	return $rows;
@@ -164,9 +198,9 @@ function out($block = null)
 function insert($tab)
 {
 	if (!$tab) return false;
-	if (!$this->form->db) throw new NoDatabaseException;
-
-	foreach ($_REQUEST['rowdata'] as $frow) {
+	$this->service('db');
+	
+	foreach ($this->values['items'] as $frow) {
 		$this->form->values = $frow;
 		$this->form->insert($tab);
 	}
@@ -180,10 +214,11 @@ function insert($tab)
 function update($tab)
 {
 	if (!$tab) return false;
-	if (!$this->form->db) throw new NoDatabaseException;
+	$this->service('db');
+	
 	if (!$this->pk) throw new NoValueException('Primary key not found.');
 
-	foreach ($_REQUEST['rowdata'] as $frow) {
+	foreach ($this->values['items'] as $frow) {
 		$this->form->values = $frow;
 		$this->form->update($tab, $this->pk . "='".$frow[$this->pk]."'");
 	}
