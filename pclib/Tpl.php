@@ -354,16 +354,56 @@ function getBlock($block)
 **/
 function getValue($id)
 {
+	if (strpos($id, '_tvar_') === 0) {
+		return $this->getVariable($id);
+	}
+
 	$elem = $this->elements[$id];
 	if ($elem['loop']) return $this->compute($id);
 	if ($elem['field']) $id = $elem['field'];
+	
 	foreach ($this->inBlock as &$block) {
 		$rowno = $this->elements[$block]['rowno'];
 		$value = isset($rowno)? $this->values[$block][$rowno][$id] : $this->values[$block][$id];
 		if (isset($value)) break;
 	}
+
 	if (!isset($value)) $value = $this->values[$id];
 	return (is_numeric($value) or $value)? $value : $elem['default'];
+}
+
+/** Get template variable _tvar_... */
+protected function getVariable($id)
+{
+	$bid = $this->inBlock[0];
+	$b = $this->elements[$bid];
+
+	$parts = explode('_', $id, 4);
+
+	if (in_array($parts[2], array('get', 'post', 'cookie', 'session'))) {
+		$value = $this->getHttpVariable($parts[2], $parts[3]);
+	}
+	else {
+		switch ($id) {
+			case '_tvar_baseurl': $value = BASE_URL; break;
+			case '_tvar_rowno': $value = $this->getRowNo(); break;
+			case '_tvar_count': $value = count($this->values[$bid]); break;
+			case '_tvar_top': $value = ($b['rowno'] == 0)? '1':'0'; break;
+			case '_tvar_bottom': $value = ($b['rowno'] == count($this->values[$bid]) - 1)? '1':'0'; break;
+		}	
+	}
+	
+	return $this->escapeHtmlFunction($value);
+}
+
+protected function getHttpVariable($method, $id)
+{
+	switch ($method) {
+		case 'get': return $_GET[$id];
+		case 'post': return $_POST[$id];
+		case 'session': return $_SESSION[$id];
+		case 'cookie': return $_COOKIE[$id];
+	}
 }
 
 /** Return row number of the current block. */
@@ -462,14 +502,15 @@ function compute($id)
 function print_Element($id, $sub, $value)
 {
 	$elem = $this->elements[$id];
-	if ($sub == 'lb') {
-		print $elem['lb']? $elem['lb'] : $id;
-		return;
-	}
-	elseif ($sub == 'value') {
-		print $value;
-		return;
-	}
+
+  if ($sub == 'lb') {
+    print $elem['lb']? $elem['lb'] : $id;
+    return;
+  }
+  elseif ($sub == 'value') {
+    print $value;
+    return;
+  }
 
 	if ($this->config['pclib.security']['tpl-escape'] and !$elem["noescape"] and is_string($value)) {
 		$value = $this->escapeHtmlFunction($value);

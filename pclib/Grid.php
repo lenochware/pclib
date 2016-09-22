@@ -395,6 +395,25 @@ protected function print_Class_Item($id, $sub)
 	}
 }
 
+/** Get template variable _tvar_... */
+protected function getVariable($id)
+{
+	$page = $this->pager->getValue('page');
+	$maxpage =  $this->pager->getValue('maxpage');
+
+	switch ($id) {
+		case '_tvar_first': 
+			$value = ($page == 1 and parent::getVariable('_tvar_top'))? '1':'0';
+		break;	
+		case '_tvar_last': 
+			$value = ($page == $maxpage and parent::getVariable('_tvar_bottom'))? '1':'0';
+		break;	
+		default: return parent::getVariable($id);
+	}
+	
+	return $this->escapeHtmlFunction($value);
+}
+
 /**
  * Load values for current page from database (fill \ref tpl::values array).
  * tpl::values are not cleared, so you can add additional fields from the code.
