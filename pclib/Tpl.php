@@ -444,42 +444,22 @@ protected function getFields($dsstr = null)
 }
 
 /**
- * Build default template from file assets/def_*.tpl and uses it.
- * Show values in simple table layout. Generated template is based on database table.
- * Ex: $form->create('select * from Orders');
- * @param string $dsstr Datasource string ( see db->select() )
- * @param string $fileName If present, it will save generated template as $filename for future use
- * @param string $template If present, used instead of 'assets/def_*.tpl' as template generator
-**/
-function create($dsstr, $fileName = null, $template = null)
+ * Use default template for displaying database table content.
+ */
+protected function createFromTable($tableName, $templatePath)
 {
-	$trans = array('<:' => '<', ':>' => '>', '{:' => '{', ':}' => '}');
-	if (!$template) $template = PCLIB_DIR.'assets/def_tpl.tpl';
+	$columns = $this->service('db')->columns($tableName);
+	$s = extensions\TemplateFactory::getTemplate($templatePath, $columns);
+	$this->loadString($s);
+	$this->init();
+}
 
-	$fields = $this->getFields($dsstr);
-	foreach($fields as $id) {
-		$elem .= "string $id lb \"$id\"\n";
-		$body[] = array(
-		'LABEL' => '{'.$id.'.lb}',
-		'FIELD' => '{'.$id.'}',
-		);
-	}
-
-	$t = new Tpl($template);
-	$t->values['NAME'] = $this->service('db')->tableName($dsstr);
-	$t->values['BODY'] = $body;
-	$t->values['ELEMENTS'] = trim($elem);
-	$html = strtr($t->html(), $trans);
-
-	if ($fileName) {
-		$ok = file_put_contents($fileName, $html);
-		if (!$ok) throw new IOException("Cannot write file $fileName.");
-		else @chmod($fileName, 0666);
-	}
-	else {
-		$this->loadString($html);
-		$this->init();
-	}
+/**
+ * Use default template for displaying database table content.
+ */
+function create($tableName)
+{
+	$this->createFromTable($tableName, PCLIB_DIR.'assets/default-tpl.tpl');
 }
 
 /** Return computed value of element $id. */

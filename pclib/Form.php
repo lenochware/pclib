@@ -202,65 +202,11 @@ function isEditable($id, $testAttr = true)
 }
 
 /**
- * Build default form template.
- * @see tpl::create()
+ * Use default template for displaying database table content.
  */
-function create($dsstr, $fileName = null, $template = null)
+function create($tableName)
 {
-	$this->service('db');
-	$trans = array('<:' => '<', ':>' => '>', '{:' => '{', ':}' => '}');
-	if (!$template) $template = PCLIB_DIR.'assets/def_form.tpl';
-
-	$table = $this->db->tableName($dsstr);
-	$columns = $this->db->columns($table);
-
-	$fields = $this->getFields($dsstr);
-	foreach($fields as $id) {
-		if ($columns[$id]['autoinc']) continue;
-		$elem .= $this->columnToElementStr($columns[$id]);
-		$body[] = array(
-		'LABEL' => '{'.$id.'.lb}',
-		'FIELD' => '{'.$id.'}',
-		'ERR' => '{'.$id.'.err}',
-		);
-	}
-
-	$t = new Tpl($template);
-	$t->values['NAME'] = $table;
-	$t->values['BODY'] = $body;
-	$t->values['ELEMENTS'] = trim($elem);
-	$html = strtr($t->html(), $trans);
-
-	if ($fileName) {
-		$ok = file_put_contents($fileName, $html);
-		if (!$ok) throw new IOException("Cannot write file $fileName.");
-		else @chmod($fileName, 0666);
-	}
-	else {
-		$this->loadString($html);
-		$this->init();
-	}
-}
-
-/** Return element for table column. Helper for create(). */
-private function columnToElementStr(array $col)
-{
-	$type = 'input';
-
-	$size = ($col['size'] > 50)? '50/'.$col['size'] : $col['size'];
-	if ($col['type'] == 'string' and $col['size'] > 255) { $type = 'text'; $size = null; }
-	if ($col['type'] == 'bool') { $type = 'check'; $size = null; }
-
-	if ($col['type'] == 'int' or $col['type'] == 'float') $size = '6/30';
-	if ($col['type'] == 'date') $size = ($col['size']>1)? '20/30' : '10/30';
-
-	$lb = ifnot($col['comment'], $col['name']);
-	$s = $type.' '.$col['name'].' lb "'.$lb.'"';
-	if ($size) $s .= " size \"$size\"";
-	if ($col['type'] == 'date') $s .= ' date';
-	if (stripos('-'.$col['name'], 'MAIL')) $s .= ' email';
-	if (!$col['nullable']) $s .= ' required';
-	return $s."\n";
+	$this->createFromTable($tableName, PCLIB_DIR.'assets/default-form.tpl');
 }
 
 /**

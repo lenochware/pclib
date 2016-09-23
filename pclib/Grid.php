@@ -168,11 +168,12 @@ function setQuery($sql)
 	$sql = $this->db->setParams($sql, $args + (array)$this->filter);
 	$sql = str_replace("\n", " \n ", strtr($sql, "\r\t","  "));
 
+	if (!$this->document) $this->create($sql);
+
 	$this->setLength($this->db->count($sql));
 
 	if ($lpos = stripos($sql, ' limit ')) $sql = substr($sql, 0, $lpos);
 	$this->sql = $sql;
-	if (!$this->document) $this->create($this->sql);
 }
 
 /**
@@ -532,45 +533,12 @@ protected function getQuery()
 }
 
 /**
- * Build default grid template.
- * @see Tpl::create()
+ * Use default template for displaying database table content.
  */
-function create($dsstr, $fileName = null, $template = null)
+function create($tableName)
 {
-	$trans = array('<:' => '<', ':>' => '>', '{:' => '{', ':}' => '}');
-	if (!$template) $template = PCLIB_DIR.'assets/def_grid.tpl';
-
-	$table = $this->db->tableName($dsstr);
-	$columns = $this->db->columns($table);
-
-	$fields = $this->getFields($dsstr);
-	$head = $body = array();
-	foreach($fields as $id) {
-		$col = $columns[$id];
-		$lb = ifnot($col['comment'], $id);
-		$elem .= "string $id lb \"$lb\" sort";
-		if ($col['type'] == 'date') $elem .= ' date';
-		$elem .= "\n";
-		$head[]['LABEL'] = '{'.$id.'.lb}';
-		$body[]['FIELD'] = '{'.$id.'}';
-	}
-
-	$t = new Tpl($template);
-	$t->values['NAME'] = $this->db->tableName($dsstr);
-	$t->values['HEAD'] = $head;
-	$t->values['BODY'] = $body;
-	$t->values['ELEMENTS'] = trim($elem);
-	$html = strtr($t->html(), $trans);
-
-	if ($fileName) {
-		$ok = file_put_contents($fileName, $html);
-		if (!$ok) throw new IOException("Cannot write file $fileName.");
-		else @chmod($fileName, 0666);
-	}
-	else {
-		$this->loadString($html);
-		$this->init();
-	}
+	$tableName = $this->db->tableName($tableName);
+	$this->createFromTable($tableName, PCLIB_DIR.'assets/default-grid.tpl');
 }
 
 /** get proper base url for %grid sort and pager & other links */
