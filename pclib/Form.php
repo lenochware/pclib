@@ -427,10 +427,8 @@ function print_Class($id, $sub, $value)
 {
 	parent::print_Class($id, 'fields', $value);
 
-	$fields = $this->getFields();
 	print "<tr><td colspan=\"3\">";
-	foreach($fields as $id) {
-		$elem = $this->elements[$id];
+	foreach($this->elements as $id => $elem) {
 		if ($elem['noprint'] or $elem['skip'] or $elem['type'] != 'button') continue;
 		$this->print_Button($id, '', $this->getValue($id));
 		print ' ';

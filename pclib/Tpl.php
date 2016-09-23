@@ -51,9 +51,6 @@ public $elements = array();
 /** Array of template values. */
 public $values = array();
 
-/* List of fields written into template if {tpl.fields} or {tpl.control} tag is used. */
-protected $fields = array();
-
 /**
  *  Name of the session variable where template values are stored.
  *  @see loadSession(), saveSession()
@@ -435,14 +432,6 @@ function deleteSession()
 	$this->app->deleteSession($this->sessName);
 }
 
-/** Try return array of fieldnames from query/table/elements */
-protected function getFields($dsstr = null)
-{
-	if ($this->fields) return $this->fields;
-	if ($dsstr) return array_filter(array_keys((array)$this->service('db')->select($dsstr)),'is_string');
-	return array_keys($this->elements);
-}
-
 /**
  * Use default template for displaying database table content.
  */
@@ -673,12 +662,26 @@ function print_Class($id, $sub, $value)
 
 	if ($id != $this->className) return;
 
-	$fields = $this->getFields();
-	foreach($fields as $id) {
-		$elem = $this->elements[$id];
+	foreach($this->elements as $id => $elem) {
 		if ($elem['noprint'] or $elem['skip'] or in_array($elem['type'], $ignore_list)) continue;
 		$this->print_Class_Item($id, $sub);
 	}
+}
+
+/**
+	* Implements {tpl.fields} placeholder.
+	* @see print_class();
+	* @copydoc tag-handler
+	*/
+protected function print_Class_Item($id, $sub)
+{
+	print "<tr><td class=\"$id\">";
+	$this->print_Element($id, 'lb', null);
+	print '</td><td>';
+	$value = $this->getValue($id);
+	if (!$this->fireEventElem('onprint', $id, '', $value))
+		$this->print_Element($id, '', $value);
+	print '</td></tr>';
 }
 
 /**
@@ -696,22 +699,6 @@ function print_Action($id, $sub, $value)
 		printf($this->t('Page not found: "%s"'), $action->controller);
 	}
 	else print $ct->run($action);
-}
-
-/**
-	* Implements {tpl.fields} placeholder.
-	* @see print_class();
-	* @copydoc tag-handler
-	*/
-protected function print_Class_Item($id, $sub)
-{
-	print "<tr><td class=\"$id\">";
-	$this->print_Element($id, 'lb', null);
-	print '</td><td>';
-	$value = $this->getValue($id);
-	if (!$this->fireEventElem('onprint', $id, '', $value))
-		$this->print_Element($id, '', $value);
-	print '</td></tr>';
 }
 
 /**
