@@ -213,7 +213,7 @@ protected function _out($block = null)
 function out($block = null)
 {
 	$this->onBeforeOut();
-	$this->_out();
+	$this->_out($block);
 	$this->onAfterOut();
 }
 
