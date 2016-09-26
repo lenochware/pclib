@@ -541,6 +541,55 @@ function create($tableName)
 	$this->createFromTable($tableName, PCLIB_DIR.'assets/default-grid.tpl');
 }
 
+/**
+ * Return content of the grid as csv-text.
+ * @param array $options [templatePath: '', csv-separ: ';', csv-row-separ: "\r\n"]
+ * @return string csv-text
+ */
+function getExportCsv($options = array())
+{
+	$templatePath = $options['templatePath'] ?: PCLIB_DIR.'assets/export-csv.tpl';
+
+	$ignoreList = array('class','block','pager','sort','link');
+
+	$columns = array();
+	foreach ($this->elements as $id => $elem) {
+		if (in_array($elem['type'], $ignoreList) or $elem['skip']) continue;
+		$columns[$id] = array('name' => $id, 'element' => $elem);
+	}
+
+	$exportGrid = extensions\TemplateFactory::create($templatePath, $columns);
+	$exportGrid->setQuery($this->sql);
+	$exportGrid->pager->setPageLen($this->length);
+	$html = $exportGrid->html();
+
+	$trans = array(
+		"\n" => '',
+		"\r" => '',
+		";" => ',',
+		"<csv-separ>" => $options['csv-separ'] ?: ';',
+		"<csv-row-separ>" => $options['csv-row-separ'] ?: "\r\n",
+	);
+
+	$trans[$trans['<csv-separ>']] = ($trans['<csv-separ>'] == ';')? ',' : ';';
+
+	return strtr($html, $trans);
+}
+
+/**
+ * Show download dialog for csv-file with content of the grid.
+ * @param array $options
+ * @see getExportCsv()
+ */
+function exportCsv($fileName, $options = array())
+{
+	ob_clean();
+	header('Content-type: text/csv');
+	header('Content-Disposition: attachment; filename="'.$fileName.'"');
+	print $this->getExportCsv($options);
+	die();
+}
+
 /** get proper base url for %grid sort and pager & other links */
 protected function getBaseUrl()
 {
