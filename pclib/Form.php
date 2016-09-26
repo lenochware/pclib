@@ -95,7 +95,7 @@ protected function _init()
 	}
 
 	//get values
-	$this->submitted = ifnot($_REQUEST['pcl_form_submit'], true);
+	$this->submitted = $_REQUEST['pcl_form_submit'] ?: true;
 	$this->values = $this->getHttpData();
 
 	if ($this->header['csrf']
@@ -411,7 +411,7 @@ function print_Errors()
 	if (!$this->invalid) return;
 	print "<div class=\"error-messages\">";
 	foreach($this->invalid as $id => $message) {
-		$lb = ifnot($this->elements[$id]['lb'], $id);
+		$lb = $this->elements[$id]['lb'] ?: $id;
 		print "<div>$lb $message</div>";
 	}
 	print "</div>";
@@ -551,7 +551,7 @@ function print_Button($id, $sub, $value)
 {
 	$elem = $this->elements[$id];
 	$url = $this->getUrl($elem);
-	$onclick = ifnot($elem['onclick'], $elem['html']['onclick']);
+	$onclick = $elem['onclick'] ?: $elem['html']['onclick'];
 	$tagname = $this->useButtonTag? 'button':'input';
 	if ($elem['tag']) $tagname = $elem['tag'];
 
@@ -699,7 +699,7 @@ function print_Select($id, $sub, $value)
 	$items = $this->getItems($id);
 	$tag   = $this->getTag($id);
 
-	$emptylb = ifnot($elem['emptylb'], ' - Choose - ');
+	$emptylb = $elem['emptylb'] ?: ' - Choose - ';
 
 	$options = array();
 	$html = $elem['noemptylb']? '':'<option value="">'.$this->t($emptylb).'</option>';
@@ -1260,7 +1260,7 @@ private function getValidationString()
 			case 'file': $options = strtr($options, array('.' => '\.', '*' => '.*', '?' => '.')); break;
 		}
 
-		$lb = ifnot(strip_tags(strtr($elem['lb'],'"|',"'/")), $id);
+		$lb = strip_tags(strtr($elem['lb'],'"|',"'/")) ?: $id;
 
 		$output[] = "$id|$lb|$required|$rule|$options";
 	}
