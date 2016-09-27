@@ -180,13 +180,13 @@ function getPrimaryId()
 /**
  * Find record by primary key and load values from db.
  * @param int $id primary key
- * @return App_Model $this
+ * @return App_Model $this|null
  */
 function find($id)
 {
 	$this->values = $this->db->select($this->tableName, array($this->primary => $id));
 	if ($this->values) $this->inDb = true;
-	return $this;
+	return $this->values? $this : null;
 }
 
 function getColumns()
@@ -381,7 +381,9 @@ protected function deleteRelated()
 		if (!$rel['cascade']) continue;
 
 		$found = $this->related($rel['id']);
+		if ($found instanceof Selection and $found->isEmpty()) continue;
 		if (!$found) continue;
+		
 		switch($rel['cascade']) {
 			case 'delete':
 				$found->delete();
