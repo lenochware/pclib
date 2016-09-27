@@ -137,6 +137,18 @@ function first()
 	return $this->current();
 }
 
+function isEmpty()
+{
+	$rows = $this->getClone()->limit(1)->select('*');
+	return !$rows;
+}
+
+function count()
+{
+	$rows = $this->getClone()->select('count(*) as n');
+	return (int)$rows[0]['n'];
+}
+
 /**
  * Find record by primary key.
  * @return Model $model
@@ -152,6 +164,11 @@ function delete()
 	foreach ($this as $model) {
 		$model->delete();
 	}
+}
+
+function getClone()
+{
+	return clone $this;
 }
 
 /*
@@ -188,17 +205,15 @@ function limit($limit, $offset)
 	return $this;
 }
 
-/*
-function select() {
-	$args = func_get_args();
-	if (is_array($args[0])) $args = $args[0];
-	if (!$args) $args = array('*');
-	
-	$this->query['command'] = 'select';
-	$this->query['columns'] = $args;
-	return $this;
+//selectRaw, raw, getRaw, selectRow?
+function select($columns)
+{
+	$this->query['select'] = is_array($columns)? $columns : explode(',', $columns);
+	$this->execute();
+	$rows = $this->db->fetchAll($this->result);
+	$this->reset();
+	return $rows;
 }
-*/
 
 /**
  * Set source table $s. Fluent interface.
@@ -265,7 +280,7 @@ function having($s)
  */
 function reset()
 {
-	$this->query = array();
+	$this->query = array('select' => array('*'));
 	$this->position = 0;
 	$this->data = array();  
 	$this->result = null;
@@ -279,12 +294,11 @@ function reset()
 function getSql()
 {
 	extract($this->query, EXTR_SKIP);
-	$columns = array('*'); //always '*' for now
 	
-	if (!$columns or !$from)
+	if (!$select or !$from)
 		throw new SqlQueryException('Invalid command.');
 	
-	$sql = 'SELECT '.implode(',', $columns).' FROM '.$from;
+	$sql = 'SELECT '.implode(',', $select).' FROM '.$from;
 	if ($where)  $sql .= ' WHERE '.implode(' AND ', $where);
 	if ($group)  $sql .= ' GROUP BY '.$group;
 	if ($having) $sql .= ' HAVING '.implode(' AND ', $having);
