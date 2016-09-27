@@ -48,6 +48,7 @@ function __construct(App $app)
 {
 	$this->app = $app;
 	$this->db = $this->app->getService('db');
+	$this->reset();
 }
 
 /** Iterator.rewind() implementation. */
@@ -60,7 +61,7 @@ function rewind()
 /** Iterator.current() implementation. */
 function current()
 {
-	return $this->newModel($this->data);
+	return $this->valid()? $this->newModel($this->data) : null;
 }
 
 /** Iterator.key() implementation. */
@@ -199,7 +200,7 @@ protected function execute()
  * Set selection limit. Fluent interface.
  * @return Selection $this
  */
-function limit($limit, $offset)
+function limit($limit, $offset = 0)
 {
 	$this->query['limit'] = array($limit, $offset);
 	return $this;
