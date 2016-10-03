@@ -32,7 +32,7 @@ protected $tableName;
 /** Primary key column name. */
 protected $primary = 'id';
 
-/** Is model stored in db storage? */
+/** Is model stored in database? */
 protected $inDb = false;
 
 /** var Tpl */
@@ -164,12 +164,9 @@ protected function getRelations()
 	return $rel;
 }
 
-
-//nastavi propojeni s recordem v databazi (pk se nesmi jinak menit)
 function setPrimaryId($id)
 {
 	$this->values[$this->primary] = (int)$id;
-	$this->inDb = true;
 }
 
 function getPrimaryId()
@@ -185,7 +182,7 @@ function getPrimaryId()
 function find($id)
 {
 	$this->values = $this->db->select($this->tableName, array($this->primary => $id));
-	if ($this->values) $this->inDb = true;
+	if ($this->values) $this->isInDb(true);
 	return $this->values? $this : null;
 }
 
@@ -261,6 +258,26 @@ function related($name) {
 }
 
 /**
+ * Get or set flag indicating if model has database representation.
+ * However, actual values can differ from database - see $this->modified.
+ * @return bool $inDb
+ */
+function isInDb($value = null)
+{
+	if (!isset($value)) return $this->inDb;
+
+	if ($value) {
+		$this->inDb = true;
+		$this->modified = array();
+	}
+	if (!$value) {
+		$this->inDb = false;
+	}
+
+	return $this->inDb;
+}
+
+/**
  * Save model to the database.
  * @return bool $ok
  */
@@ -269,10 +286,9 @@ function save()
 	if (!$this->testRight('save')) return false;
 
 	if (!$this->modified) return true;
-	$ok = $this->inDb? $this->update() : $this->insert();
+	$ok = $this->isInDb()? $this->update() : $this->insert();
 	if ($ok) {
-		$this->inDb = true;
-		$this->modified = array();
+		$this->isInDb(true);
 	}
 	return $ok;
 }
@@ -358,7 +374,7 @@ function delete()
 {
 	if (!$this->testRight('delete')) return false;
 
-	if (!$this->inDb) return false;
+	if (!$this->isInDb()) return false;
 
 	$id = $this->getPrimaryId();
 	if (!$id) throw new Exception('Missing primary key.');
@@ -368,7 +384,7 @@ function delete()
 	$this->deleteRelated();
 	$ok = $this->db->delete($this->tableName, array($this->primary => $id));
 	if ($ok) {
-		$this->inDb = false;
+		$this->isInDb(false);
 		$this->modified = array_keys($this->values);
 	}
 

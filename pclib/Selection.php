@@ -105,7 +105,7 @@ protected function newModel($data)
 
 	if ($data) {
 		$model->setValues($data);
-		$model->setPrimaryId($data['ID']);
+		$model->isInDb(true);
 	}
 
 	return $model;
@@ -124,7 +124,8 @@ public function __call($name, $args)
 {
 	$modelClass = $this->getModelName();
 	array_unshift($args, $this);
-	return call_user_func_array(array($modelClass, $name), $args); 
+	$methodName = 'select'.ucfirst($name);
+	return call_user_func_array(array($modelClass, $methodName), $args); 
 	//parent::__call($name, $args);
 }
 
