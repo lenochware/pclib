@@ -166,9 +166,13 @@ protected function createDefaultTemplate()
 
 protected function prepareTemplate(Tpl $t)
 {
+	$prepare = array(
+		'role' => array('rights', 'read', 'write'),
+		'event' => array('cancel_when', 'delete'),
+	);
 	foreach ($t->elements as $id => $el) {
-		if ($el['type'] != 'role') continue;
-		foreach (array('rights', 'read', 'write') as $k) {
+		if (!$prepare[$el['type']]) continue;
+		foreach ($prepare[$el['type']] as $k) {
 			$t->elements[$id][$k.'_array'] = $el[$k]? explode(',', $el[$k]) : array();
 		}
 	}
@@ -238,8 +242,19 @@ public function __set($name, $value)
  */
 function related($name) {
 	$def = $this->getTemplate()->elements[$name];
+	if (!$def['type'] == 'relation') {
+		throw new Exception("Relation not found: '%s'", array($name));
+	}
+
+	$rel = new Relation($this->app, $this, $def);
+	if ($def['owner'] or $def['one']) {
+		return $rel->first();
+	}
+	else return $rel;
+
+
 	$table = $def['table'];
-	$foreignKey = $def['fk'];
+	$foreignKey = $def['key'];
 
 	if (!$table or !$foreignKey) {
 		throw new Exception("Missing table or key name.");
@@ -391,8 +406,13 @@ function delete()
 
 	if (!$this->validate('delete')) return false;
 
-	$this->deleteRelated();
+	$this->validateRelated();
+
+	//startTransaction
 	$ok = $this->db->delete($this->tableName, array($this->primary => $id));
+	$this->deleteRelated();
+	//commitTransaction
+
 	if ($ok) {
 		$this->isInDb(false);
 		$this->modified = array_keys($this->values);
@@ -401,24 +421,34 @@ function delete()
 	return $ok;
 }
 
+/**
+ * Check if rules in "event ondelete" are passed.
+ */
+protected function validateRelated()
+{
+	$el = $this->getTemplate()->elements['ondelete'];
+	if ($el['type'] != 'event') return;
+
+	foreach ($el['cancel_when_array'] as $relationId) {
+		$found = $this->related($relationId);
+		if ($found instanceof Selection and $found->isEmpty()) continue;
+		if ($found) {
+			throw new Exception("Record cannot be deleted, related records found: '%s'", array($relationId));
+		}
+	}
+}
+
+/**
+ * Delete related models as defined in "event ondelete".
+ */
 protected function deleteRelated()
 {
-	foreach ($this->getRelations() as $rel) {
-		if (!$rel['cascade']) continue;
+	$el = $this->getTemplate()->elements['ondelete'];
+	if ($el['type'] != 'event') return;
 
-		$found = $this->related($rel['id']);
-		if ($found instanceof Selection and $found->isEmpty()) continue;
-		if (!$found) continue;
-		
-		switch($rel['cascade']) {
-			case 'delete':
-				$found->delete();
-			break;
-			case 'error':
-			default:
-				throw new Exception("Record cannot be deleted, related records found: '%s'", array($rel['id']));
-			break;
-		}
+	foreach ($el['delete_array']  as $relationId) {
+		$found = $this->related($relationId);
+		if ($found) $found->delete();
 	}
 }
 
