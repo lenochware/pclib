@@ -142,8 +142,9 @@ class ErrorHandler extends BaseObject
 			'message' => $e->getMessage(),
 			'file' => $e->getFile(),
 			'line' => $e->getLine(),
-			'trace' => $e->getTrace(),
+			'trace' => $e->getTraceAsString(),
 			'htmlTrace' => $this->getHtmlTrace($e),
+			'route' => $_REQUEST['r'],
 		);
 		return $values;
 	}
@@ -197,7 +198,7 @@ class ErrorHandler extends BaseObject
 			$error = $this->getValues($e);
 			
 			$this->service('logger')->log($error['severity'], $error['severity'],
-				paramStr("{severity}: {message} in {file} on line {line}", $error)
+				paramStr("{exceptionClass}: {message} in '{file}' on line {line} processing '{route}'", $error)
 			);
 		}
 		catch(\Exception $ex) {

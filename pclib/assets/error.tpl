@@ -4,6 +4,9 @@ string message
 string severity
 string file
 string line
+string exceptionClass
+string route
+string trace
 ?>
 <html>
 	<body>
