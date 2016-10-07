@@ -161,6 +161,15 @@ function find($id)
 	return $model->find($id);
 }
 
+function update($values)
+{
+	foreach ($this as $model) {
+		$model->setValues($values);
+		$model->save();
+	}
+}
+
+
 function delete()
 {
 	foreach ($this as $model) {
