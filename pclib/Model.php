@@ -94,12 +94,34 @@ function getTemplate()
 	return $this->template;
 }
 
-function getValidator()
+protected function getValidator()
 {
 	if (!$this->validator) {
 		$this->validator = new Validator($this->getTemplate());
 	}
 	return $this->validator;
+}
+
+/**
+ * Return model database columns.
+ * @return array $columns
+ */
+function getColumns()
+{
+	$cols = self::$columnsCache[$this->tableName];
+	if (!$cols) {
+		$cols = $this->db->columns($this->tableName);
+		self::$columnsCache[$this->tableName] = $cols;
+	}
+	return $cols;
+}
+
+/**
+ * Return underlying database table name.
+ */
+function getTableName()
+{
+	return $this->tableName;
 }
 
 /**
@@ -132,7 +154,7 @@ protected function createTemplate()
 }
 
 /**
- * Create default template object based on table columns.
+ * Create default template object (empty).
  * @return Tpl $template
  */
 protected function createDefaultTemplate()
@@ -150,18 +172,6 @@ protected function prepareTemplate(Tpl $t)
 			$t->elements[$id][$k.'_array'] = $el[$k]? explode(',', $el[$k]) : array();
 		}
 	}
-}
-
-protected function getRelations()
-{
-	$rel = array();
-
-	foreach ($this->getTemplate()->elements as $id => $el) {
-		if ($el['type'] != 'relation') continue;
-		$rel[$id] = $el;
-	}
-
-	return $rel;
 }
 
 function setPrimaryId($id)
@@ -184,16 +194,6 @@ function find($id)
 	$this->values = $this->db->select($this->tableName, array($this->primary => $id));
 	if ($this->values) $this->isInDb(true);
 	return $this->values? $this : null;
-}
-
-function getColumns()
-{
-	$cols = self::$columnsCache[$this->tableName];
-	if (!$cols) {
-		$cols = $this->db->columns($this->tableName);
-		self::$columnsCache[$this->tableName] = $cols;
-	}
-	return $cols;
 }
 
 /** 
@@ -306,6 +306,11 @@ protected function getValuesForSave()
 	return $values;
 }
 
+/**
+ * Choose access role.
+ * Role permissions for the model can be defined in template.
+ * @param string $role
+ */
 function setRole($role)
 {
 	$el = $this->getTemplate()->elements[$role];
@@ -316,6 +321,11 @@ function setRole($role)
 	$this->accessRole = $role;
 }
 
+/**
+ * Test if current role has right do $action.
+ * @param string|array $action
+ * @return bool $allowed
+ */
 function hasRight($action)
 {
 	if (!$this->accessRole) return true;
