@@ -96,8 +96,11 @@ function log($category, $message_id, $message = null, $item_id = null)
 	);
 
 	if ($this->service('auth', false)) {
-		$user = $this->auth->getUser()->getValues();
-		$message['USER_ID'] = $user['ID'];
+		$user = $this->auth->getUser();
+		if ($user) {
+			$data = $user->getValues();
+			$message['USER_ID'] = $data['ID'];
+		}
 	}
 
 	return $this->getStorage()->log($message);
