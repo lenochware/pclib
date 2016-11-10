@@ -419,3 +419,16 @@
 - dump() output improved
 - App->make() replaced with newController(), newModel()
 - Bugfixes
+
+2.1.1
+ - Added parameters to error.tpl, better message in errorlog
+ - Added class TemplateFactory for building forms and grids from db-columns
+ - Templates assets/def_*.tpl renamed to assets/default-*.tpl and updated
+ - Tpl->create() uses TemplateFactory now
+ - Added _tvar template variables
+ - Added methods Grid->exportCsv() and Grid->getExportCsv()
+ - Removed function ifnot()
+ - Added config parameter 'pclib.security'
+ - Changed form-upload fileName format
+ - GridForm fixed and updated
+ - Bugfixes
