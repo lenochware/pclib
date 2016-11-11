@@ -1124,12 +1124,18 @@ protected function getLkpLookup($lookup)
 	return $this->service('db')->selectPair($sql);
 }
 
-protected function getDataSource($rs)
+protected function getDataSource($name)
 {
-	$action = new Action($this->replaceParams($rs));
-	$ct = $this->app->newController($action->controller);
-	$args = $ct->getArgs($action->method, $action->params);
-	return call_user_func_array(array($ct, $action->method), $args);
+	if (is_callable($name)) {
+		return call_user_func($name);
+	}
+	else {
+		$action = new Action($this->replaceParams($name));
+		$ct = $this->app->newController($action->controller);
+		if (!$ct) throw new Exception("Cannot get datasource '%s'", array($name));
+		$args = $ct->getArgs($action->method, $action->params);
+		return call_user_func_array(array($ct, $action->method), $args);
+	}
 }
 
 protected function getLkpList($list)
