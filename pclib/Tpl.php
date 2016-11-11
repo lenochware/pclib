@@ -481,7 +481,11 @@ function print_Element($id, $sub, $value)
     return;
   }
 
-	if ($this->config['pclib.security']['tpl-escape'] and !$elem["noescape"] and is_string($value)) {
+	if (
+		($elem['escape'] 
+			or ($this->config['pclib.security']['tpl-escape'] and !$elem["noescape"])
+		) and is_string($value)
+	) {
 		$value = $this->escapeHtmlFunction($value);
 	}
 
@@ -1019,7 +1023,7 @@ function htmlTag($name, $attr = array(), $content = null, $startTagOnly = false)
 
 function escapeHtml($s)
 {
-	return htmlspecialchars($s);
+	return utf8_htmlspecialchars($s);
 }
 
 /**
