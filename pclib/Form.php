@@ -574,10 +574,15 @@ function print_Button($id, $sub, $value)
 		 $tag['value'] = isset($elem['lb'])? $this->escape($elem['lb']) : $id;
 	}
 
-	if ($url and $elem['popup'])
+	if ($elem['confirm']) {
+		$onclick = "if(!confirm('".$elem['confirm']."')) return false;";
+	}
+	elseif ($url and $elem['popup']) {
 		$onclick = $this->getPopup($id, $elem['popup'], $url);
-	elseif ($url)
+	}
+	elseif ($url) {
 		$onclick = "window.location='$url';";
+	}
 
 	$tag['onclick'] = $onclick;
 	print $this->htmlTag($tagname, $tag, $content);
