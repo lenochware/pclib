@@ -814,7 +814,9 @@ function upload($old = array())
 
 	foreach ($_FILES as $id => $aFile) {
 		$elem = $this->elements[$id];
+		if (!$elem) continue;
 		if ($aFile['error']) $this->invalid[$id] = 'Upload error ('.$aFile['error'].')';
+
 		if ($elem['nosave'] or !$aFile['size'] or $aFile['error']) continue;
 		if ($this->fileInBlackList($this->values[$id])) throw new RuntimeException("Illegal file type.");
 		if (!$elem['into']) throw new NoValueException("Missing 'into \"directory\"' attribute for input file.");
