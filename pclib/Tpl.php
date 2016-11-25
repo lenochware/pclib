@@ -638,8 +638,8 @@ function print_Link($id, $sub, $value)
 	elseif (!$lb)
 		$lb = (string)$value;
 
-	$tag = array('href' => $url, '__attr' => $elem['attr']);
-	if ($elem['html']) $tag += $elem['html'];
+	$tag = array('href' => $url, 'class' => $id, '__attr' => $elem['attr']);
+	if ($elem['html']) $tag = array_merge($tag, $elem['html']);
 	print $this->htmlTag('a', $tag, $lb);
 }
 
