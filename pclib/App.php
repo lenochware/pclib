@@ -277,11 +277,24 @@ public function configure()
 /**
  * Perform redirect to $route.
  * Example: $app->redirect("products/edit/id:$id");
+ * @param string|array $route
+ * @param htttp code (e.g. 301 Moved Permanently)
  * See also @ref pcl-route
  */
-function redirect($stringRoute)
+function redirect($route, $code = null)
 {
-	$url = $this->router->createUrl($stringRoute);
+
+	if ($code and function_exists('http_response_code')) {
+		http_response_code($code);
+	}
+
+	if (is_array($route)) {
+		$url = $route['url'];
+	}
+	else {
+		$url = $this->router->createUrl($route);
+	}
+
 	header("Location: $url");
 	exit();
 }
