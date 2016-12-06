@@ -809,7 +809,7 @@ private function getTableName($tab)
 	return $tableName;
 }
 
-function uploadFs($tableName, $id)
+protected function uploadFs($tableName, $id)
 {
 	$fs = $this->fileStorage;
 	$files = array();
@@ -824,7 +824,7 @@ function uploadFs($tableName, $id)
 	$fs->save(array($id, $tableName), $files);
 }
 
-function uploadBasic($old = array())
+protected function uploadBasic($old = array())
 {
 	foreach ($_FILES as $id => $aFile) {
 		$elem = $this->elements[$id];
@@ -928,15 +928,26 @@ function delete($tab, $cond)
 	if ($params and is_array($params[0])) $params = $params[0];
 
 	$data = $this->db->select($tab, $cond, $params);
-
-	foreach ($this->elements as $id=>$elem)
-		if ($elem['file'] and $elem['into']) {
-			 $path = realpath($this->elements[$id]['into']);
-			 if (!$data[$id]) continue;
-			 @unlink($path.'/'.$data[$id]);
-		}
-
 	$this->db->delete($tab, $cond, $params);
+
+	if ($this->header['fileupload']) {
+		$this->deleteFiles($tab, $data);
+	}
+}
+
+protected function deleteFiles($tableName, $data)
+{
+	if ($this->fileStorage) {
+		$this->fileStorage->deleteEntity(array($data['ID'], $tableName));
+	}
+	else {
+		foreach ($this->elements as $id=>$elem) {
+			if (!$elem['file'] or !$elem['into']) continue;
+			$path = realpath($this->elements[$id]['into']);
+			if (!$data[$id]) continue;
+			@unlink($path.'/'.$data[$id]);
+		}
+	}
 }
 
 /**
