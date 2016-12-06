@@ -48,6 +48,8 @@ public $onSave;
 /** Occurs before deleting from database. */
 public $onDelete;
 
+public $fileStorage;
+
 /**
  * Array of error messages filled by validate() function.
  * You can set it on your own too.
@@ -803,15 +805,13 @@ private function getTableName($tab)
 	return $tableName;
 }
 
-/**
- * Upload form files.
- * @param array $old List of previous versions of files - will be deleted
- */
-function upload($old = array())
+function uploadFs()
 {
-	$event = $this->onUpload($_FILES, $old);
-	if ($event and !$event->propagate) return;
+	$this->service('fileStorage');
+}
 
+function uploadBasic($old = array())
+{
 	foreach ($_FILES as $id => $aFile) {
 		$elem = $this->elements[$id];
 		if (!$elem) continue;
@@ -829,7 +829,19 @@ function upload($old = array())
 		if (!$ok) throw new IOException("Cannot upload file $path/$filename (permissions problem?)");
 		@chmod($path.'/'.$filename, 0666);
 		$this->values[$id] = $filename;
-	}
+	}	
+}
+
+/**
+ * Upload form files.
+ * @param array $old List of previous versions of files - will be deleted
+ */
+function upload($old = array())
+{
+	$event = $this->onUpload($_FILES, $old);
+	if ($event and !$event->propagate) return;
+
+	$this->uploadBasic($old);
 }
 
 /**
