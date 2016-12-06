@@ -85,6 +85,8 @@ protected function _init()
 		$this->dbSync($this->header['table']);
 	}
 
+	$this->fileStorage = $this->service('fileStorage', false);
+
 	if ($this->config['pclib.security']['csrf']) {
 		$this->header['csrf'] = true;
 	}
@@ -805,9 +807,13 @@ private function getTableName($tab)
 	return $tableName;
 }
 
-function uploadFs()
+function uploadFs($tableName, $id)
 {
-	$this->service('fileStorage');
+	$fs = $this->fileStorage;
+	$files = $fs->postedFiles();
+
+	$entity = array($id, crc32($tableName));
+	$fs->save($entity, $files);
 }
 
 function uploadBasic($old = array())
@@ -836,12 +842,17 @@ function uploadBasic($old = array())
  * Upload form files.
  * @param array $old List of previous versions of files - will be deleted
  */
-function upload($old = array())
+function upload($tableName, $id, $old = array())
 {
 	$event = $this->onUpload($_FILES, $old);
 	if ($event and !$event->propagate) return;
 
-	$this->uploadBasic($old);
+	if ($this->fileStorage) {
+		$this->uploadFs($tableName, $id);
+	}
+	else {
+		$this->uploadBasic($old);
+	}
 }
 
 /**
@@ -859,9 +870,9 @@ function insert($tab)
 
 	$this->service('db');
 
-	if (count($_FILES)) $this->upload();
 	if (!$this->prepared) $this->prepare(1);
 	$id = $this->db->insert($tab, $this->values);
+	if (count($_FILES)) $this->upload($tab, $id);
 	return $id;
 }
 
@@ -884,7 +895,7 @@ function update($tab, $cond)
 
 	if (count($_FILES)) {
 		$old = $this->db->select($tab, $cond, $params);
-		$this->upload($old);
+		$this->upload($tab, $old['ID'], $old);
 	}
 
 	if (!$this->prepared) $this->prepare();
