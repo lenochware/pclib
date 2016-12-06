@@ -13,6 +13,7 @@
 # version 2.1 of the License, or (at your option) any later version.
 
 namespace pclib;
+use pclib;
 
 /**
  *  Store binary files into directory structure - file metadata are stored in table FILESTORAGE.
@@ -23,7 +24,8 @@ namespace pclib;
  *  For your own rules about directories and filenames, redefine methods getFileName() or getDir().
  *
  **/
-class FileStorage {
+class FileStorage extends system\BaseObject implements IService
+{
   /** Database table name. */
   public $TABLE = 'FILESTORAGE';
 
@@ -35,6 +37,12 @@ class FileStorage {
 
   /** Unused - always "/Y/n/" in this version. */
   public $dirNameFormat = ''; 
+
+  /** Occurs before file is saved. */
+  public $onBeforeSave;
+
+  /** Occurs after file is saved. */
+  public $onAfterSave;
 
   protected $db;
 
@@ -56,10 +64,6 @@ function __construct($rootdir) {
   $this->rootdir = $rootdir;
   $this->user = $pclib->app->auth? $pclib->app->auth->getuser() : array();
 }
-
-function onBeforeSave($entity, $file) {}
-
-function onAfterSave($entity, $file, $id) {}
 
 /**
  *  Save file and assign it to the entity.
