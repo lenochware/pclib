@@ -80,8 +80,6 @@ function saveFile($entity, $file)
 		return;
 	}
 
-	if (!$file['FILE_ID']) $file['FILE_ID'] = $this->newFileId($entity);
-
 	$dir = $this->getDir($this->dirNameFormat, $file);
 	$filename = $this->getFileName($this->fileNameFormat, $file);
 
@@ -130,7 +128,7 @@ function save($entity, $files)
 /**
  *  Return array of posted files coming from php array _FILES.
  *  Example: $fs->save($entity, $fs->postedFiles());
- *  Example: $file = postedFiles('FILE_1'); //Read FILE_1 form field, FILE_ID = 1
+ *  Example: $file = postedFiles('FILE_1'); //Read FILE_1 form field
  *  \param $input_id If present, it will return data from one input only
  */
 function postedFiles($input_id = null)
@@ -144,11 +142,9 @@ function postedFiles($input_id = null)
 		}
 		if (!$data or $data['size']<=0 or !is_uploaded_file($data['tmp_name'])) continue;
 
-		$aId = explode('_',$id);
-
 		$files[] = array(
 		'INPUT_ID' => $id,
-		'FILE_ID' => (int)array_pop($aId),
+		'FILE_ID' => $id,
 		'TMP_NAME' => $data['tmp_name'],
 		'ORIGNAME' => $data['name'],
 		'MIMETYPE' => $data['type'],
@@ -158,7 +154,7 @@ function postedFiles($input_id = null)
 	return $input_id? $files[0] : $files;
 }
 
-function hasUploadedFile($file)
+protected function hasUploadedFile($file)
 {
 	return ($file['TMP_NAME'] and $file['SIZE'] > 0);
 }
@@ -166,7 +162,7 @@ function hasUploadedFile($file)
 /**
  * Update file metadata.
  */
-function updateMeta($entity, $file)
+protected function updateMeta($entity, $file)
 {
 	$editables = array('ANNOT','ORIGNAME');
 
@@ -292,17 +288,6 @@ function getOne($entity, $file_id = null)
 	if ($file_id) $filter['FILE_ID'] = $file_id;
 
 	return $this->db->select($this->TABLE, $filter);
-}
-
-
-/**
- * Generate id of the newly added file.
- */
-protected function newFileId($entity)
-{
-	$filter = array('ENTITY_ID'=>$entity[0],'ENTITY_TYPE'=>$entity[1]);
-	$count = (int)$this->db->field($this->TABLE.':max(FILE_ID)', $filter);
-	return ($count+1);
 }
 
 /**
