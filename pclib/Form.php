@@ -229,9 +229,11 @@ protected function getHttpData()
 		}
 	}
 
-	foreach ((array)$_FILES as $id => $aFile) {
-		if($this->elements[$id]['file'] and $aFile['size']) {
-			$data[$id] = $aFile['name'];
+	if (!$this->fileStorage) {
+		foreach ((array)$_FILES as $id => $aFile) {
+			if($this->elements[$id]['file'] and $aFile['size']) {
+				$data[$id] = $aFile['name'];
+			}
 		}
 	}
 
@@ -810,10 +812,16 @@ private function getTableName($tab)
 function uploadFs($tableName, $id)
 {
 	$fs = $this->fileStorage;
-	$files = $fs->postedFiles();
+	$files = array();
 
-	$entity = array($id, crc32($tableName));
-	$fs->save($entity, $files);
+	foreach ($fs->postedFiles() as $file) {
+		$elem = $this->elements[$file['INPUT_ID']];
+		if (!$elem or $elem['nosave']) continue;
+		$file['PREFIX'] = $elem['prefix'] ?: strtolower($tableName).'_';
+		$files[] = $file;
+	}
+
+	$fs->save(array($id, $tableName), $files);
 }
 
 function uploadBasic($old = array())

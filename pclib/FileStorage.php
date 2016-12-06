@@ -33,7 +33,7 @@ class FileStorage extends system\BaseObject implements IService
   public $errors = array();
 
   /** You can use fields: HASH,EXT,ORIGNAME,ORIGNAME_NORMALIZED,FILE_ID or any field from $entity. */
-  public $fileNameFormat = "{HASH}.{EXT}";
+  public $fileNameFormat = "{PREFIX}{HASH}.{EXT}";
 
   /** Unused - always "/Y/n/" in this version. */
   public $dirNameFormat = ''; 
@@ -55,7 +55,7 @@ class FileStorage extends system\BaseObject implements IService
 function __construct($rootdir)
 {
   parent::__construct();
-  
+
   if (!is_dir($rootdir)) throw new IOException("Directory '$rootdir' does not exists.");
   $this->rootdir = $rootdir;
 
