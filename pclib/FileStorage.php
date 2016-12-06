@@ -261,12 +261,8 @@ function findOne($filter) {
  * You can use any fields for filtering.
  */
 function getAll($entity) {
-/*  $files = $this->db->select_all(
-    "select * from $this->TABLE where ENTITY_ID='{0}' AND ENTITY_TYPE='{1}' order by FILE_ID", 
-    $entity
-  );*/
   $files = $this->db->select_all(
-    "select * from $this->TABLE where ENTITY_ID='[0]' AND ENTITY_TYPE='[1]' order by FILE_ID", 
+    "select * from $this->TABLE where ENTITY_ID='{0}' AND ENTITY_TYPE='{1}' order by FILE_ID", 
     $entity
   );
   return $files;
@@ -368,6 +364,6 @@ protected function getFileName($format, $file) {
   return paramstr($format, $file);
 }
 
-} //FileStorage
+}
 
 ?>
