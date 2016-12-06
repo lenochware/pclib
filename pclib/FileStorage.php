@@ -44,25 +44,22 @@ class FileStorage extends system\BaseObject implements IService
   /** Occurs after file is saved. */
   public $onAfterSave;
 
-  protected $db;
+  public $db;
 
   /** Path to your writable storage directory. */
   protected $rootdir;
 
-  protected $user;
-
 /**
  * \param $rootdir Path to your writable storage directory.
  */
-function __construct($rootdir) {
-  global $pclib;
-  if (!$pclib->app) throw new RuntimeException('No instance of application (class app) found.');
+function __construct($rootdir)
+{
+  parent::__construct();
+  
   if (!is_dir($rootdir)) throw new IOException("Directory '$rootdir' does not exists.");
-  //$this->app = $pclib->app;
-  //$this->config = $this->app->config;
-  $this->db = $pclib->app->db;
   $this->rootdir = $rootdir;
-  $this->user = $pclib->app->auth? $pclib->app->auth->getuser() : array();
+
+  $this->service('db');
 }
 
 /**
@@ -106,7 +103,7 @@ function saveFile($entity, $file) {
   'ANNOT' => $file['ANNOT'],
   'MIMETYPE' => $file['MIMETYPE'],
   'SIZE' => $file['SIZE'],
-  'USER_ID' => $this->user['ID'],
+  //'USER_ID' => $this->user['ID'],
   'DT' => date("Y-m-d H:i:s"),
   );
 
