@@ -26,40 +26,40 @@ use pclib;
  **/
 class FileStorage extends system\BaseObject implements IService
 {
-  /** Database table name. */
-  public $TABLE = 'FILESTORAGE';
+	/** Database table name. */
+	public $TABLE = 'FILESTORAGE';
 
-  /** If upload error occurs, this will contains error messages. */
-  public $errors = array();
+	/** If upload error occurs, this will contains error messages. */
+	public $errors = array();
 
-  /** You can use fields: HASH,EXT,ORIGNAME,ORIGNAME_NORMALIZED,FILE_ID or any field from $entity. */
-  public $fileNameFormat = "{PREFIX}{HASH}.{EXT}";
+	/** You can use fields: HASH,EXT,ORIGNAME,ORIGNAME_NORMALIZED,FILE_ID or any field from $entity. */
+	public $fileNameFormat = "{PREFIX}{HASH}.{EXT}";
 
-  /** Unused - always "/Y/n/" in this version. */
-  public $dirNameFormat = ''; 
+	/** Unused - always "/Y/n/" in this version. */
+	public $dirNameFormat = ''; 
 
-  /** Occurs before file is saved. */
-  public $onBeforeSave;
+	/** Occurs before file is saved. */
+	public $onBeforeSave;
 
-  /** Occurs after file is saved. */
-  public $onAfterSave;
+	/** Occurs after file is saved. */
+	public $onAfterSave;
 
-  public $db;
+	public $db;
 
-  /** Path to your writable storage directory. */
-  protected $rootdir;
+	/** Path to your writable storage directory. */
+	protected $rootdir;
 
 /**
  * \param $rootdir Path to your writable storage directory.
  */
 function __construct($rootdir)
 {
-  parent::__construct();
+	parent::__construct();
 
-  if (!is_dir($rootdir)) throw new IOException("Directory '$rootdir' does not exists.");
-  $this->rootdir = $rootdir;
+	if (!is_dir($rootdir)) throw new IOException("Directory '$rootdir' does not exists.");
+	$this->rootdir = $rootdir;
 
-  $this->service('db');
+	$this->service('db');
 }
 
 /**
@@ -71,46 +71,47 @@ function __construct($rootdir)
  * \param $entity associative array with entity data
  * \param $file associative array with file to upload informations. See postedFiles().
  */
-function saveFile($entity, $file) {
-  $this->onBeforeSave($entity, $file);
-  
-  if (!$this->hasUploadedFile($file)) {
-    $this->updateMeta($entity, $file);
-    return;
-  }
+function saveFile($entity, $file)
+{
+	$this->onBeforeSave($entity, $file);
+	
+	if (!$this->hasUploadedFile($file)) {
+		$this->updateMeta($entity, $file);
+		return;
+	}
 
-  if (!$file['FILE_ID']) $file['FILE_ID'] = $this->newFileId($entity);
+	if (!$file['FILE_ID']) $file['FILE_ID'] = $this->newFileId($entity);
 
-  $dir = $this->getDir($this->dirNameFormat, $file);
-  $filename = $this->getFileName($this->fileNameFormat, $file);
+	$dir = $this->getDir($this->dirNameFormat, $file);
+	$filename = $this->getFileName($this->fileNameFormat, $file);
 
-  $found = $this->findOne(array(
-    'ENTITY_ID'  =>$entity[0],
-    'ENTITY_TYPE'=>$entity[1],
-    'FILE_ID'=>$file['FILE_ID'],
-  ));
-  if ($found) $this->delete($found['ID']);
+	$found = $this->findOne(array(
+		'ENTITY_ID'  =>$entity[0],
+		'ENTITY_TYPE'=>$entity[1],
+		'FILE_ID'=>$file['FILE_ID'],
+	));
+	if ($found) $this->delete($found['ID']);
 
-  $ok = @move_uploaded_file($file['TMP_NAME'], $this->rootdir.$dir.$filename);
-  if (!$ok) throw new IOException("Uploading '".$file['ORIGNAME']."' failed.");
+	$ok = @move_uploaded_file($file['TMP_NAME'], $this->rootdir.$dir.$filename);
+	if (!$ok) throw new IOException("Uploading '".$file['ORIGNAME']."' failed.");
 
-  $newfile = array(
-  'ENTITY_ID' => $entity[0],
-  'ENTITY_TYPE' => $entity[1],
-  'FILE_ID' => $file['FILE_ID'],
-  'FILEPATH' => $dir.$filename,
-  'ORIGNAME' => $file['ORIGNAME'],
-  'ANNOT' => $file['ANNOT'],
-  'MIMETYPE' => $file['MIMETYPE'],
-  'SIZE' => $file['SIZE'],
-  //'USER_ID' => $this->user['ID'],
-  'DT' => date("Y-m-d H:i:s"),
-  );
+	$newfile = array(
+	'ENTITY_ID' => $entity[0],
+	'ENTITY_TYPE' => $entity[1],
+	'FILE_ID' => $file['FILE_ID'],
+	'FILEPATH' => $dir.$filename,
+	'ORIGNAME' => $file['ORIGNAME'],
+	'ANNOT' => $file['ANNOT'],
+	'MIMETYPE' => $file['MIMETYPE'],
+	'SIZE' => $file['SIZE'],
+	//'USER_ID' => $this->user['ID'],
+	'DT' => date("Y-m-d H:i:s"),
+	);
 
-  $id = $this->db->insert($this->TABLE, $newfile);
+	$id = $this->db->insert($this->TABLE, $newfile);
 
-  $this->onAfterSave($entity, $newfile, $id);
-  return $id;
+	$this->onAfterSave($entity, $newfile, $id);
+	return $id;
 }
 
 /**
@@ -119,10 +120,11 @@ function saveFile($entity, $file) {
  *  \param $files Files to upload coming from method postedFiles()
  *  \see saveFile()
  */
-function save($entity, $files) {
-  foreach ($files as $file) {
-    $this->saveFile($entity, $file);
-  }
+function save($entity, $files)
+{
+	foreach ($files as $file) {
+		$this->saveFile($entity, $file);
+	}
 }
 
 /**
@@ -131,198 +133,211 @@ function save($entity, $files) {
  *  Example: $file = postedFiles('FILE_1'); //Read FILE_1 form field, FILE_ID = 1
  *  \param $input_id If present, it will return data from one input only
  */
-function postedFiles($input_id = null) {
-  $files = array();
-  $posted = $input_id? array($input_id => $_FILES[$input_id]) : (array)$_FILES;
-  
-  foreach($posted as $id => $data) {
-    if ($data['error'] and $data['error'] != UPLOAD_ERR_NO_FILE) {
-      $this->errors[$id] = $this->getError($data['error']);
-    }
-    if (!$data or $data['size']<=0 or !is_uploaded_file($data['tmp_name'])) continue;
+function postedFiles($input_id = null)
+{
+	$files = array();
+	$posted = $input_id? array($input_id => $_FILES[$input_id]) : (array)$_FILES;
+	
+	foreach($posted as $id => $data) {
+		if ($data['error'] and $data['error'] != UPLOAD_ERR_NO_FILE) {
+			$this->errors[$id] = $this->getError($data['error']);
+		}
+		if (!$data or $data['size']<=0 or !is_uploaded_file($data['tmp_name'])) continue;
 
-    $aId = explode('_',$id);
+		$aId = explode('_',$id);
 
-    $files[] = array(
-    'INPUT_ID' => $id,
-    'FILE_ID' => (int)array_pop($aId),
-    'TMP_NAME' => $data['tmp_name'],
-    'ORIGNAME' => $data['name'],
-    'MIMETYPE' => $data['type'],
-    'SIZE' => $data['size'],
-    );
-  }
-  return $input_id? $files[0] : $files;
+		$files[] = array(
+		'INPUT_ID' => $id,
+		'FILE_ID' => (int)array_pop($aId),
+		'TMP_NAME' => $data['tmp_name'],
+		'ORIGNAME' => $data['name'],
+		'MIMETYPE' => $data['type'],
+		'SIZE' => $data['size'],
+		);
+	}
+	return $input_id? $files[0] : $files;
 }
 
-function hasUploadedFile($file) {
-  return ($file['TMP_NAME'] and $file['SIZE'] > 0);
+function hasUploadedFile($file)
+{
+	return ($file['TMP_NAME'] and $file['SIZE'] > 0);
 }
 
 /**
  * Update file metadata.
  */
-function updateMeta($entity, $file) {
+function updateMeta($entity, $file)
+{
+	$editables = array('ANNOT','ORIGNAME');
 
-  $editables = array('ANNOT','ORIGNAME');
+	$found = $this->findOne(array(
+		'ENTITY_ID'=>$entity[0],
+		'ENTITY_TYPE'=>$entity[1],
+		'FILE_ID'=>$file['FILE_ID'],
+	));
+	if (!$found) return false;
 
-  $found = $this->findOne(array(
-    'ENTITY_ID'=>$entity[0],
-    'ENTITY_TYPE'=>$entity[1],
-    'FILE_ID'=>$file['FILE_ID'],
-  ));
-  if (!$found) return false;
+	foreach($file as $k=>$tmp)
+		if (!in_array($k,$editables)) unset($file[$k]);
 
-  foreach($file as $k=>$tmp)
-    if (!in_array($k,$editables)) unset($file[$k]);
-
-  $this->db->update($this->TABLE, $file, pri($found['ID']));
+	$this->db->update($this->TABLE, $file, pri($found['ID']));
 }
 
 /**
  * Return entity of the record from FILESTORAGE table.
  */
-function getEntity($id) {
-  $r = $this->db->select($this->TABLE, pri($id));
-  return array($r['ENTITY_ID'],$r['ENTITY_TYPE']);
+function getEntity($id)
+{
+	$r = $this->db->select($this->TABLE, pri($id));
+	return array($r['ENTITY_ID'],$r['ENTITY_TYPE']);
 }
 
 /**
  * Delete multiple files according $filter array.
  */
-function deleteAll($filter) {
-  $toDelete = $this->db->select_one($this->TABLE.':ID', $filter);
-  foreach($toDelete as $id) $this->delete($id);
+function deleteAll($filter)
+{
+	$toDelete = $this->db->select_one($this->TABLE.':ID', $filter);
+	foreach($toDelete as $id) $this->delete($id);
 }
 
 /**
  * Delete file with primary key $id.
  */
-function delete($id) {
-  $file = $this->db->select($this->TABLE, pri($id));
-  if (!$file) throw new IOException("File not found.");
-  $path = $this->rootdir.$file['FILEPATH'];
-  if (file_exists($path)) {
-    $ok = @unlink($path);
-    if (!$ok) throw new IOException("File '$path' cannot be deleted.");
-  }
-  $this->db->delete($this->TABLE, pri($id));
+function delete($id)
+{
+	$file = $this->db->select($this->TABLE, pri($id));
+	if (!$file) throw new IOException("File not found.");
+	$path = $this->rootdir.$file['FILEPATH'];
+	if (file_exists($path)) {
+		$ok = @unlink($path);
+		if (!$ok) throw new IOException("File '$path' cannot be deleted.");
+	}
+	$this->db->delete($this->TABLE, pri($id));
 }
 
 /**
  * Delete all files linked with $entity.
  */
-function deleteEntity($entity) {
-  $this->deleteAll(array('ENTITY_ID' => $entity[0], 'ENTITY_TYPE' => $entity[1]));
+function deleteEntity($entity)
+{
+	$this->deleteAll(array('ENTITY_ID' => $entity[0], 'ENTITY_TYPE' => $entity[1]));
 }
 
 /**
  * Output file $id to the end-user.
  */
-function output($id, $attachment = false) {
-  $file = $this->db->select($this->TABLE, pri($id));
-  $path = $this->rootdir.$file['FILEPATH'];
-  if (!file_exists($path)) throw new FileNotFoundException("File '$path' not found.");
+function output($id, $attachment = false)
+{
+	$file = $this->db->select($this->TABLE, pri($id));
+	$path = $this->rootdir.$file['FILEPATH'];
+	if (!file_exists($path)) throw new FileNotFoundException("File '$path' not found.");
 
-  $disposition = $attachment? 'attachment':'inline';
-  header('Content-type: '.$file['MIMETYPE']);
-  header('Content-Disposition: '.$disposition.'; filename="'.$file['ORIGNAME'].'"');
-  readfile($path);
-  die();
+	$disposition = $attachment? 'attachment':'inline';
+	header('Content-type: '.$file['MIMETYPE']);
+	header('Content-Disposition: '.$disposition.'; filename="'.$file['ORIGNAME'].'"');
+	readfile($path);
+	die();
 }
 
 /**
  * Check if file is image.
  */
 function isImage($file) {
-  return (strpos($file['MIMETYPE'], 'image/') === 0);
+	return (strpos($file['MIMETYPE'], 'image/') === 0);
 }
 
 /**
  * Return list of all files (rows from db-table) according used filter.
  * You can use any fields for filtering.
  */
-function findAll($filter) {
-  $files = $this->db->select_all($this->TABLE, $filter);
-  return $files;
+function findAll($filter)
+{
+	$files = $this->db->select_all($this->TABLE, $filter);
+	return $files;
 }
 
 /**
  * Return particular file (row from db-table) according used filter.
  * You can use any fields for filtering.
  */
-function findOne($filter) {
-  if (is_numeric($filter)) $filter = array('ID'=>$filter);
-  return $this->db->select($this->TABLE, $filter);
+function findOne($filter)
+{
+	if (is_numeric($filter)) $filter = array('ID'=>$filter);
+	return $this->db->select($this->TABLE, $filter);
 }
 
 /**
  * Return list of all files assigned to $entity.
  * You can use any fields for filtering.
  */
-function getAll($entity) {
-  $files = $this->db->select_all(
-    "select * from $this->TABLE where ENTITY_ID='{0}' AND ENTITY_TYPE='{1}' order by FILE_ID", 
-    $entity
-  );
-  return $files;
+function getAll($entity)
+{
+	$files = $this->db->select_all(
+		"select * from $this->TABLE where ENTITY_ID='{0}' AND ENTITY_TYPE='{1}' order by FILE_ID", 
+		$entity
+	);
+	return $files;
 }
 
 /**
  * Return particular file (row from db-table) for entity $entity.
  */
-function getOne($entity, $file_id = null) {
-  $filter = array(
-    'ENTITY_ID'=>$entity[0],
-    'ENTITY_TYPE'=>$entity[1],
-  );
-  if ($file_id) $filter['FILE_ID'] = $file_id;
+function getOne($entity, $file_id = null)
+{
+	$filter = array(
+		'ENTITY_ID'=>$entity[0],
+		'ENTITY_TYPE'=>$entity[1],
+	);
+	if ($file_id) $filter['FILE_ID'] = $file_id;
 
-  return $this->db->select($this->TABLE, $filter);
+	return $this->db->select($this->TABLE, $filter);
 }
 
 
 /**
  * Generate id of the newly added file.
  */
-protected function newFileId($entity) {
-  $filter = array('ENTITY_ID'=>$entity[0],'ENTITY_TYPE'=>$entity[1]);
-  $count = (int)$this->db->field($this->TABLE.':max(FILE_ID)', $filter);
-  return ($count+1);
+protected function newFileId($entity)
+{
+	$filter = array('ENTITY_ID'=>$entity[0],'ENTITY_TYPE'=>$entity[1]);
+	$count = (int)$this->db->field($this->TABLE.':max(FILE_ID)', $filter);
+	return ($count+1);
 }
 
 /**
  * Return upload error message.
  */
-function getError($code) {
-  switch ($code) { 
-    case UPLOAD_ERR_INI_SIZE: 
-        $message = "The uploaded file exceeds the upload_max_filesize directive in php.ini";
-        break; 
-    case UPLOAD_ERR_FORM_SIZE: 
-        $message = "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form"; 
-        break; 
-    case UPLOAD_ERR_PARTIAL: 
-        $message = "The uploaded file was only partially uploaded"; 
-        break; 
-    case UPLOAD_ERR_NO_FILE: 
-        $message = "No file was uploaded"; 
-        break; 
-    case UPLOAD_ERR_NO_TMP_DIR: 
-        $message = "Missing a temporary folder"; 
-        break; 
-    case UPLOAD_ERR_CANT_WRITE: 
-        $message = "Failed to write file to disk"; 
-        break; 
-    case UPLOAD_ERR_EXTENSION: 
-        $message = "File upload stopped by extension"; 
-        break; 
+function getError($code)
+{
+	switch ($code) { 
+		case UPLOAD_ERR_INI_SIZE: 
+				$message = "The uploaded file exceeds the upload_max_filesize directive in php.ini";
+				break; 
+		case UPLOAD_ERR_FORM_SIZE: 
+				$message = "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form"; 
+				break; 
+		case UPLOAD_ERR_PARTIAL: 
+				$message = "The uploaded file was only partially uploaded"; 
+				break; 
+		case UPLOAD_ERR_NO_FILE: 
+				$message = "No file was uploaded"; 
+				break; 
+		case UPLOAD_ERR_NO_TMP_DIR: 
+				$message = "Missing a temporary folder"; 
+				break; 
+		case UPLOAD_ERR_CANT_WRITE: 
+				$message = "Failed to write file to disk"; 
+				break; 
+		case UPLOAD_ERR_EXTENSION: 
+				$message = "File upload stopped by extension"; 
+				break; 
 
-    default: 
-        $message = "Unknown upload error"; 
-        break; 
-  } 
-  return $message; 
+		default: 
+				$message = "Unknown upload error"; 
+				break; 
+	} 
+	return $message; 
 }
 
 
@@ -330,8 +345,9 @@ function getError($code) {
  * Sanitize filename.
  * Replace non-ascii characters, remove diacriticts and replace whitespaces with '_'.
  */
-protected function normalize($filename) {
-  return mkident($filename, '_');
+protected function normalize($filename)
+{
+	return mkident($filename, '_');
 }
 
 /**
@@ -339,16 +355,17 @@ protected function normalize($filename) {
  * It is creating and using '/Year/month/' directories by default.
  * Parameters $format and $file are unused in current version.
  */
-protected function getDir($format, $file) {
-  $dir = date("/Y/n/");
-  $fulldir = $this->rootdir.$dir;
-  if (!is_dir($fulldir)) {
-    $oldumask = umask(0);
-    $ok = mkdir($fulldir, 0777, true);
-    umask($oldumask);
-    if (!$ok) throw new IOException("Directory '$fulldir' cannot be created.");
-  }
-  return $dir;
+protected function getDir($format, $file)
+{
+	$dir = date("/Y/n/");
+	$fulldir = $this->rootdir.$dir;
+	if (!is_dir($fulldir)) {
+		$oldumask = umask(0);
+		$ok = mkdir($fulldir, 0777, true);
+		umask($oldumask);
+		if (!$ok) throw new IOException("Directory '$fulldir' cannot be created.");
+	}
+	return $dir;
 }
 
 /**
@@ -357,11 +374,12 @@ protected function getDir($format, $file) {
  * \param $format Format string e.g. "PREFIX_{ORIGNAME_NORMALIZED}.{EXT}";
  * \param array $file File information (Any field can be used in $format string)
  */
-protected function getFileName($format, $file) {
-  $file['ORIGNAME_NORMALIZED'] = $this->normalize($file['ORIGNAME']);
-  $file['EXT'] = pathinfo($file['ORIGNAME'], PATHINFO_EXTENSION);
-  $file['HASH'] = randomstr(8);
-  return paramstr($format, $file);
+protected function getFileName($format, $file)
+{
+	$file['ORIGNAME_NORMALIZED'] = $this->normalize($file['ORIGNAME']);
+	$file['EXT'] = pathinfo($file['ORIGNAME'], PATHINFO_EXTENSION);
+	$file['HASH'] = randomstr(8);
+	return paramstr($format, $file);
 }
 
 }
