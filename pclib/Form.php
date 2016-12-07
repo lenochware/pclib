@@ -823,12 +823,17 @@ protected function uploadFs($tableName, $id)
 	foreach ($fs->postedFiles() as $file) {
 		$elem = $this->elements[$file['INPUT_ID']];
 		if (!$elem or $elem['nosave']) continue;
-		
+
 		$file['PREFIX'] = $elem['prefix'] ?: strtolower($tableName).'_';
 		$files[] = $file;
 	}
 
 	$fs->save(array($id, $tableName), $files);
+
+	$errors = $fs->getUploadErrors();
+	if ($errors) {
+		$this->invalid += $errors;
+	}
 }
 
 protected function uploadBasic($old = array())

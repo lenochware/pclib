@@ -29,6 +29,9 @@ class FileStorage extends system\BaseObject implements IService
 	/** Database table name. */
 	public $TABLE = 'FILESTORAGE';
 
+	/** If upload error occurs, this will contains error messages. */
+	public $errors = array();
+
 	/** You can use fields: HASH,EXT,ORIGNAME,ORIGNAME_NORMALIZED,FILE_ID or any field from $entity. */
 	public $fileNameFormat = "{PREFIX}{HASH}.{EXT}";
 
@@ -81,7 +84,8 @@ function saveFile($entity, $file)
 	}
 
 	if ($this->fileInBlackList($file['ORIGNAME'])) {
-		throw new RuntimeException("Illegal file type.");
+		$this->errors[$file['INPUT_ID']] = 'File type is not allowed.';
+		return;
 	}
 
 	$dir = $this->getDir($this->dirNameFormat, $file);
@@ -95,7 +99,10 @@ function saveFile($entity, $file)
 	if ($found) $this->delete($found['ID']);
 
 	$ok = @move_uploaded_file($file['TMP_NAME'], $this->rootdir.$dir.$filename);
-	if (!$ok) throw new IOException("Uploading '".$file['ORIGNAME']."' failed.");
+	if (!$ok) {
+		$this->errors[$file['INPUT_ID']] = "Uploading '".$file['ORIGNAME']."' failed.";
+		return;
+	}
 
 	$newfile = array(
 	'ENTITY_ID' => $entity[0],
@@ -170,8 +177,15 @@ function postedFiles($input_id = null)
 		$posted += $multiples;
 	}
 
-	foreach($posted as $id => $data) {
-		if ($data['error'] or $this->fileInBlackList($data['name'])) {
+	foreach($posted as $id => $data)
+	{
+		if ($data['error'] and $data['error'] != UPLOAD_ERR_NO_FILE) {
+			$this->errors[$id] = $this->getErrorMessage($data['error']);
+			continue;
+		}
+
+		if ($this->fileInBlackList($data['name'])) {
+			$this->errors[$id] = 'File type is not allowed.';
 			continue;
 		}
 
@@ -336,31 +350,7 @@ function fileInBlackList($fileName)
 
 function getUploadErrors()
 {
-	$errors = array();
-
-	foreach ((array)$_FILES as $id => $file) {
-
-		if (!is_array($file['name'])) {
-			if ($file['error'] == UPLOAD_ERR_NO_FILE) continue;
-
-			if ($this->fileInBlackList($file['name']))  $errors[$id] = 'File type is not allowed.';
-			if ($file['error']) {
-				$errors[$id] = $this->getErrorMessage($file['error']);
-			}
-		}
-		else {
-			foreach ($this->getMultipleField($id, $file) as $id2 => $file2) {
-				if ($file2['error'] == UPLOAD_ERR_NO_FILE) continue;
-
-				if ($this->fileInBlackList($file2['name']))  $errors[$id2] = 'File type is not allowed.';
-				if ($file2['error']) {
-					$errors[$id2] = $this->getErrorMessage($file2['error']);
-				}
-			}
-		}
-	}
-
-	return $errors;
+	return $this->errors;
 }
 
 /**
