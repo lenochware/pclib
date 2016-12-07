@@ -133,6 +133,8 @@ protected function getMultipleField($input_id, $data)
 		foreach (array('name', 'type', 'tmp_name', 'error', 'size') as $key) {
 			$multiple[$input_id.'_'.$i][$key] = $data[$key][$i];
 		}
+
+		$multiple[$input_id.'_'.$i]['input_id'] = $input_id;
 	}
 	return $multiple;
 }
@@ -155,6 +157,9 @@ function postedFiles($input_id = null)
 			$multiples += $this->getMultipleField($k, $data);
 			unset($posted[$k]);
 		}
+		else {
+			$posted[$k]['input_id'] = $k;
+		}
 	}
 
 	if ($multiples) {
@@ -169,7 +174,7 @@ function postedFiles($input_id = null)
 		if (!$data or $data['size']<=0 or !is_uploaded_file($data['tmp_name'])) continue;
 
 		$files[] = array(
-		'INPUT_ID' => $id,
+		'INPUT_ID' => $data['input_id'],
 		'FILE_ID' => $id,
 		'TMP_NAME' => $data['tmp_name'],
 		'ORIGNAME' => $data['name'],

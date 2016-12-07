@@ -497,7 +497,13 @@ function print_Input($id, $sub, $value)
 	if ($elem['password']) $type = 'password';
 	elseif($elem['file'])  {
 		$type = 'file';
-		$tag['name'] = $tag['id'];
+		if ($elem['multiple']) {
+			$tag['name'] = $tag['id'].'[]';
+			$tag['multiple'] = 1;
+		}
+		else {
+			$tag['name'] = $tag['id'];
+		}
 	}
 	elseif($elem['hidden']) {
 		$type = 'hidden';
