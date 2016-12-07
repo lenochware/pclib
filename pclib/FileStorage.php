@@ -125,6 +125,18 @@ function save($entity, $files)
 	}
 }
 
+protected function getMultipleField($input_id, $data)
+{
+	$multiple = array();
+	$count = count($data['name']);
+	for($i = 0; $i < $count; $i++) {
+		foreach (array('name', 'type', 'tmp_name', 'error', 'size') as $key) {
+			$multiple[$input_id.'_'.$i][$key] = $data[$key][$i];
+		}
+	}
+	return $multiple;
+}
+
 /**
  *  Return array of posted files coming from php array _FILES.
  *  Example: $fs->save($entity, $fs->postedFiles());
@@ -135,11 +147,25 @@ function postedFiles($input_id = null)
 {
 	$files = array();
 	$posted = $input_id? array($input_id => $_FILES[$input_id]) : (array)$_FILES;
-	
+
+	//handle multiple file upload fields
+	$multiples = array();
+	foreach ($posted as $k => $data) {
+		if (is_array($data['name'])) {
+			$multiples += $this->getMultipleField($k, $data);
+			unset($posted[$k]);
+		}
+	}
+
+	if ($multiples) {
+		$posted += $multiples;
+	}
+
 	foreach($posted as $id => $data) {
 		if ($data['error'] and $data['error'] != UPLOAD_ERR_NO_FILE) {
 			$this->errors[$id] = $this->getError($data['error']);
 		}
+
 		if (!$data or $data['size']<=0 or !is_uploaded_file($data['tmp_name'])) continue;
 
 		$files[] = array(
