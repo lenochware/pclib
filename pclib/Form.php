@@ -48,6 +48,8 @@ public $onSave;
 /** Occurs before deleting from database. */
 public $onDelete;
 
+public $fileStorage;
+
 /**
  * Array of error messages filled by validate() function.
  * You can set it on your own too.
@@ -83,6 +85,8 @@ protected function _init()
 		$this->dbSync($this->header['table']);
 	}
 
+	$this->fileStorage = $this->service('fileStorage', false);
+
 	if ($this->config['pclib.security']['csrf']) {
 		$this->header['csrf'] = true;
 	}
@@ -106,7 +110,7 @@ protected function _init()
 	foreach ($this->elements as $id=>$elem) {
 		$value = $this->values[$id];
 		if ($elem['type'] == 'check' and !$value and !$elem['noprint']) $this->values[$id] = array();
-		elseif($elem['type'] == 'input') $this->values[$id] = trim($value);
+		elseif($elem['type'] == 'input' and is_string($value)) $this->values[$id] = trim($value);
 		if ($elem['onsave']) $this->values[$id] = $this->fireEventElem('onsave',$id,'',$value);
 
 		if ($fmt = $this->getAttr($id, 'format')) $this->values[$id] = $this->formatStr($value, $fmt);
@@ -225,9 +229,11 @@ protected function getHttpData()
 		}
 	}
 
-	foreach ((array)$_FILES as $id => $aFile) {
-		if($this->elements[$id]['file'] and $aFile['size']) {
-			$data[$id] = $aFile['name'];
+	if (!$this->fileStorage) {
+		foreach ((array)$_FILES as $id => $aFile) {
+			if($this->elements[$id]['file'] and $aFile['size']) {
+				if (is_string($aFile['name'])) $data[$id] = $aFile['name'];
+			}
 		}
 	}
 
@@ -491,7 +497,13 @@ function print_Input($id, $sub, $value)
 	if ($elem['password']) $type = 'password';
 	elseif($elem['file'])  {
 		$type = 'file';
-		$tag['name'] = $tag['id'];
+		if ($elem['multiple']) {
+			$tag['name'] = $tag['id'].'[]';
+			$tag['multiple'] = 1;
+		}
+		else {
+			$tag['name'] = $tag['id'];
+		}
 	}
 	elseif($elem['hidden']) {
 		$type = 'hidden';
@@ -803,15 +815,29 @@ private function getTableName($tab)
 	return $tableName;
 }
 
-/**
- * Upload form files.
- * @param array $old List of previous versions of files - will be deleted
- */
-function upload($old = array())
+protected function uploadFs($tableName, $id)
 {
-	$event = $this->onUpload($_FILES, $old);
-	if ($event and !$event->propagate) return;
+	$fs = $this->fileStorage;
+	$files = array();
 
+	foreach ($fs->postedFiles() as $file) {
+		$elem = $this->elements[$file['INPUT_ID']];
+		if (!$elem or $elem['nosave']) continue;
+
+		$file['PREFIX'] = $elem['prefix'] ?: strtolower($tableName).'_';
+		$files[] = $file;
+	}
+
+	$fs->save(array($id, $tableName), $files);
+
+	$errors = $fs->getUploadErrors();
+	if ($errors) {
+		$this->invalid += $errors;
+	}
+}
+
+protected function uploadBasic($old = array())
+{
 	foreach ($_FILES as $id => $aFile) {
 		$elem = $this->elements[$id];
 		if (!$elem) continue;
@@ -829,6 +855,23 @@ function upload($old = array())
 		if (!$ok) throw new IOException("Cannot upload file $path/$filename (permissions problem?)");
 		@chmod($path.'/'.$filename, 0666);
 		$this->values[$id] = $filename;
+	}	
+}
+
+/**
+ * Upload form files.
+ * @param array $old List of previous versions of files - will be deleted
+ */
+function upload($tableName, $id, $old = array())
+{
+	$event = $this->onUpload($_FILES, $old);
+	if ($event and !$event->propagate) return;
+
+	if ($this->fileStorage) {
+		$this->uploadFs($tableName, $id);
+	}
+	else {
+		$this->uploadBasic($old);
 	}
 }
 
@@ -847,9 +890,9 @@ function insert($tab)
 
 	$this->service('db');
 
-	if (count($_FILES)) $this->upload();
 	if (!$this->prepared) $this->prepare(1);
 	$id = $this->db->insert($tab, $this->values);
+	if (count($_FILES)) $this->upload($tab, $id);
 	return $id;
 }
 
@@ -870,9 +913,13 @@ function update($tab, $cond)
 	$params = (func_num_args() > 2)? array_slice(func_get_args(),2) : null;
 	if ($params and is_array($params[0])) $params = $params[0];
 
+	$old = $this->db->select($tab, $cond, $params);
+	if (!$old) {
+		throw new Exception('Record not found.');
+	}
+
 	if (count($_FILES)) {
-		$old = $this->db->select($tab, $cond, $params);
-		$this->upload($old);
+		$this->upload($tab, $old['ID'], $old);
 	}
 
 	if (!$this->prepared) $this->prepare();
@@ -897,15 +944,26 @@ function delete($tab, $cond)
 	if ($params and is_array($params[0])) $params = $params[0];
 
 	$data = $this->db->select($tab, $cond, $params);
-
-	foreach ($this->elements as $id=>$elem)
-		if ($elem['file'] and $elem['into']) {
-			 $path = realpath($this->elements[$id]['into']);
-			 if (!$data[$id]) continue;
-			 @unlink($path.'/'.$data[$id]);
-		}
-
 	$this->db->delete($tab, $cond, $params);
+
+	if ($this->header['fileupload']) {
+		$this->deleteFiles($tab, $data);
+	}
+}
+
+protected function deleteFiles($tableName, $data)
+{
+	if ($this->fileStorage) {
+		$this->fileStorage->deleteEntity(array($data['ID'], $tableName));
+	}
+	else {
+		foreach ($this->elements as $id=>$elem) {
+			if (!$elem['file'] or !$elem['into']) continue;
+			$path = realpath($this->elements[$id]['into']);
+			if (!$data[$id]) continue;
+			@unlink($path.'/'.$data[$id]);
+		}
+	}
 }
 
 /**
