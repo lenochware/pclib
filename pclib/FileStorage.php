@@ -1,8 +1,7 @@
 <?php
 /**
  * @file
- * Store binary files into directory structure - file metadata are stored in table FILESTORAGE.
- *
+ * Provides file management functions. You can upload, store, list and manage files.
  * @author -dk- <lenochware@gmail.com>
  * @link http://pclib.brambor.net/
  */
@@ -16,13 +15,12 @@ namespace pclib;
 use pclib;
 
 /**
- *  Store binary files into directory structure - file metadata are stored in table FILESTORAGE.
- *  Each file is assigned to $entity ($entity can be invoice, order, user etc.) One entity can have multiple files.
- *  File is identified with key ENTITY_ID, ENTITY_TYPE and FILE_ID in the database.
- *  It will generate structure of subdierectories, by default in format 'storage/year/month/'.
- *  It will rename files - by default 8-characters hash will be used.
- *  For your own rules about directories and filenames, redefine methods getFileName() or getDir().
- *
+ *  Provides file management functions. You can upload, store, list and manage files.
+ *  - Files are stored in directory structure 'rootdir/year/month/' by default.
+ *  - Each file has record in database table FILESTORAGE and it is assigned to some $entity.
+ *  - Examples:
+ *  $fs->save([100, 'products'], $fs->postedFiles()); //Save posted files
+ *  $fs->getAll([100, 'products']); //return array with list of files for product_id=100
  **/
 class FileStorage extends system\BaseObject implements IService
 {
@@ -159,6 +157,7 @@ protected function getMultipleField($input_id, $data)
 function postedFiles($input_id = null)
 {
 	$files = array();
+	$this->errors = array();
 	$posted = $input_id? array($input_id => $_FILES[$input_id]) : (array)$_FILES;
 
 	//handle multiple file upload fields
