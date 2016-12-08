@@ -75,6 +75,10 @@ function __construct($rootdir)
 function saveFile($entity, $file)
 {
 	$this->onBeforeSave($entity, $file);
+
+	if (!(int)$entity[0] or !$entity[1]) {
+		throw new NoValueException('Cannot save file - invalid entity.');
+	}
 	
 	if (!$this->hasUploadedFile($file)) {
 		$this->updateMeta($entity, $file);

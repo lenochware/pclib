@@ -110,7 +110,7 @@ protected function _init()
 	foreach ($this->elements as $id=>$elem) {
 		$value = $this->values[$id];
 		if ($elem['type'] == 'check' and !$value and !$elem['noprint']) $this->values[$id] = array();
-		elseif($elem['type'] == 'input') $this->values[$id] = trim($value);
+		elseif($elem['type'] == 'input' and is_string($value)) $this->values[$id] = trim($value);
 		if ($elem['onsave']) $this->values[$id] = $this->fireEventElem('onsave',$id,'',$value);
 
 		if ($fmt = $this->getAttr($id, 'format')) $this->values[$id] = $this->formatStr($value, $fmt);
@@ -232,7 +232,7 @@ protected function getHttpData()
 	if (!$this->fileStorage) {
 		foreach ((array)$_FILES as $id => $aFile) {
 			if($this->elements[$id]['file'] and $aFile['size']) {
-				$data[$id] = $aFile['name'];
+				if (is_string($aFile['name'])) $data[$id] = $aFile['name'];
 			}
 		}
 	}
@@ -913,8 +913,12 @@ function update($tab, $cond)
 	$params = (func_num_args() > 2)? array_slice(func_get_args(),2) : null;
 	if ($params and is_array($params[0])) $params = $params[0];
 
+	$old = $this->db->select($tab, $cond, $params);
+	if (!$old) {
+		throw new Exception('Record not found.');
+	}
+
 	if (count($_FILES)) {
-		$old = $this->db->select($tab, $cond, $params);
 		$this->upload($tab, $old['ID'], $old);
 	}
 
