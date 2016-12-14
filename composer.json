@@ -1,0 +1,20 @@
+{
+	"name": "lenochware/pclib",
+	"description": "Pclib framework",
+	"keywords": ["framework", "pclib"],
+	"homepage": "http://pclib.brambor.net",
+	"license": ["GPL-3.0"],
+	"authors": [
+		{
+			"name": "lenochware",
+			"email": "lenochware@gmail.com"
+		},
+	],
+	"require": {
+		"php": ">=5.2.0"
+	},
+	"autoload": {
+		"classmap": ["pclib"],
+		"files": ["pclib/pclib.php"]
+	},
+}
