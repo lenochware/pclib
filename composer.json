@@ -3,7 +3,7 @@
 	"description": "Pclib framework",
 	"keywords": ["framework", "pclib"],
 	"homepage": "http://pclib.brambor.net",
-	"license": ["GPL-3.0"],
+	"license": ["LGPL-2.1+"],
 	"authors": [
 		{
 			"name": "lenochware",
