@@ -16,5 +16,5 @@
 	"autoload": {
 		"classmap": ["pclib"],
 		"files": ["pclib/pclib.php"]
-	},
+	}
 }
