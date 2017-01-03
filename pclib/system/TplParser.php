@@ -37,6 +37,7 @@ class TplParser extends BaseObject
 		$this->TPL_ELEM = chr(1);
 		$this->TPL_SEPAR = chr(2);
 		$this->TPL_BLOCK = chr(3);
+		$this->service('translator', false);
 	}
 
 	function parse($templateStr)

@@ -84,6 +84,8 @@ protected $header = array();
 /** Document array - It contains parsed template. */
 protected $document;
 
+protected $parser;
+
 private $inBlock = array();
 
 /** Function for escaping html in template values. */
@@ -106,6 +108,7 @@ function __construct($path = '', $sessName = '')
 	$this->app = $pclib->app;
 	$this->config = $this->app->config;
 	$this->escapeHtmlFunction = array($this, 'escapeHtml');
+	$this->parser = new system\TplParser;
 
 	$this->sessName = $sessName;
 	$this->loadSession();
@@ -166,8 +169,8 @@ protected function hasType($name)
 function load($path)
 {
 	if (!file_exists($path)) throw new FileNotFoundException("File '$path' not found.");
-	$tpl_string = file_get_contents ($path);
-	$this->loadString ($tpl_string);
+	$tpl_string = file_get_contents($path);
+	$this->loadString($tpl_string);
 	$this->onLoad($path);
 }
 
@@ -178,23 +181,9 @@ function load($path)
  */
 function loadString($s)
 {
-	$tag_start = '<?elements';
-	$tag_end = '?'.'>';
-
-	$start = strpos($s, $tag_start);
-	$end = strpos($s, $tag_end);
-	if ($start === false or $end === false or $end < $start) {
-		$template_def = $s;
-	}
-	else {
-		$elements_def = substr($s, $start + strlen($tag_start), $end-$start-strlen($tag_start));
-		$this->parseElements($elements_def);
-		$template_def = trim(substr($s, $end-$start+strlen($tag_end)),"\r\n");
-	}
-
-	$this->parseTemplate($template_def);
-
-	return true;
+	$templ = $this->parser->parse($s);	
+	$this->elements = $templ[0];
+	$this->document = $templ[1];
 }
 
 protected function _out($block = null)
@@ -225,7 +214,7 @@ function html($block = null)
 {
 	ob_start();
 	$this->out($block);
-	$html_code = ob_get_contents ();
+	$html_code = ob_get_contents();
 	ob_end_clean();
 	return $html_code;
 }
@@ -841,160 +830,6 @@ protected function getUrl($elem)
 	}
 
 	return false;
-}
-
-// add element definition
-// $line has same format as line in section "elements" in common template
-function addTag($line)
-{
-	$this->parseLine($line);
-}
-
-private function getDocument($def)
-{
-	$pat[0] = "/{([a-z0-9_.]+)}/i";
-	$pat[1] = "/{(BLOCK|IF|IF NOT)\s+([a-z0-9_]+)}/i";
-	$pat[2] = "%{/(BLOCK|IF)}%i";
-
-	$rep[0] = TPL_SEPAR . TPL_ELEM  . TPL_SEPAR . '\\1' . TPL_SEPAR;
-	$rep[1] = TPL_SEPAR . TPL_BLOCK . TPL_SEPAR . '\\2:\\1' . TPL_SEPAR;
-	$rep[2] = TPL_SEPAR . TPL_BLOCK . TPL_SEPAR . 'END:\\1' . TPL_SEPAR;
-
-	if ($this->config['pclib.compatibility']['tpl_syntax']) {
-		$pat[3] = "/<!--\s*BLOCK\s+([a-z0-9_]+)\s*-->/i";
-		$rep[3] = TPL_SEPAR . TPL_BLOCK . TPL_SEPAR . '\\1' . TPL_SEPAR;
-	}
-
-	return explode(TPL_SEPAR, preg_replace($pat, $rep, $def));
-}
-
-private function initBlocks()
-{
-	$this->elements['pcl_document'] = array(
-		'type' => 'block',
-		'begin'=> 0, 'end' => count($this->document)
-	);
-
-	$bstack = array(); $block = null;
-	foreach ($this->document as $key=>$strip) {
-		if ($strip == TPL_ELEM) {
-			list($id,$sub) = explode('.',$this->document[$key+1]);
-			if ($this->elements[$id] and !$this->elements[$id]['block'])
-				$this->elements[$id]['block'] = $block;
-		}
-
-		if ($strip != TPL_BLOCK) continue;
-		list($name,$type) = explode(':',$this->document[$key+1]);
-
-		$type = strtoupper($type);
-		$section = strtoupper($name);
-
-		if ($section == 'END') {
-			if ($block) $this->elements[$block]['end'] = $key;
-			$block = array_pop($bstack);
-		}
-		elseif ($section == 'ELSE') {
-			if ($block) $this->elements[$block]['else'] = $key + 2;
-			$this->document[$key]   = null;
-			$this->document[$key+1] = null;
-		}
-		else {
-			array_push($bstack, $block);
-			$block = $name;
-
-			if ($type == 'IF') {
-				$block = '__if'.$key;
-				$this->elements[$block]['if'] = $name;
-			}
-			elseif($type == 'IF NOT') {
-				$block = '__if'.$key;
-				$this->elements[$block]['ifnot'] = $name;
-			}
-
-			$this->document[$key+1] = $block;
-			if ($this->elements[$block]['begin']) {
-				throw new Exception("Block name '%s' is already used.", array($block));
-			}
-			$this->elements[$block]['id']    = $block;
-			$this->elements[$block]['type']  = 'block';
-			$this->elements[$block]['block'] = end($bstack);
-			$this->elements[$block]['begin'] = $key + 2;
-			$this->elements[$block]['end'] = $this->elements['pcl_document']['end'];
-
-		}
-	}
-}
-
-/**
- * Parse template html-code and fill $document array
- *
- * @param string $def template html-code
- */
-protected function parseTemplate($def)
-{
-	if ($this->translator and strpos('-'.$def,'<M>')) {
-		$def = $this->translator->translateTags($def);
-	}
-
-	$this->document = $this->getDocument($def);
-	$this->initBlocks();
-}
-
-/**
- * Parse template elements definition block and fill $elements array
- *
- * @param string $def elements definition block
- */
-protected function parseElements($def)
-{
-	if (trim($def) == '') return;
-	$this->elements = array();
-
-	$def = str_replace('\"', '&quot;', $def);
-	$lines = explode(EOL, $def);
-	foreach ($lines as $line) {
-		$line = trim($line);
-		if ($line == '') continue;
-		$this->parseLine($line);
-	}
-}
-
-/**
- * Parse element definition line and save element to $elements array.
- */
-protected function parseLine($line)
-{
-	$terms = preg_split("/[\s]+/", $line);
-	$type = array_shift($terms);
-	$id = array_shift($terms);
-	$this->elements[$id]['type'] = $type;
-	$this->elements[$id]['id'] = $id;
-
-	while ($term = array_shift($terms)) {
-		$value = ($terms and $terms[0][0] == "\"")? $this->readQTerm($terms) : 1;
-		if (strpos($term,'html_')===0) {
-			if ($value === 1) $this->elements[$id]['html'][] = substr($term,5);
-			else $this->elements[$id]['html'][substr($term,5)] = $value;
-		}
-		else
-			$this->elements[$id][$term] = $value;
-	}
-
-	if ($this->elements[$id]['lb']) {
-		$this->elements[$id]['lb'] = $this->t($this->elements[$id]['lb']);
-	}
-
-	return $id;
-}
-
-/** Read quoted value of attribute */
-private function readQTerm(&$terms)
-{
-	$term = array_shift($terms);
-	while ((substr($term, -1) != "\"" and count($terms)) or strlen($term) == 1) {
-		$term .= " " . array_shift($terms);
-	}
-	return str_replace('&quot;', '"', substr($term, 1, -1));
 }
 
 function htmlTag($name, $attr = array(), $content = null, $startTagOnly = false)
