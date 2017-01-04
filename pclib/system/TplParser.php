@@ -27,8 +27,6 @@ class TplParser extends BaseObject
 	protected $TPL_SEPAR;
 	protected $TPL_BLOCK;
 
-	public $onParseLine;
-
 	public $translator;
 
 	function __construct()
@@ -75,6 +73,11 @@ class TplParser extends BaseObject
 	{
 		$elms = array();
 
+		$elms['pcl_document'] = array(
+			'type' => 'block',
+			'begin'=> 0, 'end' => 0
+		);
+
 		if (trim($s) == '') return $elms;
 
 		$s = str_replace('\"', '&quot;', $s);
@@ -84,7 +87,10 @@ class TplParser extends BaseObject
 			if ($line == '') continue;
 			$elem = $this->parseLine($line);
 			$elms[$elem['id']] = $elem;
+			$typelist[$elem['type']] = $elem['id'];
 		}
+
+		$elms['pcl_document']['typelist'] = $typelist;
 
 		return $elms;
 	}
@@ -116,8 +122,6 @@ class TplParser extends BaseObject
 		if ($elem['lb'] and $this->translator) {
 			$elem['lb'] = $this->translator->translate($elem['lb']);
 		}
-
-		//$this->onParseLine($line, $elem);
 
 		return $elem;
 	}
@@ -185,10 +189,7 @@ class TplParser extends BaseObject
 
 	private function initBlocks($elements, $document)
 	{
-		$elements['pcl_document'] = array(
-			'type' => 'block',
-			'begin'=> 0, 'end' => count($document)
-		);
+		$elements['pcl_document']['end'] = count($document);
 
 		$bstack = array(); $block = null;
 		foreach ($document as $key=>$strip) {
