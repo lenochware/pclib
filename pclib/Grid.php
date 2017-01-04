@@ -92,7 +92,8 @@ protected function initPager()
 {
 	$pager = $this->getPager();
 
-	$el = $this->elements['pager'];
+	$pgid = $this->elements['pcl_document']['typelist']['pager'];
+	$el = $this->elements[$pgid];
 
 	if ($el['ul']) {
 		$pager->pattern = '%1$s%3$s%2$s';
@@ -323,12 +324,13 @@ function print_Element($id, $sub, $value)
  */
 function print_Pager($id, $sub)
 {
-	$el = $this->elements['pager'];
+	$pgid = $this->elements['pcl_document']['typelist']['pager'];
+	$el = $this->elements[$pgid];
 
 	if ($this->pager->getValue('maxpage') < 2 and !$el['nohide']) return;
 
-	if ($this->values['pager']) {
-		print $this->values['pager'];
+	if ($this->values[$pgid]) {
+		print $this->values[$pgid];
 		return;
 	}
 
@@ -635,17 +637,6 @@ protected function print_BlockRow($block, $rowno = null)
 	else {
 		parent::print_BlockRow($block, $rowno);
 	}
-}
-
-protected function parseLine($line)
-{
-	$id = parent::parseLine($line);
-
-	if ($this->elements[$id]['type'] == 'pager' and $id != 'pager') {
-		throw new Exception("Only allowed name for pager element is 'pager'.");
-	}
-
-	return $id;
 }
 
 /**

@@ -168,11 +168,10 @@ function print_BlockRow($block_id, $rowno = null)
 	parent::print_BlockRow($block_id, $rowno);
 }
 
-protected function parseLine($line)
+protected function _init()
 {
-	$id = parent::parseLine($line);
-	if ($this->elements[$id]['type'] == 'primary') $this->pk = $id;
-	return $id;
+	parent::_init();
+	$this->pk = $this->elements['pcl_document']['typelist']['primary'];
 }
 
 function out($block = null)
