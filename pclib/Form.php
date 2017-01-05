@@ -1038,7 +1038,7 @@ function mailTo($to, $subj, $intro='', $hdr='')
 {
 	$msg = "$intro\n";
 	foreach ($this->content() as $lb => $value) {
-		$msg .= str_pad($lb, 20) . $value .EOL;
+		$msg .= str_pad($lb, 20) . $value ."\n";
 	}
 
 	mail($to, $subj, $msg, $hdr);
@@ -1242,10 +1242,10 @@ protected function head()
 
 	if ($this->header['fileupload']) $tag['enctype'] = 'multipart/form-data';
 
-	$html = $this->htmlTag('form', $tag, null, true).EOL;
+	$html = $this->htmlTag('form', $tag, null, true)."\n";
 
 	foreach ((array)$hidden as $k => $v) {
-		$html .= "<input type=\"hidden\" name=\"$k\" value=\"$v\"".($this->useXhtml? ' />' : '>').EOL;
+		$html .= "<input type=\"hidden\" name=\"$k\" value=\"$v\"".($this->useXhtml? ' />' : '>')."\n";
 	}
 
 	return $html;

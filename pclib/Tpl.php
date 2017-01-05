@@ -14,6 +14,7 @@
 
 namespace pclib;
 use pclib;
+use pclib\system\TplParser;
 
 /**
  * Template engine. Load template, populate it with values and display it.
@@ -108,7 +109,7 @@ function __construct($path = '', $sessName = '')
 	$this->app = $pclib->app;
 	$this->config = $this->app->config;
 	$this->escapeHtmlFunction = array($this, 'escapeHtml');
-	$this->parser = new system\TplParser;
+	$this->parser = new TplParser;
 
 	$this->sessName = $sessName;
 	$this->loadSession();
@@ -754,7 +755,7 @@ protected function print_BlockRow($block, $rowno = null)
 	for ($i = $begin; $i < $end; $i++) {
 		$strip = $this->document[$i];
 
-		if ($strip == TPL_ELEM) {
+		if ($strip == TplParser::TPL_ELEM) {
 			 $strip = $this->document[++$i];
 			 list($id,$sub) = explode('.', $strip);
 
@@ -768,7 +769,7 @@ protected function print_BlockRow($block, $rowno = null)
 			 if (!$this->fireEventElem('onprint',$id,$sub,$value))
 				 $this->print_Element($id, $sub, $value);
 		}
-		elseif ($strip == TPL_BLOCK) {
+		elseif ($strip == TplParser::TPL_BLOCK) {
 			$subblock = $this->document[++$i];
 			if (!$this->elements[$subblock]) throw new \pclib\Exception('Template broken.');
 			if (!$this->elements[$subblock]['noprint']) $this->print_Block($subblock);

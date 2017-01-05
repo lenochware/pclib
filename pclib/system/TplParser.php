@@ -23,18 +23,15 @@ namespace pclib\system;
  */
 class TplParser extends BaseObject
 {
-	protected $TPL_ELEM;
-	protected $TPL_SEPAR;
-	protected $TPL_BLOCK;
+	const TPL_ELEM = "\x01";
+	const TPL_SEPAR = "\x02";
+	const TPL_BLOCK = "\x03";
 
 	public $translator;
 
 	function __construct()
 	{
 		parent::__construct();
-		$this->TPL_ELEM = chr(1);
-		$this->TPL_SEPAR = chr(2);
-		$this->TPL_BLOCK = chr(3);
 		$this->service('translator', false);
 	}
 
@@ -151,16 +148,16 @@ class TplParser extends BaseObject
 		$pat[1] = "/{(BLOCK|IF|IF NOT)\s+([a-z0-9_]+)}/i";
 		$pat[2] = "%{/(BLOCK|IF)}%i";
 
-		$rep[0] = $this->TPL_SEPAR . $this->TPL_ELEM  . $this->TPL_SEPAR . '\\1' . $this->TPL_SEPAR;
-		$rep[1] = $this->TPL_SEPAR . $this->TPL_BLOCK . $this->TPL_SEPAR . '\\2:\\1' . $this->TPL_SEPAR;
-		$rep[2] = $this->TPL_SEPAR . $this->TPL_BLOCK . $this->TPL_SEPAR . 'END:\\1' . $this->TPL_SEPAR;
+		$rep[0] = self::TPL_SEPAR . self::TPL_ELEM  . self::TPL_SEPAR . '\\1' . self::TPL_SEPAR;
+		$rep[1] = self::TPL_SEPAR . self::TPL_BLOCK . self::TPL_SEPAR . '\\2:\\1' . self::TPL_SEPAR;
+		$rep[2] = self::TPL_SEPAR . self::TPL_BLOCK . self::TPL_SEPAR . 'END:\\1' . self::TPL_SEPAR;
 
 		// if ($this->config['pclib.compatibility']['tpl_syntax']) {
 		// 	$pat[3] = "/<!--\s*BLOCK\s+([a-z0-9_]+)\s*-->/i";
 		// 	$rep[3] = TPL_SEPAR . TPL_BLOCK . TPL_SEPAR . '\\1' . TPL_SEPAR;
 		// }
 
-		return explode($this->TPL_SEPAR, preg_replace($pat, $rep, $def));
+		return explode(self::TPL_SEPAR, preg_replace($pat, $rep, $def));
 	}
 
 	protected function getPartials($templ)
@@ -193,13 +190,13 @@ class TplParser extends BaseObject
 
 		$bstack = array(); $block = null;
 		foreach ($document as $key=>$strip) {
-			if ($strip == $this->TPL_ELEM) {
+			if ($strip == self::TPL_ELEM) {
 				list($id,$sub) = explode('.',$document[$key+1]);
 				if ($elements[$id] and !$elements[$id]['block'])
 					$elements[$id]['block'] = $block;
 			}
 
-			if ($strip != $this->TPL_BLOCK) continue;
+			if ($strip != self::TPL_BLOCK) continue;
 			list($name,$type) = explode(':',$document[$key+1]);
 
 			$type = strtoupper($type);
