@@ -81,40 +81,46 @@ protected function _init()
 {
 	parent::_init();
 
-	if ($this->header['table']) {
-		$this->dbSync($this->header['table']);
-	}
-
 	$this->fileStorage = $this->service('fileStorage', false);
 
 	if ($this->config['pclib.security']['csrf']) {
 		$this->header['csrf'] = true;
 	}
 
+	foreach ($this->elements as $id=>$elem) {
+		if ($elem['hidden']) $this->hidden[$id] = $id;
+		if ($elem['file'] and $elem['type'] == 'input')
+			$this->header['fileupload'] = 1;
+		if ($elem['ajaxget']) $this->header['ajax'] = 1;
+		if (strpos($elem['size'],'/')) {
+			list($sz,$ml) = explode('/',$elem['size']);
+			$this->elements[$id]['size'] = $sz;
+			$this->elements[$id]['maxlength'] = $ml;
+		}
+		if ($elem['type'] == 'check' and $elem['default']) {
+			$this->elements[$id]['default'] = explode(',', $elem['default']);
+		}
+	}
+
+	if ($this->header['table']) {
+		$this->dbSync($this->header['table']);
+	}
+
 	if ($_REQUEST['submitted'] != $this->name) return;
+
+	$this->submitted = $_REQUEST['pcl_form_submit'] ?: true;
+
+	if ($this->header['csrf']
+		and $_REQUEST['csrf_token'] != $this->getCsrfToken()
+	) throw new AuthException("CSRF authorization failed.");
+
 
 	if ($_REQUEST['ajax_id']) {
 		$this->ajax_id = pcl_ident($_REQUEST['ajax_id']);
 		$this->header['get'] = 1;
 	}
 
-	//get values
-	$this->submitted = $_REQUEST['pcl_form_submit'] ?: true;
 	$this->values = $this->getHttpData();
-
-	if ($this->header['csrf']
-		and $_REQUEST['csrf_token'] != $this->getCsrfToken()
-	) throw new AuthException("CSRF authorization failed.");
-
-	//set empty checkbox values, call onsave, apply formating
-	foreach ($this->elements as $id=>$elem) {
-		$value = $this->values[$id];
-		if ($elem['type'] == 'check' and !$value and !$elem['noprint']) $this->values[$id] = array();
-		elseif($elem['type'] == 'input' and is_string($value)) $this->values[$id] = trim($value);
-		if ($elem['onsave']) $this->values[$id] = $this->fireEventElem('onsave',$id,'',$value);
-
-		if ($fmt = $this->getAttr($id, 'format')) $this->values[$id] = $this->formatStr($value, $fmt);
-	}
 
 	$this->saveSession();
 }
@@ -214,19 +220,27 @@ function create($tableName)
 }
 
 /**
- * Return data sent through http.
+ * Return sanitized _POST (_GET) data.
  * @return array $data
  **/
 protected function getHttpData()
 {
 	$data = $this->header['get']? $_GET['data'] : $_POST['data'];
 
-	if ($this->config['pclib.security']['form-prevent-mass']) {
-		foreach ($data as $id => $value) {
-			if (!in_array($this->elements[$id]['type'], $this->editables)) {
-				unset($data[$id]);
-			}
+	$preventMass = $this->config['pclib.security']['form-prevent-mass'];
+	if ($preventMass) {
+		$data = array_intersect_key($data, $this->elements);
+	}
+
+	foreach ($this->elements as $id => $elem) {
+
+		if ($preventMass and !in_array($elem['type'], $this->editables)) {
+			unset($data[$id]);
+			continue;
 		}
+
+		if ($elem['type'] == 'check' and !$data[$id] and !$elem['noprint']) $data[$id] = array();
+		elseif($elem['type'] == 'input' and is_string($data[$id])) $data[$id] = trim($data[$id]);
 	}
 
 	if (!$this->fileStorage) {
@@ -794,6 +808,9 @@ function prepare($skipEmpty = false)
 			continue;
 		}
 
+		if ($fmt = $this->getAttr($id, 'format')) 
+			$value = $this->formatStr($value, $fmt);
+
 		if ($elem['date'])
 			$value = $this->toSqlDate($value, $elem['date']);
 
@@ -801,8 +818,13 @@ function prepare($skipEmpty = false)
 			$value = $this->toNumber($value);
 
 		if (is_array($value)) $value = $this->toBitField($value);
+
+		if ($elem['onsave']) 
+			$value = $this->fireEventElem('onsave', $id, '', $value);
+
 		$this->values[$id] = $value;
 	}
+
 	$this->prepared = true;
 }
 
@@ -1082,26 +1104,6 @@ function dbSync($tab)
 		if (!$el['size'] or $el['size'] > $columns[$id]['size'])
 			$this->elements[$id]['size'] = $columns[$id]['size'];
 	}
-}
-
-protected function parseLine($line)
-{
-	$id = parent::parseLine($line);
-	$elem = $this->elements[$id];
-	if ($elem['hidden']) $this->hidden[$id] = $id;
-	if ($elem['file'] and $elem['type'] == 'input')
-		$this->elements[$this->className]['fileupload'] = 1;
-	if ($elem['ajaxget']) $this->elements[$this->className]['ajax'] = 1;
-	if (strpos($elem['size'],'/')) {
-		list($sz,$ml) = explode('/',$elem['size']);
-		$this->elements[$id]['size'] = $sz;
-		$this->elements[$id]['maxlength'] = $ml;
-	}
-	if ($elem['type'] == 'check' and $elem['default']) {
-		$this->elements[$id]['default'] = explode(',', $elem['default']);
-	}
-
-	return $id;
 }
 
 //submit disabled elements too (add hidden field for disabled element)
