@@ -49,6 +49,8 @@ class ValidatorBase extends BaseObject
 
 	protected $elements;
 
+	protected $parser;
+
 	/**
 	 * Create validator.
 	 * Get template object or path to template and load it.
@@ -131,6 +133,15 @@ class ValidatorBase extends BaseObject
 		return $value;
 	}
 
+	protected function getParser()
+	{
+		if (!$this->parser) {
+			$this->parser = new TplParser;
+		}
+
+		return $this->parser;
+	}
+
 	/**
 	 * Validate $value using $rule.
 	 * Example: validateRule('1.1.2016', 'date', '%d.%m.%Y')
@@ -154,9 +165,7 @@ class ValidatorBase extends BaseObject
 
 	function validate($value, $rules)
 	{
-		$elem = array_flip(explode(' ', $rules));
-		$elem['type'] = 'string';
-
+		$elem = $this->getParser()->parseLine("string value $rules");
 		return $this->validateElement($value, $elem);
 
 	}
