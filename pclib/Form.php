@@ -127,7 +127,13 @@ protected function _init()
 
 protected function getValidator()
 {
-	if (!$this->validator) $this->validator = new FormValidator($this->config);
+	if (!$this->validator) {
+		$this->validator = new Validator;
+		$this->validator->skipUndefined = true;
+		$this->validator->skipUndefinedRule = true;
+		$this->validator->dateTimeFormat = $this->config['pclib.locale']['date'];
+	}
+
 	return $this->validator;
 }
 
@@ -155,19 +161,35 @@ protected function _out($block = null)
 function validate()
 {
 	$this->invalid = array();
+	$ok = $this->getValidator()->validateArray($this->values, $this->elements);
 
-	foreach ($this->elements as $id => $elem) {
-		if (!$this->isEditable($id)) continue;
+	//	if (!$this->isEditable($id)) continue;
+	//$event = $this->onValidate($elem);
+	//if ($event and !$event->propagate) return $event->result;
 
-		$elem['value'] = $this->values[$id];
+	//if ($elem['onvalidate'])
+	//return $this->fireEventElem('onvalidate',$id,'',$value);
 
-		$errormsg = $this->validateElement($elem);
-		if ($errormsg) $this->invalid[$id] = $errormsg;
+
+	/*
+	TODO:
+	- skip non-editable
+	- password
+	- number-strict
+	- onValidate($elem)
+	- onvalidate (template)
+	- translate error messages
+	- nazev pole z labelu
+	*/
+
+
+	if (!$ok) {
+		$this->invalid = $this->getValidator()->getErrors();
 	}
 
 	$this->saveSession();
 
-	return !(bool)$this->invalid;
+	return $ok;
 }
 
 /**
@@ -757,36 +779,6 @@ function print_Select($id, $sub, $value)
 }
 
 /**
- * Validate $element - return error message if invalid.
- * You can redefine this in descendant and add your own validation rules.
- * @param array $elem
- * @return string error message or empty string if ok.
- * @see validate()
- */
-protected function validateElement(array $elem)
-{
-	$event = $this->onValidate($elem);
-	if ($event and !$event->propagate) return $event->result;
-
-	$id = $elem['id'];
-	$value = $this->toString($this->values[$id]);
-
-	$validate = $this->getValidator();
-	if (!$elem['required'] and $validate->isEmpty($value)) return '';
-
-	foreach($validate->rules as $rule) {
-		if ($elem[$rule] and !$validate->$rule($value, $elem[$rule])) {
-			return $this->t($validate->getMessage($rule));
-		}
-	}
-
-	if ($elem['onvalidate'])
-		return $this->fireEventElem('onvalidate',$id,'',$value);
-
-	return '';
-}
-
-/**
  * Prepare form values for storing into database.
  * Convert date, number, remove unwanted fields etc.
  * @param bool $skipEmpty Remove empty fields?
@@ -1335,139 +1327,6 @@ private function getValidationString()
 	return implode('|',$output);
 }
 
-} // end class
-
-/**
- * Form validation rules.
- */
-class FormValidator
-{
-public $rules = array('required','date','email','number','password','file','pattern');
-
-public $messages = array(
-	'required' => 'Field is required!',
-	'date'     => 'Bad date format!',
-	'email'    => 'Bad email address!',
-	'number'   => 'Not a number!',
-	'password' => 'Invalid password!',
-	'file'     => 'Bad file type!',
-	'pattern'  => 'Invalid value!',
-);
-
-public $config;
-
-const PATTERN_EMAIL = '/^[_\w\.\-]+@[\w\.-]+\.[a-z]{2,6}$/';
-
-function __construct(array $config)
-{
-	$this->config = $config;
 }
-
-function getMessage($rule)
-{
-	return $this->messages[$rule];
-}
-
-/**
- * Validate required field.
- * @copydoc valid-rule
- */
-function required($value)
-{
-	return !$this->isEmpty($value);
-}
-
-function isEmpty($value)
-{
-	return is_array($value)? (count($value)==0) : (strlen($value)==0);
-}
-
-/**
- * Validate proper email address.
- * @copydoc valid-rule
- */
-function email($value)
-{
-	return preg_match(self::PATTERN_EMAIL, $value);
-}
-
-/**
- * Validate regexp.
- * @copydoc valid-rule
- */
-function pattern($value, $pattern)
-{
-	return preg_match('/^'.$pattern.'$/', $value);
-}
-
-/**
- * Validate number.
- * @copydoc valid-rule
- */
-function number($value, $options)
-{
-	if ($options != 'strict') return true;
-	return is_numeric($value);
-}
-
-/**
- * Validate password. You can set minlength and characters required in password
- * with extcharset attribute.
- * @copydoc valid-rule
- */
-function password($value, $options)
-{
-	if ($options == 1) $options = '8,0';
-	list($minlen,$xchars) = explode(',', $options);
-	if ($minlen and (utf8_strlen($value) < $minlen)) return false;
-	if ($xchars and ctype_alnum($value)) return false;
-	return true;
-}
-
-function parseDate($datestr, $format)
-{
-	$fmtspec = array('d','m','Y','H','M','S');
-	$d = preg_split("/[^0-9]+/", $datestr, null, PREG_SPLIT_NO_EMPTY);
-	$f = array_flip(preg_split("/[^a-z]+/i", $format, null, PREG_SPLIT_NO_EMPTY));
-	$datearray = array();
-	foreach($fmtspec as $i) {
-		$datearray[] = isset($f[$i])? $d[$f[$i]] : strftime("%$i");
-	}
-	return $datearray;
-}
-
-/**
- * Validate date against fmt. Default format is '%d.%m.%Y'.
- * @copydoc valid-rule
- */
-function date($value, $options)
-{
-	if ($options == 1) $options = $this->config['pclib.locale']['date'];
-	list($d,$m,$y,$h,$i,$s) = $this->parseDate($value, $options);
-	if (!checkdate($m,$d,$y)) return false;
-	if (!$this->checkTime($h,$i,$s)) return false;
-	return true;
-}
-
-function checkTime($h, $i, $s)
-{
-	return ($h<24 and $i<60 and $s<60);
-}
-
-/**
- * Validate filename.
- * @copydoc valid-rule
- */
-function file($value, $options)
-{
-	if ($options == 1) $options = '*';
-	$wildcards = explode(';', $options);
-	foreach ($wildcards as $wildcard) {
-		if (fnmatch($wildcard, $value)) return true;
-	}
-	return false;
-}
-
-} //class FormValidator
 
 ?>
