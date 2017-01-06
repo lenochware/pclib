@@ -24,20 +24,19 @@ namespace pclib\system;
  */
 class ValidatorBase extends BaseObject
 {
- 
- /** Are variables undefined in template valid? */
- public $skipUndefined = true;
+	/** Are variables undefined in template valid? */
+	public $skipUndefined = true;
 
- /** Silently skip unknown rules? */
- public $skipUndefinedRule = true;
+	/** Silently skip unknown rules? */
+	public $skipUndefinedRule = true;
 
-/** List of ignored attributes (rules) */
- public $ignoredAttributes = array('id', 'type', 'begin', 'end');
+	/** List of ignored attributes (rules) */
+	public $ignoredAttributes = array('id', 'type', 'begin', 'end');
 
-/** List of ignored element types */
- public $ignoredElements = array();
+	/** List of ignored element types */
+	public $ignoredElements = array();
 
-/** Array of messages [ruleName: message, ...] */
+	/** Array of messages [ruleName: message, ...] */
 	public $messages = array(
 		'undefined' => "Undefined element '{name}'",
 	);
