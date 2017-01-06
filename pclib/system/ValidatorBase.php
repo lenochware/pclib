@@ -12,6 +12,7 @@
 # version 2.1 of the License, or (at your option) any later version.
 
 namespace pclib\system;
+use pclib\Exception;
 
 /**
  * Base class for any pclib Validator.
@@ -25,10 +26,10 @@ namespace pclib\system;
 class ValidatorBase extends BaseObject
 {
 	/** Are variables undefined in template valid? */
-	public $skipUndefined = true;
+	public $skipUndefined = false;
 
 	/** Silently skip unknown rules? */
-	public $skipUndefinedRule = true;
+	public $skipUndefinedRule = false;
 
 	/** List of ignored attributes (rules) */
 	public $ignoredAttributes = array('id', 'type', 'begin', 'end');
@@ -165,6 +166,7 @@ class ValidatorBase extends BaseObject
 
 	function validate($value, $rules)
 	{
+		$this->errors = array();
 		$elem = $this->getParser()->parseLine("string value $rules");
 		return $this->validateElement($value, $elem);
 
@@ -207,7 +209,7 @@ class ValidatorBase extends BaseObject
 			}
 
 			if (!$this->validateRule($value, $rule, $param)) {
-				$this->setError($name, $value, $rule);
+				$this->setError($elem['id'], $value, $rule);
 				return false;
 			}
 		}
