@@ -161,7 +161,7 @@ protected function _out($block = null)
 function validate()
 {
 	$this->invalid = array();
-	$ok = $this->getValidator()->validateArray($this->values, $this->elements);
+	$this->getValidator()->validateArray($this->values, $this->elements);
 
 	//	if (!$this->isEditable($id)) continue;
 
@@ -172,15 +172,11 @@ function validate()
 	- number-strict
 	*/
 
-
-	if (!$ok) {
-		$this->invalid = $this->getValidator()->getErrors();
-	}
-
+	$this->invalid = $this->getValidator()->getErrors();
 	$this->onValidate();
 	$this->saveSession();
 
-	return $ok;
+	return !(bool)$this->invalid;
 }
 
 /**
