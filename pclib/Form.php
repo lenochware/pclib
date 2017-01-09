@@ -36,7 +36,7 @@ class Form extends Tpl
  */
 public $submitted;
 
-/** Occurs before element validation. */
+/** Occurs after validation. */
 public $onValidate;
 
 /** Occurs before uploading of files. */
@@ -164,22 +164,12 @@ function validate()
 	$ok = $this->getValidator()->validateArray($this->values, $this->elements);
 
 	//	if (!$this->isEditable($id)) continue;
-	//$event = $this->onValidate($elem);
-	//if ($event and !$event->propagate) return $event->result;
-
-	//if ($elem['onvalidate'])
-	//return $this->fireEventElem('onvalidate',$id,'',$value);
-
 
 	/*
 	TODO:
 	- skip non-editable
 	- password
 	- number-strict
-	- onValidate($elem)
-	- onvalidate (template)
-	- translate error messages
-	- nazev pole z labelu
 	*/
 
 
@@ -187,6 +177,7 @@ function validate()
 		$this->invalid = $this->getValidator()->getErrors();
 	}
 
+	$this->onValidate();
 	$this->saveSession();
 
 	return $ok;

@@ -85,6 +85,7 @@ protected $header = array();
 /** Document array - It contains parsed template. */
 protected $document;
 
+/** var TplParser */
 protected $parser;
 
 private $inBlock = array();
