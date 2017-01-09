@@ -39,7 +39,7 @@ class ValidatorBase extends BaseObject
 
 	/** Array of messages [ruleName: message, ...] */
 	public $messages = array(
-		'undefined' => "Undefined element '{name}'",
+		'undefined' => "Undefined element '%s'",
 	);
 
 	/** Array of rule handlers [ruleName: callable, ...] */
@@ -50,7 +50,11 @@ class ValidatorBase extends BaseObject
 
 	protected $elements;
 
+	/** var TplParser */
 	protected $parser;
+
+	/** var Translator */
+	public $translator;
 
 	/**
 	 * Create validator.
@@ -59,7 +63,8 @@ class ValidatorBase extends BaseObject
 	function __construct()
 	{
 		parent::__construct();
-		$this->setRule('required', array($this, 'notBlank'), "'%s' is required!");
+		$this->service('translator', false);
+		$this->setRule('required', array($this, 'notBlank'), "Field is required!");
 	}
 
 	/**
@@ -102,7 +107,14 @@ class ValidatorBase extends BaseObject
 			$message = $this->messages[$rule] ?: sprintf("%s: Validation of '%s' failed,", $name, $rule);
 		}
 
-		$this->errors[$name] = sprintf($message, $name, $value);
+		if ($this->translator) {
+			$s = $this->translator->translate($message, array($name, $value));
+		}
+		else {
+			$s = sprintf($message, $name, $value);
+		}
+
+		$this->errors[$name] = $s;
 	}
 
 	/** 
@@ -127,11 +139,6 @@ class ValidatorBase extends BaseObject
 	function notBlank($value)
 	{
 		return !$this->isBlank($value);
-	}
-
-	function filter($value, $rules)
-	{
-		return $value;
 	}
 
 	protected function getParser()
