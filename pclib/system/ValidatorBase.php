@@ -55,6 +55,9 @@ class ValidatorBase extends BaseObject
 	/** var Translator */
 	public $translator;
 
+	/** Occurs before element validation. */
+	public $onValidateElement;
+
 	/**
 	 * Create validator.
 	 * Get template object or path to template and load it.
@@ -155,10 +158,9 @@ class ValidatorBase extends BaseObject
 	/**
 	 * Validate $value using $rule.
 	 * Example: validateRule('1.1.2016', 'date', '%d.%m.%Y')
-	 * See also isValid()
 	 * @param mixed $value
 	 * @param string $rule
-	 * @param mixed $param Rule parameter
+	 * @param mixed $param Rule parameters
 	 * @return bool isValid
 	 */
 	function validateRule($value, $rule, $param = null)
@@ -173,6 +175,13 @@ class ValidatorBase extends BaseObject
 		}
 	}
 
+	/**
+	 * Validate $value against $rules.
+	 * Example: validate('1.1.2016', 'date')
+	 * @param mixed $value
+	 * @param string $rules
+	 * @return bool isValid
+	 */
 	function validate($value, $rules)
 	{
 		$this->errors = array();
@@ -182,14 +191,18 @@ class ValidatorBase extends BaseObject
 	}
 
 	/**
-	 * Validate $value against $rules.
-	 * Example: validate('1.1.2016', 'date')
+	 * Validate $value against $elem rules.
 	 * @param mixed $value
-	 * @param string|array $rules
+	 * @param array $elem
 	 * @return bool isValid
 	 */
 	function validateElement($value, array $elem)
 	{
+		$event = $this->onValidateElement($value, $elem);
+		if ($event) {
+			if (!$event->propagate) return $event->result;
+		}
+
 		if (!$elem['type']) {
 			if ($this->skipUndefined) {
 				return true;
@@ -234,7 +247,7 @@ class ValidatorBase extends BaseObject
 	}
 
 /**
-	 * Validate array of values, using validation rules in template.
+	 * Validate array of values, using validation rules in $elements.
 	 * Set $this->errors array.
 	 * @param array $values
 	 * @param array $elements
