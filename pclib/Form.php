@@ -132,6 +132,7 @@ protected function getValidator()
 		$valid->skipUndefined = true;
 		$valid->skipUndefinedRule = true;
 		$valid->dateTimeFormat = $this->config['pclib.locale']['date'];
+		$valid->onValidateElement[] = array($this, 'validateElementCallback');
 		$this->validator = $valid;
 	}
 
@@ -178,6 +179,14 @@ function validate()
 	$this->saveSession();
 
 	return !(bool)$this->invalid;
+}
+
+protected function validateElementCallback($event)
+{
+	$elem = $event->data[1];
+	if ($this->isEditable($elem['id'])) return;	
+	$event->propagate = false;
+	$event->result = true;
 }
 
 /**
