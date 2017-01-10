@@ -17,9 +17,8 @@ use pclib\Exception;
 /**
  * Base class for any pclib Validator.
  * Features:
- * - Definition of validation rules in template
- * - Method isValid() for validation just one value
- * - Method validate() for validation array of values against template
+ * - Method validate() for validation of one value
+ * - Method validateArray() for validation array of values against specification (elements)
  * - Method getErrors() for reading validation errors
  * - Method setRule() for adding your own rules
  */
@@ -93,18 +92,21 @@ class ValidatorBase extends BaseObject
 	}
 
 	/**
-	 * Set error message for element $name, rule $rule and value $value.
+	 * Set error message for element $name.
 	 * Called when validation of element's value failed.
+	 * @param string $name Element-id
+	 * @param mixed $value Invalid value
+	 * @param string $messageId Id such as 'email', 'required' or full message text
 	 */
-	function setError($name, $value, $rule)
+	function setError($name, $value, $messageId)
 	{
-		$mEl = $this->elements[$name.'.'.$rule];
+		$mEl = $this->elements[$name.'.'.$messageId];
 
 		if ($mEl['type'] == 'message') {
 			$message = $mEl['text'];
 		}
 		else {
-			$message = $this->messages[$rule] ?: sprintf("%s: Validation of '%s' failed,", $name, $rule);
+			$message = $this->messages[$messageId] ?: $messageId;
 		}
 
 		if ($this->translator) {
@@ -203,7 +205,6 @@ class ValidatorBase extends BaseObject
 			if ($elem['required']) {
 				$this->setError($elem['id'], $value, 'required');
 				return false;
-
 			}
 			return true;
 		}
@@ -217,6 +218,14 @@ class ValidatorBase extends BaseObject
 
 			if (!$this->validateRule($value, $rule, $param)) {
 				$this->setError($elem['id'], $value, $rule);
+				return false;
+			}
+		}
+
+		if (isset($elem['onvalidate'])) {
+			$errorMsg = call_user_func($elem['onvalidate'], $this, $elem['id'], null, $value);
+			if ($errorMsg) {
+				$this->setError($elem['id'], $value, $errorMsg);
 				return false;
 			}
 		}

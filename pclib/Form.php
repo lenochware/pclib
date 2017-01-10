@@ -128,10 +128,11 @@ protected function _init()
 protected function getValidator()
 {
 	if (!$this->validator) {
-		$this->validator = new Validator;
-		$this->validator->skipUndefined = true;
-		$this->validator->skipUndefinedRule = true;
-		$this->validator->dateTimeFormat = $this->config['pclib.locale']['date'];
+		$valid = new Validator;
+		$valid->skipUndefined = true;
+		$valid->skipUndefinedRule = true;
+		$valid->dateTimeFormat = $this->config['pclib.locale']['date'];
+		$this->validator = $valid;
 	}
 
 	return $this->validator;
