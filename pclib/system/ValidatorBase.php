@@ -38,7 +38,7 @@ class ValidatorBase extends BaseObject
 
 	/** Array of messages [ruleName: message, ...] */
 	public $messages = array(
-		'undefined' => "Undefined element '%s'",
+		'undefined' => "Undefined element!",
 	);
 
 	/** Array of rule handlers [ruleName: callable, ...] */
@@ -95,15 +95,14 @@ class ValidatorBase extends BaseObject
 	}
 
 	/**
-	 * Set error message for element $name.
+	 * Set error message for element $id.
 	 * Called when validation of element's value failed.
-	 * @param string $name Element-id
-	 * @param mixed $value Invalid value
+	 * @param string $id Element-id
 	 * @param string $messageId Id such as 'email', 'required' or full message text
 	 */
-	function setError($name, $value, $messageId)
+	function setError($id, $messageId, array $args = array())
 	{
-		$mEl = $this->elements[$name.'.'.$messageId];
+		$mEl = $this->elements[$id.'.'.$messageId];
 
 		if ($mEl['type'] == 'message') {
 			$message = $mEl['text'];
@@ -113,13 +112,13 @@ class ValidatorBase extends BaseObject
 		}
 
 		if ($this->translator) {
-			$s = $this->translator->translate($message, array($name, $value));
+			$s = $this->translator->translate($message, $args);
 		}
 		else {
-			$s = sprintf($message, $name, $value);
+			$s = vsprintf($message, $args);
 		}
 
-		$this->errors[$name] = $s;
+		$this->errors[$id] = $s;
 	}
 
 	/** 
@@ -208,7 +207,7 @@ class ValidatorBase extends BaseObject
 				return true;
 			}
 			else {
-				$this->setError($elem['id'], $value, 'undefined');
+				$this->setError($elem['id'], 'undefined');
 				return false;
 			}
 		}
@@ -216,7 +215,7 @@ class ValidatorBase extends BaseObject
 		//blank fields handling: required: invalid, not-required: valid.
 		if ($this->isBlank($value)) {
 			if ($elem['required']) {
-				$this->setError($elem['id'], $value, 'required');
+				$this->setError($elem['id'], 'required');
 				return false;
 			}
 			return true;
@@ -230,7 +229,7 @@ class ValidatorBase extends BaseObject
 			}
 
 			if (!$this->validateRule($value, $rule, $param)) {
-				$this->setError($elem['id'], $value, $rule);
+				$this->setError($elem['id'], $rule, array($elem['id'], $value, $rule, $param));
 				return false;
 			}
 		}
@@ -238,7 +237,7 @@ class ValidatorBase extends BaseObject
 		if (isset($elem['onvalidate'])) {
 			$errorMsg = call_user_func($elem['onvalidate'], $this, $elem['id'], null, $value);
 			if ($errorMsg) {
-				$this->setError($elem['id'], $value, $errorMsg);
+				$this->setError($elem['id'], $errorMsg, array($elem['id'], $value, $rule, $param));
 				return false;
 			}
 		}

@@ -164,16 +164,6 @@ function validate()
 {
 	$this->invalid = array();
 	$this->getValidator()->validateArray($this->values, $this->elements);
-
-	//	if (!$this->isEditable($id)) continue;
-
-	/*
-	TODO:
-	- skip non-editable
-	- password
-	- number-strict
-	*/
-
 	$this->invalid = $this->getValidator()->getErrors();
 	$this->onValidate();
 	$this->saveSession();

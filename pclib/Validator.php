@@ -37,7 +37,7 @@ class Validator extends system\ValidatorBase
 		$this->setRule('time', array($this, 'isTime'), "Invalid time!");
 		$this->setRule('file', array($this, 'matchShell'), "Bad file type!");
 		$this->setRule('pattern', array($this, 'matchPattern'), "Value does not match requested format!");
-		$this->setRule('range', array($this, 'inRange'), "Value is not in range '%2$s'!");
+		$this->setRule('range', array($this, 'inRange'), 'Value is not in range [%4$s] !');
 		$this->setRule('number', array($this, 'isNumeric'), "Not a number!");
 		$this->setRule('integer', array($this, 'isNumericInt'), "Not an integer value!");
 	}
