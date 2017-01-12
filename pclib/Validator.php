@@ -1,7 +1,7 @@
 <?php 
 /**
  * @file
- * Validator for common validation rules.
+ * Validator with common validation rules.
  * @author -dk-
  * http://pclib.brambor.net/
  */
@@ -15,7 +15,7 @@ namespace pclib;
 use pclib;
 
 /**
- * Validator for common validation rules.
+ * Validator with common validation rules.
  */
 class Validator extends system\ValidatorBase
 {
@@ -40,6 +40,7 @@ class Validator extends system\ValidatorBase
 		$this->setRule('range', array($this, 'inRange'), 'Value is not in range [%4$s] !');
 		$this->setRule('number', array($this, 'isNumeric'), "Not a number!");
 		$this->setRule('integer', array($this, 'isNumericInt'), "Not an integer value!");
+		$this->setRule('minlength', array($this, 'minLength'), 'Minimum %4$s characters required!');
 	}
 
 	/** Rule handler: Match regexp pattern. */
@@ -64,6 +65,12 @@ class Validator extends system\ValidatorBase
 	function isIdentifier($value)
 	{
 		return (bool)preg_match(self::PATTERN_IDENTIFIER, $value);
+	}
+
+	/** Rule handler: Match integer. */
+	function minLength($value, $length)
+	{
+		return (utf8_strlen($value) >= $length);
 	}
 
 	/** Rule handler: Match wildcards. */
@@ -106,20 +113,6 @@ class Validator extends system\ValidatorBase
 
 		return array((float)$a[0], (float)$a[1]);
 	}
-
-	/**
- * Validate password. You can set minlength and characters required in password
- * with extcharset attribute.
- * @copydoc valid-rule
- */
-// function password($value, $options)
-// {
-// 	if ($options == 1) $options = '8,0';
-// 	list($minlen,$xchars) = explode(',', $options);
-// 	if ($minlen and (utf8_strlen($value) < $minlen)) return false;
-// 	if ($xchars and ctype_alnum($value)) return false;
-// 	return true;
-// }
 
 protected function parseDate($datestr, $format)
 {
