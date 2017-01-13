@@ -12,14 +12,11 @@
 # License as published by the Free Software Foundation; either
 # version 2.1 of the License, or (at your option) any later version.
 
-/*
-TODO: merge, zacykleni pri merge, pclib.compatibility.tpl_syntax?, public parseElements?
-*/
-
 namespace pclib\system;
 
 /**
- * Parse pclib template format with "elements" data definition language.
+ * Parse pclib template with pclib-elements code.
+ * Example: $parsed = $parser->parse($templateStr);
  */
 class TplParser extends BaseObject
 {
@@ -37,6 +34,11 @@ class TplParser extends BaseObject
 		$this->service('translator', false);
 	}
 
+	/** 
+	 * Parse template.
+	 * @param string $templateStr Template source code
+	 * @return array $parsed [$elements, $body]
+	 */
 	function parse($templateStr)
 	{ 	
 		$templ = $this->split($templateStr);
@@ -47,7 +49,6 @@ class TplParser extends BaseObject
 		return $this->initBlocks($this->parseElements($templ[0]), $this->parseBody($templ[1]));
 	}
 
-	//public? partial template
 	protected function split($s)
 	{ 
 		$tag_start = '<?elements';
@@ -95,7 +96,9 @@ class TplParser extends BaseObject
 	}
 
 	/**
-	 * Parse element definition line and save element to $elements array.
+	 * Parse element definition line and return $element array.
+	 * @param string $line pclib-element line - example: "input EMAIL required"
+	 * @return array $element
 	 */
 	function parseLine($line)
 	{

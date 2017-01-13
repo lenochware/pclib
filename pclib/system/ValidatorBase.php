@@ -58,10 +58,6 @@ class ValidatorBase extends BaseObject
 	/** Occurs before element validation. */
 	public $onValidateElement;
 
-	/**
-	 * Create validator.
-	 * Get template object or path to template and load it.
-	 */
 	function __construct()
 	{
 		parent::__construct();
@@ -162,7 +158,7 @@ class ValidatorBase extends BaseObject
 	 * @param mixed $param Rule parameters
 	 * @return bool isValid
 	 */
-	function validateRule($value, $rule, $param = null)
+	protected function validateRule($value, $rule, $param = null)
 	{
 		$func = $this->rules[$rule];
 
@@ -176,7 +172,7 @@ class ValidatorBase extends BaseObject
 
 	/**
 	 * Validate $value against $rules.
-	 * Example: validate('1.1.2016', 'date')
+	 * Example: validate('1.1.2016', 'date required')
 	 * @param mixed $value
 	 * @param string $rules
 	 * @return bool isValid
@@ -192,7 +188,7 @@ class ValidatorBase extends BaseObject
 	/**
 	 * Validate $value against $elem rules.
 	 * @param mixed $value
-	 * @param array $elem
+	 * @param array $elem [rule => param, ...] e.g. ['date' => 1, 'required' => 1]
 	 * @return bool isValid
 	 */
 	function validateElement($value, array $elem)
@@ -248,8 +244,8 @@ class ValidatorBase extends BaseObject
 /**
 	 * Validate array of values, using validation rules in $elements.
 	 * Set $this->errors array.
-	 * @param array $values
-	 * @param array $elements
+	 * @param array $values [id => value, ...]
+	 * @param array $elements [id => array_of_rules, ...]
 	 * @return bool isValid
 	 */
 	function validateArray(array $values, array $elements)

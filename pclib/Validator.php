@@ -67,7 +67,7 @@ class Validator extends system\ValidatorBase
 		return (bool)preg_match(self::PATTERN_IDENTIFIER, $value);
 	}
 
-	/** Rule handler: Match integer. */
+	/** Rule handler: Minimum number of characters. */
 	function minLength($value, $length)
 	{
 		return (utf8_strlen($value) >= $length);

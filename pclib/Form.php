@@ -171,6 +171,7 @@ function validate()
 	return !(bool)$this->invalid;
 }
 
+//skip non-editable fields
 protected function validateElementCallback($event)
 {
 	$elem = $event->data[1];
