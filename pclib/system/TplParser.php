@@ -29,6 +29,8 @@ class TplParser extends BaseObject
 
 	public $translator;
 
+	public $legacyBlockSyntax = false;
+
 	function __construct()
 	{
 		parent::__construct();
@@ -152,10 +154,10 @@ class TplParser extends BaseObject
 		$rep[1] = self::TPL_SEPAR . self::TPL_BLOCK . self::TPL_SEPAR . '\\2:\\1' . self::TPL_SEPAR;
 		$rep[2] = self::TPL_SEPAR . self::TPL_BLOCK . self::TPL_SEPAR . 'END:\\1' . self::TPL_SEPAR;
 
-		// if ($this->config['pclib.compatibility']['tpl_syntax']) {
-		// 	$pat[3] = "/<!--\s*BLOCK\s+([a-z0-9_]+)\s*-->/i";
-		// 	$rep[3] = TPL_SEPAR . TPL_BLOCK . TPL_SEPAR . '\\1' . TPL_SEPAR;
-		// }
+		if ($this->legacyBlockSyntax) {
+			$pat[3] = "/<!--\s*BLOCK\s+([a-z0-9_]+)\s*-->/i";
+			$rep[3] = self::TPL_SEPAR . self::TPL_BLOCK . self::TPL_SEPAR . '\\1' . self::TPL_SEPAR;
+		}
 
 		return explode(self::TPL_SEPAR, preg_replace($pat, $rep, $def));
 	}

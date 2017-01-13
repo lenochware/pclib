@@ -111,6 +111,7 @@ function __construct($path = '', $sessName = '')
 	$this->config = $this->app->config;
 	$this->escapeHtmlFunction = array($this, 'escapeHtml');
 	$this->parser = new TplParser;
+	$this->parser->legacyBlockSyntax = $this->config['pclib.compatibility']['tpl_syntax'];
 
 	$this->sessName = $sessName;
 	$this->loadSession();
