@@ -175,9 +175,26 @@ function validate()
 protected function validateElementCallback($event)
 {
 	$elem = $event->data[1];
-	if ($this->isEditable($elem['id'])) return;	
-	$event->propagate = false;
-	$event->result = true;
+	$id = $elem['id'];
+
+	if (!$this->isEditable($id)) {
+		$event->propagate = false;
+		$event->result = true;
+		return;
+	}
+
+	if (isset($elem['onvalidate'])) {
+		$value = $this->values[$id];
+
+		$errorMsg = call_user_func($elem['onvalidate'], $this, $id, null, $value);
+		if ($errorMsg) {
+			$event->sender->setError($elem['id'], $errorMsg, array($id, $value, $rule, $param));
+
+			$event->propagate = false;
+			$event->result = false;
+		}
+	}
+
 }
 
 /**

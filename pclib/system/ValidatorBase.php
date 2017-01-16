@@ -230,14 +230,6 @@ class ValidatorBase extends BaseObject
 			}
 		}
 
-		if (isset($elem['onvalidate'])) {
-			$errorMsg = call_user_func($elem['onvalidate'], $this, $elem['id'], null, $value);
-			if ($errorMsg) {
-				$this->setError($elem['id'], $errorMsg, array($elem['id'], $value, $rule, $param));
-				return false;
-			}
-		}
-
 		return true;
 	}
 
@@ -261,7 +253,7 @@ class ValidatorBase extends BaseObject
 
 		foreach ($keys as $key) {
 			if (in_array($elements[$key]['type'], $this->ignoredElements)) continue;
-			if (!$this->validateElement($values[$key], $elements[$key])) $ok = false;
+			if (!$this->validateElement($values[$key], (array)$elements[$key])) $ok = false;
 		}
 
 		return $ok;
