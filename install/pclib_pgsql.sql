@@ -148,7 +148,7 @@ CREATE TABLE logger_messages (
   CONSTRAINT pk_logger_messages_log_id PRIMARY KEY (log_id)
 );
 
--- Table structure for table TREE_LOOKUPS (APP)
+-- Table structure for table TREE_LOOKUPS
 
 CREATE TABLE tree_lookups (
   id serial NOT NULL,
@@ -161,4 +161,21 @@ CREATE TABLE tree_lookups (
   nr integer DEFAULT NULL,
   active smallint DEFAULT 1,
   CONSTRAINT pk_tree_lookups_id PRIMARY KEY (id)
+);
+
+-- Table structure for table FILESTORAGE
+
+CREATE TABLE filestorage (
+  id serial NOT NULL,
+  filepath character varying(255) DEFAULT NULL,
+  origname character varying(255) DEFAULT NULL,
+  annot character varying(255) DEFAULT NULL,
+  entity_id integer DEFAULT NULL,
+  file_id character varying(100) DEFAULT NULL,
+  entity_type character varying(100) DEFAULT NULL,
+  mimetype character varying(255) DEFAULT NULL,
+  size integer DEFAULT NULL,
+  user_id integer DEFAULT NULL,
+  dt timestamp without time zone,
+  CONSTRAINT pk_filestorage_id PRIMARY KEY (id)
 );
