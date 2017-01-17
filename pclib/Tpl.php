@@ -835,6 +835,16 @@ protected function getUrl($elem)
 	return false;
 }
 
+// add element definition
+// $line has same format as line in section "elements" in common template
+function addTag($line)
+{
+	$elem = $this->parser->parseLine($line);
+	$this->elements[$elem['id']] = $elem;
+}
+
+
+
 function htmlTag($name, $attr = array(), $content = null, $startTagOnly = false)
 {
 	$html = '<'.$name;
