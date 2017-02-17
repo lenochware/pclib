@@ -208,7 +208,7 @@ function hasColumn($name)
 {
 	$cols = $this->getColumns();
 	$elem = $this->getTemplate()->elements;
-	return $cols[$name] ?: ($elem[$name]['type'] == 'column');
+	return (bool)$cols[$name] ?: ($elem[$name]['type'] == 'column');
 }
 
 /**

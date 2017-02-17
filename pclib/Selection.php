@@ -141,12 +141,14 @@ function first()
 
 function isEmpty()
 {
+	if (!$this->query['from']) return true;
 	$rows = $this->getClone()->limit(1)->select('*');
 	return !$rows;
 }
 
 function count()
 {
+	if (!$this->query['from']) return 0;
 	$rows = $this->getClone()->select('count(*) as n');
 	return (int)$rows[0]['n'];
 }
