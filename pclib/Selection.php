@@ -24,7 +24,7 @@ use pclib;
  * - Using in foreach: foreach ($sel as $person) {..}
  * - Return models: $person1 = $sel->from('PEOPLE')->find(1); print $person1->posts;
  */
-class Selection implements \Iterator {
+class Selection extends system\BaseObject implements \Iterator {
 
 protected $app;
 
@@ -48,7 +48,7 @@ function __construct(App $app)
 {
 	$this->app = $app;
 	$this->db = $this->app->getService('db');
-	$this->reset();
+	$this->clear();
 }
 
 /** Iterator.rewind() implementation. */
@@ -141,14 +141,14 @@ function first()
 
 function isEmpty()
 {
-	if (!$this->query['from']) return true;
+	if (!$this->getSql()) return true;
 	$rows = $this->getClone()->limit(1)->select('*');
 	return !$rows;
 }
 
 function count()
 {
-	if (!$this->query['from']) return 0;
+	if (!$this->getSql()) return 0;
 	$rows = $this->getClone()->select('count(*) as n');
 	return (int)$rows[0]['n'];
 }
@@ -204,7 +204,6 @@ protected function execute()
 	$this->position = 0;
 	$this->data = array();
 
-	//$this->reset();
 	return $this->result;
 }
 
@@ -224,7 +223,8 @@ function select($columns)
 	$this->query['select'] = is_array($columns)? $columns : explode(',', $columns);
 	$this->execute();
 	$rows = $this->db->fetchAll($this->result);
-	$this->reset();
+	$this->close();
+	$this->query['select'] = array('*');
 	return $rows;
 }
 
@@ -288,15 +288,25 @@ function having($s)
 }
 
 /**
- * Reset selection. Remove all conditions and loaded data.
+ * Closes the cursor, enabling the query to be executed again.
  * @return Selection $this
  */
-function reset()
+function close()
 {
-	$this->query = array('select' => array('*'));
 	$this->position = 0;
-	$this->data = array();  
+	$this->data = array();
 	$this->result = null;
+	return $this;
+}
+
+/**
+ * Clear selection query and data.
+ * @return Selection $this
+ */
+function clear()
+{
+	$this->close();
+	$this->query = array('select' => array('*'));
 	return $this;
 }
 
@@ -308,13 +318,12 @@ function getSql()
 {
 	extract($this->query, EXTR_SKIP);
 	
-	if (!$select or !$from)
-		throw new SqlQueryException('Invalid command.');
+	if (!$select or !$from) return '';
 	
 	$sql = 'SELECT '.implode(',', $select).' FROM '.$from;
-	if ($where)  $sql .= ' WHERE '.implode(' AND ', $where);
+	if ($where)  $sql .= ' WHERE '.implode(' AND ', array_unique($where));
 	if ($group)  $sql .= ' GROUP BY '.$group;
-	if ($having) $sql .= ' HAVING '.implode(' AND ', $having);
+	if ($having) $sql .= ' HAVING '.implode(' AND ', array_unique($having));
 	if ($order)  $sql .= ' ORDER BY '.implode(',', $order);
 	if ($limit)  $sql .= ' LIMIT '.$limit[0].' OFFSET '.$limit[1];
 	return $sql;

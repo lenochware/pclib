@@ -68,9 +68,9 @@ function save(Model $model)
 	}
 }
 
-function reset()
+function clear()
 {
-	parent::reset();
+	parent::clear();
 
 	$table = $this->params['table'];
 	$foreignKey = $this->params['key'];
