@@ -181,7 +181,9 @@ function delete()
 
 function getClone()
 {
-	return clone $this;
+	$sel = clone $this;
+	$sel->close();
+	return $sel;
 }
 
 /*
@@ -189,10 +191,14 @@ function getClone()
 function first($n = 1) {
 }
 
-//totez co toArray()?
-function all() {
-}
 */
+
+protected function tryModify()
+{
+	if ($this->result) {
+		throw new Exception('Cannot modify open selection.');
+	}
+}
 
 /**
  * Execute query to the database and set $this->result.
@@ -213,6 +219,7 @@ protected function execute()
  */
 function limit($limit, $offset = 0)
 {
+	$this->tryModify();
 	$this->query['limit'] = array($limit, $offset);
 	return $this;
 }
@@ -220,6 +227,7 @@ function limit($limit, $offset = 0)
 //selectRaw, raw, getRaw, selectRow?
 function select($columns)
 {
+	$this->tryModify();
 	$this->query['select'] = is_array($columns)? $columns : explode(',', $columns);
 	$this->execute();
 	$rows = $this->db->fetchAll($this->result);
@@ -234,6 +242,7 @@ function select($columns)
  */
 function from($s)
 {
+	$this->tryModify();
 	$this->query['from'] = $s;
 	$this->cachedTemplate = null;
 	return $this;
@@ -245,6 +254,7 @@ function from($s)
  */
 function where($s)
 {
+	$this->tryModify();
 	if(!isset($this->query['where'])) $this->query['where'] = array();
 	if (is_array($s)) $s = $this->createFieldList(' AND ', $s);
 	$this->query['where'][] = $s;
@@ -257,6 +267,7 @@ function where($s)
  */
 function order($s)
 {
+	$this->tryModify();
 	$args = func_get_args();
 	if (is_array($args[0])) $args = $args[0];
 	
@@ -271,6 +282,7 @@ function order($s)
  */
 function group($s)
 {
+	$this->tryModify();
 	$this->query['group'] = $s;
 	return $this;
 }
@@ -281,6 +293,7 @@ function group($s)
  */
 function having($s)
 {
+	$this->tryModify();
 	if(!isset($this->query['having'])) $this->query['having'] = array();
 	if (is_array($s)) $s = $this->createFieldList(' AND ', $s);
 	$this->query['having'][] = $s;
