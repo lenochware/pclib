@@ -11,7 +11,7 @@
 # License as published by the Free Software Foundation; either
 # version 2.1 of the License, or (at your option) any later version.
 
-namespace pclib;
+namespace pclib\orm;
 use pclib;
 
 class Relation extends Selection
@@ -19,7 +19,7 @@ class Relation extends Selection
 	protected $params;
 	protected $model;
 
-function __construct(App $app, Model $model, array $params)
+function __construct(\pclib\App $app, Model $model, array $params)
 {
 	if (!$params['table'] or !$params['key']) {
 		throw new Exception("Missing table or key name.");

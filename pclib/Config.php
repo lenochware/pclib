@@ -31,7 +31,7 @@ $config = array(
 
 	'pclib.loader' => array(
 		'controller' => array('dir' => 'controllers', 'namespace' => '', 'postfix' => 'Controller'),
-		'model' => array('dir' => 'models', 'namespace' => '', 'postfix' => 'Model', 'default' => '\pclib\Model'),
+		'model' => array('dir' => 'models', 'namespace' => '', 'postfix' => 'Model', 'default' => '\pclib\orm\Model'),
 	),
 
 	'pclib.tpl.escape' => false,

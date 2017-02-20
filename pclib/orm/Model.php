@@ -12,13 +12,17 @@
 # License as published by the Free Software Foundation; either
 # version 2.1 of the License, or (at your option) any later version.
 
-namespace pclib;
-use pclib;
+namespace pclib\orm;
+use pclib\system\BaseObject;
+use pclib\Tpl;
+use pclib\Validator;
+use pclib\MemberAccessException;
+use pclib\Exception;
 
 /**
  *  Base class for any application model.
  */
-class Model extends system\BaseObject
+class Model extends BaseObject
 {
 
 protected $app;	
@@ -57,7 +61,7 @@ protected static $columnsCache = array();
  * @param Db $db
  * @param string $tableName Database table
  */
-function __construct(App $app, $tableName)
+function __construct(\pclib\App $app, $tableName)
 {
 	parent::__construct();
 

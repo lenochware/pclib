@@ -11,8 +11,8 @@
 # License as published by the Free Software Foundation; either
 # version 2.1 of the License, or (at your option) any later version.
 
-namespace pclib;
-use pclib;
+namespace pclib\orm;
+use pclib\system\BaseObject;
 
 /**
  * Selection of records in database.
@@ -24,7 +24,7 @@ use pclib;
  * - Using in foreach: foreach ($sel as $person) {..}
  * - Return models: $person1 = $sel->from('PEOPLE')->find(1); print $person1->posts;
  */
-class Selection extends system\BaseObject implements \Iterator {
+class Selection extends BaseObject implements \Iterator {
 
 protected $app;
 
@@ -44,7 +44,7 @@ protected $position = 0;
 
 protected $cachedTemplate;
 
-function __construct(App $app)
+function __construct(\pclib\App $app)
 {
 	$this->app = $app;
 	$this->db = $this->app->getService('db');
