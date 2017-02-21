@@ -1,7 +1,7 @@
 <?php 
 /**
  * @file
- * Validator for common validation rules.
+ * Validator with common validation rules.
  * @author -dk-
  * http://pclib.brambor.net/
  */
@@ -15,7 +15,7 @@ namespace pclib;
 use pclib;
 
 /**
- * Validator for common validation rules.
+ * Validator with common validation rules.
  */
 class Validator extends system\ValidatorBase
 {
@@ -30,40 +30,47 @@ class Validator extends system\ValidatorBase
 	{
 		parent::__construct($path);
 
+		//naatavit primo do array?
 		$this->setRule('email', array($this, 'isEmail'), "Invalid email address!");
 		$this->setRule('url', array($this, 'isUrl'), "Invalid url!");
 		$this->setRule('date', array($this, 'isDateTime'), "Invalid date!");
 		$this->setRule('time', array($this, 'isTime'), "Invalid time!");
 		$this->setRule('file', array($this, 'matchShell'), "Bad file type!");
 		$this->setRule('pattern', array($this, 'matchPattern'), "Value does not match requested format!");
-		$this->setRule('range', array($this, 'inRange'), "Value is not in range '{value}'!");
+		$this->setRule('range', array($this, 'inRange'), 'Value is not in range [%4$s] !');
 		$this->setRule('number', array($this, 'isNumeric'), "Not a number!");
 		$this->setRule('integer', array($this, 'isNumericInt'), "Not an integer value!");
+		$this->setRule('minlength', array($this, 'minLength'), 'Minimum %4$s characters required!');
 	}
 
 	/** Rule handler: Match regexp pattern. */
 	function matchPattern($value, $pattern)
 	{
-		return preg_match('~^'.$pattern.'$~', $value);
+		return (bool)preg_match('~^'.$pattern.'$~', $value);
 	}
 
 	/** Rule handler: Email address. */
 	function isEmail($value)
 	{
-		return filter_var($value, FILTER_VALIDATE_EMAIL);
-		//return preg_match(self::PATTERN_EMAIL, $value);
+		return (bool)filter_var($value, FILTER_VALIDATE_EMAIL);
 	}
 
 	/** Rule handler: URL starting http://. */
 	function isUrl($value)
 	{
-		return filter_var($value, FILTER_VALIDATE_URL);
+		return (bool)filter_var($value, FILTER_VALIDATE_URL);
 	}
 
 	/** Rule handler: Match php identifier. */
 	function isIdentifier($value)
 	{
-		return preg_match(self::PATTERN_IDENTIFIER, $value);
+		return (bool)preg_match(self::PATTERN_IDENTIFIER, $value);
+	}
+
+	/** Rule handler: Minimum number of characters. */
+	function minLength($value, $length)
+	{
+		return (utf8_strlen($value) >= $length);
 	}
 
 	/** Rule handler: Match wildcards. */
@@ -88,7 +95,7 @@ class Validator extends system\ValidatorBase
 	/** Rule handler: Match integer. */
 	function isNumericInt($value)
 	{
-		return filter_var($value, FILTER_VALIDATE_INT);
+		return (bool)filter_var($value, FILTER_VALIDATE_INT);
 	}
 
 	/** Rule handler: Check if value is in range [min, max]. */
@@ -106,20 +113,6 @@ class Validator extends system\ValidatorBase
 
 		return array((float)$a[0], (float)$a[1]);
 	}
-
-	/**
- * Validate password. You can set minlength and characters required in password
- * with extcharset attribute.
- * @copydoc valid-rule
- */
-// function password($value, $options)
-// {
-// 	if ($options == 1) $options = '8,0';
-// 	list($minlen,$xchars) = explode(',', $options);
-// 	if ($minlen and (utf8_strlen($value) < $minlen)) return false;
-// 	if ($xchars and ctype_alnum($value)) return false;
-// 	return true;
-// }
 
 protected function parseDate($datestr, $format)
 {
@@ -146,7 +139,7 @@ function isDateTime($value, $format = '')
 /** Rule handler: Match time in format HH:MM:SS. */
 function isTime($value)
 {
-	return preg_match(self::PATTERN_TIME24, $value);
+	return (bool)preg_match(self::PATTERN_TIME24, $value);
 }
 
 }

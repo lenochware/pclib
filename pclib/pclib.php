@@ -15,7 +15,7 @@
 /**
  * PClib version string
  */
-define('PCLIB_VERSION', '2.1.0');
+define('PCLIB_VERSION', '2.2.0');
 
 /* Find out where library reside. MUST BE an absolute path. */
 if (!defined('PCLIB_DIR')) {
@@ -75,6 +75,7 @@ class Pclib
 			'PCModel' => '\pclib\orm\Model',
 			'PCValidator' => '\pclib\Validator',
 			'PCSelection' => '\pclib\orm\Selection',
+			'PCFileStorage' => '\pclib\FileStorage',
 		);
 
 		$this->legacyAliases += array_change_key_case($this->legacyAliases, CASE_LOWER);

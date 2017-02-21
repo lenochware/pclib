@@ -401,3 +401,47 @@
 - renamed: App->enviroment, App->enviromentIp -> App->environment, App->environmentIp
 - Added function App->make(), removed App->getController()
 - Bugfixes
+
+2.1.0
+- Pclib autentification and authorisation system rewritten
+- Added support of bcypt hash /PHP 5.5 password_hash() function/ - 'md5' is default
+- All auth config parameters moved to new 'pclib.auth' key
+- Class AuthUser rewritten and cleaned up
+- Auth->getUser() now return AuthUser object
+- Auth console code separated to its own class AuthConsole
+- Http autentification moved to its own class AuthHttp
+- Added element 'navigator' (breadcrumb navigator) to layout template
+- Breadcrumb navigator code moved from class App to class Layout
+- Added parameter 'table' (database table) to form template header
+- pclib.js: Validator refactoring
+  Added events onAjaxComplete, onValidate, methods validateForm(), showErrors()
+- Pagination code moved to new class GridPager. Grid->pager now contains this class.
+- dump() output improved
+- App->make() replaced with newController(), newModel()
+- Bugfixes
+
+2.1.1
+ - Added parameters to error.tpl, better message in errorlog
+ - Added class TemplateFactory for building forms and grids from db-columns
+ - Templates assets/def_*.tpl renamed to assets/default-*.tpl and updated
+ - Tpl->create() uses TemplateFactory now
+ - Added _tvar template variables
+ - Added methods Grid->exportCsv() and Grid->getExportCsv()
+ - Removed function ifnot()
+ - Added config parameter 'pclib.security'
+ - Changed form-upload fileName format
+ - GridForm fixed and updated
+ - Bugfixes
+
+ 2.2.0
+ - Added classes TplParser, parser code moved from Tpl to TplParser
+ - Added classes Validator, BaseValidator
+ - Removed class FormValidator, Form uses Validator for validation
+ - Added validation rules url, range, integer, minlength, time
+ - Added class FileStorage
+ - Added attribute 'multiple' for input file (multiple file upload support)
+ - Added template attribute 'escape' - it escapes html tags from output
+ - Template attribute 'datasource' can be callable (or route path)
+ - Added attribute 'confirm' to button tag
+ - Added composer support: use "composer require lenochware/pclib" for installation
+ - various bugfixes and small changes

@@ -191,7 +191,7 @@ function load($fileName)
 function setString($str)
 {
 	$nodes = array();
-	$lines = explode(EOL, $str);
+	$lines = explode("\n", $str);
 	$cells = explode($this->CELL_SEPAR, trim(array_shift($lines)));
 	foreach ($lines as $line) {
 		$line = trim($line);

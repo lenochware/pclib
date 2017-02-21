@@ -48,9 +48,6 @@ public $environment;
 /** Enabling debugMode will display debug-toolbar. */
 public $debugMode = false;
 
-/* Store bookmarks for breadcrumb navigator. */
-public $bookmarks = array();
-
 public $indexFile = 'index.php';
 
 /** var ErrorHandler */
@@ -98,9 +95,6 @@ function __construct($name)
 	);
 
 	$this->addConfig( PCLIB_DIR.'Config.php' );
-
-	$this->loadSession();
-
 }
 
 
@@ -283,27 +277,26 @@ public function configure()
 /**
  * Perform redirect to $route.
  * Example: $app->redirect("products/edit/id:$id");
+ * @param string|array $route
+ * @param htttp code (e.g. 301 Moved Permanently)
  * See also @ref pcl-route
  */
-function redirect($stringRoute)
+function redirect($route, $code = null)
 {
-	$this->saveSession();
-	$url = $this->router->createUrl($stringRoute);
+
+	if ($code and function_exists('http_response_code')) {
+		http_response_code($code);
+	}
+
+	if (is_array($route)) {
+		$url = $route['url'];
+	}
+	else {
+		$url = $this->router->createUrl($route);
+	}
+
 	header("Location: $url");
 	exit();
-}
-
-/** Load application state from session. */
-protected function loadSession()
-{
-	$this->bookmarks = $this->getSession('pclib.bookmarks');
-}
-
-/** Save application state to session. */
-protected function saveSession()
-{
-	if (isset($this->bookmarks))
-		$this->setSession('pclib.bookmarks', $this->bookmarks);
 }
 
 /**
@@ -311,8 +304,9 @@ protected function saveSession()
  * You can access current language as $app->language.
  * @param string $language Language code such as 'en' or 'source'.
  * @param bool $useDefault Preload default texts?
+ * @param bool $useFile Try load texts from php file?
  */
-function setLanguage($language, $useDefault = true)
+function setLanguage($language, $useDefault = true, $useFile = true)
 {
 	$trans = new Translator($this->name);
 	$trans->language = $language;
@@ -320,13 +314,21 @@ function setLanguage($language, $useDefault = true)
 	if ($language == 'source') {
 		$trans->autoUpdate = true;
 	}
-	else {
+	elseif($useFile) {
 		$transFile = $this->config['pclib.directories']['localization'].$language.'.php';
-		if (file_exists($transFile)) $trans->useFile($transFile);		
+		if (file_exists($transFile)) $trans->useFile($transFile);
 		else throw new FileNotFoundException("Translator file '$transFile' not found.");
 	}
 
-	if ($useDefault) $trans->usePage('default');
+	if ($useDefault) {
+		try {
+			$trans->usePage('default');
+		} catch (Exception $e) {
+			throw new Exception('Cannot load texts for translator - '.$e->getMessage());
+		}
+
+	}
+
 	$this->setService('translator', $trans);
 }
 
@@ -492,59 +494,6 @@ function deleteSession($name = null, $ns = null)
 		unset($_SESSION[$ns]);
 }
 
-/*
- * Bookmark (store in session) current URL as $title.
- * Next you can build breadcrumb navigator from bookmarked url adresses.
- * Ex: app->bookmark(1, 'Main page'); app->bookmark(2, 'Subpage');
- * @see getNavig()
- *
- * @param string $level Level of this item in history/breadcrumb tree.
- * @param string $title Label of the link shown in navigator
- * @param string $route If set, it will bookmark this route instead of current url
- * @param string $url If set, it will bookmark this url instead of current url
- */
-function bookmark($level, $title, $route = null, $url = null)
-{
-	if ($route) list($temp, $url) = explode('?', $this->router->createUrl($route));
-
-	$maxlevel =& $this->bookmarks[-1]['maxlevel'];
-	for ($i = $maxlevel; $i > $level; $i--) { unset($this->bookmarks[$i]); }
-	$maxlevel = $level;
-
-	$this->bookmarks[$level]['url'] = isset($url)? $url : $_SERVER['QUERY_STRING'];
-	$this->bookmarks[$level]['title'] = $title;
-}
-
-/*
- * Return HTML (breadcrumb) navigator: bookmark1 / bookmark2 / bookmark3 ...
- * It is generated from bookmarked pages.
- * @see bookmark()
- * @param string $separ link separator
- * @param bool $lastLink current page is link in navigator
- */
-function getNavig($separ = ' / ', $lastLink = false)
-{
-	$maxlevel = $this->bookmarks[-1]['maxlevel'];
-	for($i = 0; $i <= $maxlevel; $i++) {
-		$url   = $this->bookmarks[$i]['url'];
-		$title = $this->bookmarks[$i]['title'];
-		$alt = '';
-		if (!$title) continue;
-
-		if (utf8_strlen($title) > 30) {
-			$alt = 'title="'.$title.'"';
-			$title = utf8_substr($title, 0, 30). '...';
-		}
-
-		if ($i == $maxlevel and !$lastLink)
-			$navig[] = "<span $alt>$title</span>";
-		else
-			$navig[] = "<a href=\"".$this->indexFile."?$url\" $alt>$title</a>";
-
-	}
-	return implode($separ, (array)$navig);
-}
-
 function getClassName($name, $loaderName)
 {
 	$options = $this->config['pclib.loader'][$loaderName];
@@ -628,7 +577,6 @@ function out()
 
 	if (!$this->layout) throw new NoValueException('Cannot show output: app->layout does not exists.');
 	$this->layout->out();
-	$this->saveSession();
 	$this->onAfterOut();
 }
 

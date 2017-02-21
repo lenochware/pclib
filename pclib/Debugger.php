@@ -217,7 +217,7 @@ protected function stringify($v, $colorize = true)
 		case 'boolean': $s = $v? 'true':'false'; break;
 		case 'array':   $s = ($n = count($v))? "array($n)" : "array()"; break;
 		case 'object':  $s = 'object('.get_class($v).')'; break;
-		case 'resource': $s = '<'.get_resource_type($v).'>'; break;
+		case 'resource': $s = 'resource('.get_resource_type($v).')'; break;
 		default: $s = $v;
 	}
 	if ($this->useHtml and $colorize) $s = $this->colorize($s, $type);

@@ -80,7 +80,7 @@ public static function register()
 function html()
 {
 	$t = new PCTpl(PCLIB_DIR.'assets/debugbar.tpl');
-	$t->values['POSITION'] = ifnot($this->app->config['pclib.debugbar.position'], $this->positionDefault);
+	$t->values['POSITION'] = $this->app->config['pclib.debugbar.position'] ?: $this->positionDefault;
 	$t->values['VERSION'] = PCLIB_VERSION;
 	$t->values['TIME'] = $this->getTime($this->startTime);
 	$t->values['MEMORY'] = round(memory_get_peak_usage()/1048576,2);

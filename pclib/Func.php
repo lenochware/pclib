@@ -12,24 +12,6 @@
 # License as published by the Free Software Foundation; either
 # version 2.1 of the License, or (at your option) any later version.
 
-/**#@+ VARIOUS TPL CONSTANTS */
-define( 'TPL_ELEM',  chr(1) );
-define( 'TPL_SEPAR', chr(2) );
-define( 'TPL_BLOCK', chr(3) );
-define( 'EOL',       "\n" );
-/**#@-*/
-
-/**
- * If not set $a return $b, otherwise $a
- *
- * @param string $name desc
- * @return string $name desc
-**/
-function ifnot($a,$b)
-{
-	return $a?$a:$b;
-}
-
 /** Placeholders in string $str will be replaced with values from $param array.
  *  Format is the same like for template file. \n
  *  Ex: print paramstr("{A} is {B}", array('A' => 'pclib', 'B' => 'best')); \n

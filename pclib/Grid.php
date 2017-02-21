@@ -92,7 +92,8 @@ protected function initPager()
 {
 	$pager = $this->getPager();
 
-	$el = $this->elements['pager'];
+	$pgid = $this->elements['pcl_document']['typelist']['pager'];
+	$el = $this->elements[$pgid];
 
 	if ($el['ul']) {
 		$pager->pattern = '%1$s%3$s%2$s';
@@ -168,11 +169,12 @@ function setQuery($sql)
 	$sql = $this->db->setParams($sql, $args + (array)$this->filter);
 	$sql = str_replace("\n", " \n ", strtr($sql, "\r\t","  "));
 
+	if (!$this->document) $this->create($sql);
+
 	$this->setLength($this->db->count($sql));
 
 	if ($lpos = stripos($sql, ' limit ')) $sql = substr($sql, 0, $lpos);
 	$this->sql = $sql;
-	if (!$this->document) $this->create($this->sql);
 }
 
 /**
@@ -322,12 +324,13 @@ function print_Element($id, $sub, $value)
  */
 function print_Pager($id, $sub)
 {
-	$el = $this->elements['pager'];
+	$pgid = $this->elements['pcl_document']['typelist']['pager'];
+	$el = $this->elements[$pgid];
 
 	if ($this->pager->getValue('maxpage') < 2 and !$el['nohide']) return;
 
-	if ($this->values['pager']) {
-		print $this->values['pager'];
+	if ($this->values[$pgid]) {
+		print $this->values[$pgid];
 		return;
 	}
 
@@ -393,6 +396,25 @@ protected function print_Class_Item($id, $sub)
 			$this->print_Element($id, '', $value);
 		print '</td>';
 	}
+}
+
+/** Get template variable _tvar_... */
+protected function getVariable($id)
+{
+	$page = $this->pager->getValue('page');
+	$maxpage =  $this->pager->getValue('maxpage');
+
+	switch ($id) {
+		case '_tvar_first': 
+			$value = ($page == 1 and parent::getVariable('_tvar_top'))? '1':'0';
+		break;	
+		case '_tvar_last': 
+			$value = ($page == $maxpage and parent::getVariable('_tvar_bottom'))? '1':'0';
+		break;	
+		default: return parent::getVariable($id);
+	}
+	
+	return $this->escapeHtmlFunction($value);
 }
 
 /**
@@ -513,45 +535,61 @@ protected function getQuery()
 }
 
 /**
- * Build default grid template.
- * @see Tpl::create()
+ * Use default template for displaying database table content.
  */
-function create($dsstr, $fileName = null, $template = null)
+function create($tableName)
 {
-	$trans = array('<:' => '<', ':>' => '>', '{:' => '{', ':}' => '}');
-	if (!$template) $template = PCLIB_DIR.'assets/def_grid.tpl';
+	$tableName = $this->db->tableName($tableName);
+	$this->createFromTable($tableName, PCLIB_DIR.'assets/default-grid.tpl');
+}
 
-	$table = $this->db->tableName($dsstr);
-	$columns = $this->db->columns($table);
+/**
+ * Return content of the grid as csv-text.
+ * @param array $options [templatePath: '', csv-separ: ';', csv-row-separ: "\r\n"]
+ * @return string csv-text
+ */
+function getExportCsv($options = array())
+{
+	$templatePath = $options['templatePath'] ?: PCLIB_DIR.'assets/export-csv.tpl';
 
-	$fields = $this->getFields($dsstr);
-	$head = $body = array();
-	foreach($fields as $id) {
-		$col = $columns[$id];
-		$lb = ifnot($col['comment'], $id);
-		$elem .= "string $id lb \"$lb\" sort";
-		if ($col['type'] == 'date') $elem .= ' date';
-		$elem .= "\n";
-		$head[]['LABEL'] = '{'.$id.'.lb}';
-		$body[]['FIELD'] = '{'.$id.'}';
+	$ignoreList = array('class','block','pager','sort','link');
+
+	$columns = array();
+	foreach ($this->elements as $id => $elem) {
+		if (in_array($elem['type'], $ignoreList) or $elem['skip']) continue;
+		$columns[$id] = array('name' => $id, 'element' => $elem);
 	}
 
-	$t = new Tpl($template);
-	$t->values['NAME'] = $this->db->tableName($dsstr);
-	$t->values['HEAD'] = $head;
-	$t->values['BODY'] = $body;
-	$t->values['ELEMENTS'] = trim($elem);
-	$html = strtr($t->html(), $trans);
+	$exportGrid = extensions\TemplateFactory::create($templatePath, $columns);
+	$exportGrid->setQuery($this->sql);
+	$exportGrid->pager->setPageLen($this->length);
+	$html = $exportGrid->html();
 
-	if ($fileName) {
-		$ok = file_put_contents($fileName, $html);
-		if (!$ok) throw new IOException("Cannot write file $fileName.");
-		else @chmod($fileName, 0666);
-	}
-	else {
-		$this->loadString($html);
-		$this->init();
-	}
+	$trans = array(
+		"\n" => '',
+		"\r" => '',
+		";" => ',',
+		"<csv-separ>" => $options['csv-separ'] ?: ';',
+		"<csv-row-separ>" => $options['csv-row-separ'] ?: "\r\n",
+	);
+
+	$trans[$trans['<csv-separ>']] = ($trans['<csv-separ>'] == ';')? ',' : ';';
+
+	return strtr($html, $trans);
+}
+
+/**
+ * Show download dialog for csv-file with content of the grid.
+ * @param array $options
+ * @see getExportCsv()
+ */
+function exportCsv($fileName, $options = array())
+{
+	ob_clean();
+	header('Content-type: text/csv');
+	header('Content-Disposition: attachment; filename="'.$fileName.'"');
+	print $this->getExportCsv($options);
+	die();
 }
 
 /** get proper base url for %grid sort and pager & other links */
@@ -599,17 +637,6 @@ protected function print_BlockRow($block, $rowno = null)
 	else {
 		parent::print_BlockRow($block, $rowno);
 	}
-}
-
-protected function parseLine($line)
-{
-	$id = parent::parseLine($line);
-
-	if ($this->elements[$id]['type'] == 'pager' and $id != 'pager') {
-		throw new Exception("Only allowed name for pager element is 'pager'.");
-	}
-
-	return $id;
 }
 
 /**

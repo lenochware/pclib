@@ -105,7 +105,6 @@ public function run($action)
 
 /**
  * Redirect to $route.
- * @deprecated Use $this->app->redirect().
  **/
 function redirect($route)
 {

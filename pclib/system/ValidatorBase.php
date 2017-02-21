@@ -12,69 +12,57 @@
 # version 2.1 of the License, or (at your option) any later version.
 
 namespace pclib\system;
+use pclib\Exception;
 
 /**
  * Base class for any pclib Validator.
  * Features:
- * - Definition of validation rules in template
- * - Method isValid() for validation just one value
- * - Method validate() for validation array of values against template
+ * - Method validate() for validation of one value
+ * - Method validateArray() for validation array of values against specification (elements)
  * - Method getErrors() for reading validation errors
  * - Method setRule() for adding your own rules
  */
 class ValidatorBase extends BaseObject
 {
- 
- /** Are variables undefined in template valid? */
- public $skipUndefined = true;
+	/** Are variables undefined in template valid? */
+	public $skipUndefined = false;
 
- /** Silently skip unknown rules? */
- public $skipUndefinedRule = true;
+	/** Silently skip unknown rules? */
+	public $skipUndefinedRule = false;
 
-/** List of ignored attributes (rules) */
- public $ignoredAttributes = array('id', 'type', 'begin', 'end');
+	/** List of ignored attributes (rules) */
+	public $ignoredAttributes = array('id', 'type', 'begin', 'end');
 
-/** List of ignored element types */
- public $ignoredElements = array();
+	/** List of ignored element types */
+	public $ignoredElements = array();
 
-/** Array of messages [ruleName: message, ...] */
+	/** Array of messages [ruleName: message, ...] */
 	public $messages = array(
-		'undefined' => "Undefined element '{name}'",
+		'undefined' => "Undefined element!",
 	);
 
 	/** Array of rule handlers [ruleName: callable, ...] */
 	protected $rules = array();
 
-	/**var Tpl */
-	protected $template;
-
 	/** Array of [fieldName: errorMessage, ...] */
 	protected $errors;
 
-	/**
-	 * Create validator.
-	 * Get template object or path to template and load it.
-	 * @param string|Tpl $pathOrTpl
-	 */
-	function __construct($pathOrTpl = '')
-	{
-		if ($pathOrTpl instanceof \pclib\Tpl) {
-			$this->template = $pathOrTpl;
-		}
-		else {
-			$this->load($pathOrTpl);
-		}
+	protected $elements;
 
-		$this->setRule('required', array($this, 'notBlank'), "'{name}' is required!");
-	}
+	/** var TplParser */
+	protected $parser;
 
-	/**
-	 * Load template.
-	 * @param string $path Path to template.
-	 */
-	function load($path)
+	/** var Translator */
+	public $translator;
+
+	/** Occurs before element validation. */
+	public $onValidateElement;
+
+	function __construct()
 	{
-		$this->template = new \pclib\Tpl($path);
+		parent::__construct();
+		$this->service('translator', false);
+		$this->setRule('required', array($this, 'notBlank'), "Field is required!");
 	}
 
 	/**
@@ -103,46 +91,30 @@ class ValidatorBase extends BaseObject
 	}
 
 	/**
-	 * Validate array of values, using validation rules in template.
-	 * Set $this->errors array.
-	 * @param array $values
-	 * @return bool isValid
-	 */
-	function validate(array $values)
-	{
-		$ok = true;
-		$this->errors = array();
-
-		$keys = array_unique(
-			array_merge(array_keys($values), 
-			array_keys($this->template->elements))
-		);
-
-		foreach ($keys as $key) {
-			if (in_array($this->template->elements[$key]['type'], $this->ignoredElements)) continue;
-			if (!$this->isValidElem($values[$key], $key)) $ok = false;
-		}
-
-		return $ok;
-	}
-
-	/**
-	 * Set error message for element $name, rule $rule and value $value.
+	 * Set error message for element $id.
 	 * Called when validation of element's value failed.
+	 * @param string $id Element-id
+	 * @param string $messageId Id such as 'email', 'required' or full message text
 	 */
-	function setError($name, $value, $rule)
+	function setError($id, $messageId, array $args = array())
 	{
-		$mEl = $this->template->elements[$name.'.'.$rule];
+		$mEl = $this->elements[$id.'.'.$messageId];
 
 		if ($mEl['type'] == 'message') {
 			$message = $mEl['text'];
 		}
 		else {
-			$message = $this->messages[$rule] ?: sprintf("%s: Validation of '%s' failed,", $name, $rule);
+			$message = $this->messages[$messageId] ?: $messageId;
 		}
 
-		$param = array('name' => $name, 'value' => $value);
-		$this->errors[$name] = paramStr($message, $param);
+		if ($this->translator) {
+			$s = $this->translator->translate($message, $args);
+		}
+		else {
+			$s = vsprintf($message, $args);
+		}
+
+		$this->errors[$id] = $s;
 	}
 
 	/** 
@@ -169,16 +141,24 @@ class ValidatorBase extends BaseObject
 		return !$this->isBlank($value);
 	}
 
+	protected function getParser()
+	{
+		if (!$this->parser) {
+			$this->parser = new TplParser;
+		}
+
+		return $this->parser;
+	}
+
 	/**
 	 * Validate $value using $rule.
-	 * Example: isValidRule('1.1.2016', 'date', '%d.%m.%Y')
-	 * See also isValid()
+	 * Example: validateRule('1.1.2016', 'date', '%d.%m.%Y')
 	 * @param mixed $value
 	 * @param string $rule
-	 * @param mixed $param Rule parameter
+	 * @param mixed $param Rule parameters
 	 * @return bool isValid
 	 */
-	function isValidRule($value, $rule, $param = null)
+	protected function validateRule($value, $rule, $param = null)
 	{
 		$func = $this->rules[$rule];
 
@@ -191,23 +171,39 @@ class ValidatorBase extends BaseObject
 	}
 
 	/**
-	 * Validate $value using template element.
-	 * Example: isValidElem('1.1.2016', 'ORDER_DATE')
-	 * See also isValid()
+	 * Validate $value against $rules.
+	 * Example: validate('1.1.2016', 'date required')
 	 * @param mixed $value
-	 * @param string $name Element name
+	 * @param string $rules
 	 * @return bool isValid
 	 */
-	function isValidElem($value, $name)
+	function validate($value, $rules)
 	{
-		$elem = $this->template->elements[$name];
+		$this->errors = array();
+		$elem = $this->getParser()->parseLine("string value $rules");
+		return $this->validateElement($value, $elem);
+
+	}
+
+	/**
+	 * Validate $value against $elem rules.
+	 * @param mixed $value
+	 * @param array $elem [rule => param, ...] e.g. ['date' => 1, 'required' => 1]
+	 * @return bool isValid
+	 */
+	function validateElement($value, array $elem)
+	{
+		$event = $this->onValidateElement($value, $elem);
+		if ($event) {
+			if (!$event->propagate) return $event->result;
+		}
 
 		if (!$elem['type']) {
 			if ($this->skipUndefined) {
 				return true;
 			}
 			else {
-				$this->setError($name, $value, 'undefined');
+				$this->setError($elem['id'], 'undefined');
 				return false;
 			}
 		}
@@ -215,9 +211,8 @@ class ValidatorBase extends BaseObject
 		//blank fields handling: required: invalid, not-required: valid.
 		if ($this->isBlank($value)) {
 			if ($elem['required']) {
-				$this->setError($name, $value, 'required');
+				$this->setError($elem['id'], 'required');
 				return false;
-
 			}
 			return true;
 		}
@@ -229,8 +224,8 @@ class ValidatorBase extends BaseObject
 				}
 			}
 
-			if (!$this->isValidRule($value, $rule, $param)) {
-				$this->setError($name, $value, $rule);
+			if (!$this->validateRule($value, $rule, $param)) {
+				$this->setError($elem['id'], $rule, array($elem['id'], $value, $rule, $param));
 				return false;
 			}
 		}
@@ -238,28 +233,33 @@ class ValidatorBase extends BaseObject
 		return true;
 	}
 
-	/**
-	 * Validate $value using template element or rule.
-	 * Example: isValid('1.1.2016', 'elem ORDER_DATE') or isValid('1.1.2016', 'date')
-	 * @param mixed $value
-	 * @param string $name Element or rule name
-	 * @param mixed $name Rule parameter
+/**
+	 * Validate array of values, using validation rules in $elements.
+	 * Set $this->errors array.
+	 * @param array $values [id => value, ...]
+	 * @param array $elements [id => array_of_rules, ...]
 	 * @return bool isValid
 	 */
-	function isValid($value, $name, $param = null)
+	function validateArray(array $values, array $elements)
 	{
-		if (strpos($name, 'elem ') === 0) {
-			return $this->isValidElem($value, substr($name, 5));
+		$ok = true;
+		$this->errors = array();
+		$this->elements = $elements;
+
+		$keys = array_unique(
+			array_merge(array_keys($values), 
+			array_keys($elements))
+		);
+
+		foreach ($keys as $key) {
+			if (in_array($elements[$key]['type'], $this->ignoredElements)) continue;
+			if (!$this->validateElement($values[$key], (array)$elements[$key])) $ok = false;
 		}
-		else return $this->isValidRule($value, $name, $param);
+
+		return $ok;
 	}
 
-	//vygeneruje podle *.tpl souboru javascript s validacnimi pravidly?
-	//pri pridani noveho rule uzivatel muze pridat i odpovidajici js?
-	function createJavascript()
-	{
 
-	}
 }
 
 ?>
