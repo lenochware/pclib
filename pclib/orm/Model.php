@@ -101,7 +101,9 @@ function getTemplate()
 protected function getValidator()
 {
 	if (!$this->validator) {
-		$this->validator = new Validator($this->getTemplate());
+		$this->validator = new Validator;
+		$this->validator->skipUndefined = true;
+		$this->validator->ignoredElements = array('relation', 'role', 'event');
 	}
 	return $this->validator;
 }
@@ -467,7 +469,7 @@ function onError($action) {}
  */
 function validate($action = '')
 {
-	$ok = $this->getValidator()->validate($this->values);
+	$ok = $this->getValidator()->validateArray($this->values, $this->getTemplate()->elements);
 	if (!$ok) $this->onError($action);
 	return $ok;
 }
