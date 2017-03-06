@@ -28,6 +28,8 @@ class TplParser extends BaseObject
 
 	public $legacyBlockSyntax = false;
 
+	public $translateAttrib = array('lb' => 1, 'hint' => 1, 'html_title' => 1);
+
 	function __construct()
 	{
 		parent::__construct();
@@ -113,16 +115,17 @@ class TplParser extends BaseObject
 
 		while ($term = array_shift($terms)) {
 			$value = ($terms and $terms[0][0] == "\"")? $this->readQTerm($terms) : 1;
+
+			if ($this->translator and isset($this->translateAttrib[$term])) {
+				$value = $this->translator->translate($value);
+			}
+
 			if (strpos($term,'html_')===0) {
 				if ($value === 1) $elem['html'][] = substr($term,5);
 				else $elem['html'][substr($term,5)] = $value;
 			}
 			else
 				$elem[$term] = $value;
-		}
-
-		if ($elem['lb'] and $this->translator) {
-			$elem['lb'] = $this->translator->translate($elem['lb']);
 		}
 
 		return $elem;
