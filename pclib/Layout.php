@@ -58,11 +58,13 @@ function bookmark($level, $title, $route = null, $url = null)
  * Return HTML (breadcrumb) navigator: bookmark1 / bookmark2 / bookmark3 ...
  * It is generated from bookmarked pages.
  * @see bookmark()
- * @param string $separ link separator
- * @param bool $lastLink current page is link in navigator
+ * @param array $options separ: link separator, lastLink: current page is a link, ul: generate UL/LI
  */
-function getNavig($separ = ' / ', $lastLink = false)
+function getNavig($options = array())
 {
+	$default = array('separ' => ' / ', 'lastlink' => false, 'ul' => false);
+	$options += $default;
+
 	$maxlevel = $this->bookmarks[-1]['maxlevel'];
 	for($i = 0; $i <= $maxlevel; $i++) {
 		$url   = $this->bookmarks[$i]['url'];
@@ -75,13 +77,19 @@ function getNavig($separ = ' / ', $lastLink = false)
 			$title = utf8_substr($title, 0, 30). '...';
 		}
 
-		if ($i == $maxlevel and !$lastLink)
+		if ($i == $maxlevel and !$options['lastlink'])
 			$navig[] = "<span $alt>$title</span>";
 		else
 			$navig[] = "<a href=\"".$this->app->indexFile."?$url\" $alt>$title</a>";
 
 	}
-	return implode($separ, (array)$navig);
+
+	if ($options['ul']) {
+		return "<li>".implode('</li><li>', (array)$navig)."</li>";
+	}
+	else {
+		return implode($options['separ'], (array)$navig);
+	}
 }
 
 /**
@@ -174,7 +182,7 @@ function print_Messages($id, $sub, $value)
  */
 function print_Navigator($id, $sub, $value)
 {
-	print $this->getNavig();
+	print $this->getNavig($this->elements[$id]);
 }
 
 function print_Element($id, $sub, $value)
