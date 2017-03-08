@@ -73,6 +73,28 @@ function __construct($cssClass = 'pctree')
 }
 
 /**
+ * Return current index to Tree::nodes array.
+ */
+protected function currentIndex()
+{
+	return $this->i;
+}
+
+/**
+ * Generate HTML for list open tag - UL.
+ */
+protected function htmlListBegin($level)
+{
+		if ($this->i == 0) {
+		$html = "<ul class=\"$this->cssClass\"";
+		$html .= $this->name? " id=\"$this->name\">" : '>';
+	}
+	else $html = '<ul>';
+
+	return $html;
+}
+
+/**
  * Generate %tree HTML. Recursive function.
  * @param array $nodes Flat array of %tree nodes
  * @param int $level Current %tree level
@@ -80,11 +102,7 @@ function __construct($cssClass = 'pctree')
  */
 protected function htmlTree($level = 0)
 {
-	if ($this->i == 0) {
-		$html = "<ul class=\"$this->cssClass\"";
-		$html .= $this->name? " id=\"$this->name\">" : '>';
-	}
-	else $html = '<ul>';
+	$html = $this->htmlListBegin($level);
 
 	while($node = $this->nodes[$this->i++]) {
 		
@@ -105,7 +123,7 @@ protected function htmlTree($level = 0)
 		}
 		else {
 			if ($this->nodes[$this->i]['LEVEL'] > $node['LEVEL']) $node['HASCHILD'] = true;
-			$html .= $this->htmlNode($node);
+			$html .= $this->htmlListNode($node);
 		}
 	}
 	$html .= "</ul>";
@@ -120,13 +138,13 @@ private function skipInactive($inactiveNode)
 }
 
 /**
- * Generate HTML for %tree node. Override for own %tree drawing alg.
- * Tree::pattern and Tree::pattern_link is used for drawing
+ * Generate HTML for %tree node - LI.
+ * Tree::pattern and Tree::pattern_link are used for drawing.
  * @param array $node Tree node (must contain LABEL, LEVEL)
  * @return string $html Node html code
  * @see htmltree()
  */
-protected function htmlNode($node)
+protected function htmlListNode($node)
 {
 	$class = $node['HASCHILD']? ($node['EXPANDED']? 'folder open' : 'folder closed') : 'item';
 	$class = trim($node['CLASS'].' '.$class);
