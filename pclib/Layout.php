@@ -100,11 +100,15 @@ function getNavig($options = array())
  */
 public function addScripts()
 {
-	if (!$this->headTag) throw new NoValueException('Missing "head" tag in template.');
+	$id = $this->headTag;
+	if (!$id) throw new NoValueException('Missing "head" tag in template.');
 	$scripts = func_get_args();
 	if (is_array($scripts[0])) $scripts = $scripts[0];
-	if (is_array($this->values[$this->headTag])) $this->values[$this->headTag] += $scripts;
-	else $this->values[$this->headTag] = $scripts;
+	
+	if (is_array($this->values[$id])) {
+		$this->values[$id] = array_merge($this->values[$id], $scripts);
+	}
+	else $this->values[$id] = $scripts;
 }
 
 function addInline($s) 
