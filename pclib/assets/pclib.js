@@ -148,7 +148,7 @@ validateForm: function(form) {
 		elements[i] = elem;
 	}
 
-	return {isValid: isValid, elements};
+	return {isValid: isValid, elements: elements};
 },
 
 /**
