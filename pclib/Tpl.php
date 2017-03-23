@@ -603,8 +603,13 @@ function print_Link($id, $sub, $value)
 	if ($sub == 'js') {
 		if ($elem['popup'])
 			$js = $this->getPopup($id, $elem['popup'], $url);
-		else
-			$js = "window.location='$url';";
+		else {
+			$js = "window.location='$url'";
+			if ($elem['hash']) {
+				$js .= "+(document.location.hash || '');";
+			}
+		}
+
 		print $js;
 		return;
 	}
