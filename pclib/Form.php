@@ -66,6 +66,8 @@ protected $prepared = false;
 
 private $ajax_id;
 
+private $extraHidden = array();
+
 /** Name of the 'class' element */
 protected $className = 'form';
 
@@ -1103,6 +1105,11 @@ function dbSync($tab)
 	}
 }
 
+function addHidden($name, $value)
+{
+	$this->extraHidden[$name] = $value;
+}
+
 //submit disabled elements too (add hidden field for disabled element)
 protected function ieFix($id, $name, $value)
 {
@@ -1241,7 +1248,8 @@ protected function head()
 
 	$html = $this->htmlTag('form', $tag, null, true)."\n";
 
-	foreach ((array)$hidden as $k => $v) {
+	$hidden = (array)$hidden + $this->extraHidden; 
+	foreach ($hidden as $k => $v) {
 		$html .= "<input type=\"hidden\" name=\"$k\" value=\"$v\"".($this->useXhtml? ' />' : '>')."\n";
 	}
 
