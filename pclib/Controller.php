@@ -62,8 +62,9 @@ function getArgs($actionMethod, array $params)
 		if (!strlen($param_value) and !$param->isOptional()) {
 			$this->app->error('Required parameter "%s" for page "%s" missing.', null, $param->name, get_class($this) .'/'.$this->action);
 		}
-		if (isset($param_value)) $args[] = $param_value;
+		$args[] = $param_value;
 	}
+
 	return $args;
 }
 
