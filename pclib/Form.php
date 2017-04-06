@@ -742,7 +742,7 @@ function print_ListInput($id, $sub, $value)
 
 	$html .= "<datalist id=\"dl_$tag[id]\">";
 	foreach ($items as $i => $item) {
-		$html .= "<option label=\"$i\" value=\"$item\">";
+		$html .= "<option value=\"$item\">";
 	}
 	$html .= "</datalist>";
 
