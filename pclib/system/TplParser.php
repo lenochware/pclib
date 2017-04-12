@@ -104,7 +104,7 @@ class TplParser extends BaseObject
 	 */
 	function parseLine($line)
 	{
-		$terms = preg_split("/[\s]+/", $line);
+		$terms = preg_split("/[\s]+/u", $line);
 		$type = array_shift($terms);
 		$id = array_shift($terms);
 
