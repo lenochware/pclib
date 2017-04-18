@@ -35,6 +35,9 @@ public $storage;
 /** Apps with the same realm share authentization session. */
 public $realm;
 
+/** Check if remote address changed. */
+public $verifyRemote = true;
+
 /** var AuthUser User which is logged in. */
 public $loggedUser;
 
@@ -197,10 +200,11 @@ protected function setSessionUser(pclib\AuthUser $user = null)
 
 protected function sessionHash($data)
 {
-	 return md5(
-		 $_SERVER['REMOTE_ADDR']    //We fight against session stealing
+	$remoteAddr = $this->verifyRemote? $_SERVER['REMOTE_ADDR'] : '';
+	return md5(
+		 $remoteAddr    	//We fight against session stealing
 		 .$this->realm
-		 .$data['ID']               //Forbid changing user or role
+		 .$data['ID']     //Forbid changing user or role
 		 .$data['ROLES']
 		 .$this->secret
 		 );
