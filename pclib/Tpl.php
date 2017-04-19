@@ -636,6 +636,11 @@ function print_Link($id, $sub, $value)
 		$lb = (string)$value;
 
 	$tag = array('href' => $url, 'class' => $id, '__attr' => $elem['attr']);
+
+	if ($elem['confirm']) {
+		$tag['onclick'] = "return confirm('".$elem['confirm']."')";
+	}
+
 	if ($elem['html']) $tag = array_merge($tag, $elem['html']);
 	print $this->htmlTag('a', $tag, $lb);
 }
