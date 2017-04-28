@@ -603,8 +603,13 @@ function print_Link($id, $sub, $value)
 	if ($sub == 'js') {
 		if ($elem['popup'])
 			$js = $this->getPopup($id, $elem['popup'], $url);
-		else
-			$js = "window.location='$url';";
+		else {
+			$js = "window.location='$url'";
+			if ($elem['hash']) {
+				$js .= "+(document.location.hash || '');";
+			}
+		}
+
 		print $js;
 		return;
 	}
@@ -631,6 +636,11 @@ function print_Link($id, $sub, $value)
 		$lb = (string)$value;
 
 	$tag = array('href' => $url, 'class' => $id, '__attr' => $elem['attr']);
+
+	if ($elem['confirm']) {
+		$tag['onclick'] = "return confirm('".$elem['confirm']."')";
+	}
+
 	if ($elem['html']) $tag = array_merge($tag, $elem['html']);
 	print $this->htmlTag('a', $tag, $lb);
 }

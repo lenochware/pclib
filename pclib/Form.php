@@ -62,9 +62,9 @@ protected $validator;
 
 protected $hidden;
 
-protected $prepared = false;
-
 private $ajax_id;
+
+private $extraHidden = array();
 
 /** Name of the 'class' element */
 protected $className = 'form';
@@ -740,7 +740,7 @@ function print_ListInput($id, $sub, $value)
 
 	$html .= "<datalist id=\"dl_$tag[id]\">";
 	foreach ($items as $i => $item) {
-		$html .= "<option label=\"$i\" value=\"$item\">";
+		$html .= "<option value=\"$item\">";
 	}
 	$html .= "</datalist>";
 
@@ -787,21 +787,22 @@ function print_Select($id, $sub, $value)
  * Prepare form values for storing into database.
  * Convert date, number, remove unwanted fields etc.
  * @param bool $skipEmpty Remove empty fields?
+ * @return array $values
  */
-function prepare($skipEmpty = false)
+function preparedValues($skipEmpty = false)
 {
-	if (!$this->values) return;
+	if (!$this->values) return array();
+
+	$values = array();
 	foreach ($this->values as $id=>$value) {
 		$elem = $this->elements[$id];
 		if ($id == '' or ($value == '' and $skipEmpty)
 		or $this->getAttr($id, 'nosave')
 		/*or $elem['noprint']*/) {
-			unset($this->values[$id]);
 			continue;
 		}
 
 		if ($this->elements[$id]['file'] and !$this->values[$id]) {
-			unset($this->values[$id]);
 			continue;
 		}
 
@@ -819,10 +820,10 @@ function prepare($skipEmpty = false)
 		if ($elem['onsave']) 
 			$value = $this->fireEventElem('onsave', $id, '', $value);
 
-		$this->values[$id] = $value;
+		$values[$id] = $value;
 	}
 
-	$this->prepared = true;
+	return $values;
 }
 
 private function getTableName($tab)
@@ -909,8 +910,7 @@ function insert($tab)
 
 	$this->service('db');
 
-	if (!$this->prepared) $this->prepare(1);
-	$id = $this->db->insert($tab, $this->values);
+	$id = $this->db->insert($tab, $this->preparedValues(true));
 	if (count($_FILES)) $this->upload($tab, $id);
 	return $id;
 }
@@ -941,8 +941,7 @@ function update($tab, $cond)
 		$this->upload($tab, $old['ID'], $old);
 	}
 
-	if (!$this->prepared) $this->prepare();
-	$this->db->update($tab, $this->values, $cond, $params);
+	$this->db->update($tab, $this->preparedValues(), $cond, $params);
 }
 
 /**
@@ -1103,6 +1102,11 @@ function dbSync($tab)
 	}
 }
 
+function addHidden($name, $value)
+{
+	$this->extraHidden[$name] = $value;
+}
+
 //submit disabled elements too (add hidden field for disabled element)
 protected function ieFix($id, $name, $value)
 {
@@ -1241,7 +1245,8 @@ protected function head()
 
 	$html = $this->htmlTag('form', $tag, null, true)."\n";
 
-	foreach ((array)$hidden as $k => $v) {
+	$hidden = (array)$hidden + $this->extraHidden; 
+	foreach ($hidden as $k => $v) {
 		$html .= "<input type=\"hidden\" name=\"$k\" value=\"$v\"".($this->useXhtml? ' />' : '>')."\n";
 	}
 

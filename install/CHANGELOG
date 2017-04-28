@@ -445,3 +445,9 @@
  - Added attribute 'confirm' to button tag
  - Added composer support: use "composer require lenochware/pclib" for installation
  - various bugfixes and small changes
+
+2.2.1
+- Added Auth->verifyRemote config param
+- Added Form->addHidden(), Form->preparedValues(), removed Form->prepare()
+- Breadcrumb navigator can be generated as UL
+- Various improvements and bugfixes

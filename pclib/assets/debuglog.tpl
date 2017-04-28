@@ -5,6 +5,7 @@ string LOGGERNAME
 string ACTIONNAME
 bind COLOR field "ACTIONNAME" list "url,green,error,red,*,black"
 string MESSAGE
+pager pager pglen "1000"
 ?>
 <table>
 {block items}

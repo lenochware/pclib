@@ -179,3 +179,5 @@ CREATE TABLE filestorage (
   dt timestamp without time zone,
   CONSTRAINT pk_filestorage_id PRIMARY KEY (id)
 );
+
+CREATE INDEX i_filestorage_entity ON filestorage USING btree (entity_type, entity_id);
