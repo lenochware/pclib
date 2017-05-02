@@ -19,7 +19,7 @@ class Relation extends Selection
 	protected $params;
 	protected $model;
 
-function __construct(\pclib\App $app, Model $model, array $params)
+function __construct(Model $model, array $params)
 {
 	if (!$params['table'] or !$params['key']) {
 		throw new Exception("Missing table or key name.");
@@ -27,7 +27,7 @@ function __construct(\pclib\App $app, Model $model, array $params)
 
 	$this->params = $params;
 	$this->model = $model;
-	parent::__construct($app);
+	parent::__construct();
 }
 
 function getType()

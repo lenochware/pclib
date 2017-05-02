@@ -25,8 +25,6 @@ use pclib\Exception;
 class Model extends BaseObject
 {
 
-protected $app;	
-
 /** var Db */
 public $db; //must be public because of service()
 
@@ -61,11 +59,9 @@ protected static $columnsCache = array();
  * @param Db $db
  * @param string $tableName Database table
  */
-function __construct(\pclib\App $app, $tableName)
+function __construct($tableName, $values = array())
 {
 	parent::__construct();
-
-	$this->app = $app;
 
 	$this->service('db');
 
@@ -74,6 +70,7 @@ function __construct(\pclib\App $app, $tableName)
 	}
 
 	$this->tableName = $tableName;
+	$this->setValues($values);
 }
 
 /**
@@ -197,7 +194,7 @@ function getPrimaryId()
 /**
  * Find record by primary key and load values from db.
  * @param int $id primary key
- * @return App_Model $this|null
+ * @return Model $this|null
  */
 function find($id)
 {
@@ -252,7 +249,7 @@ function related($name) {
 		throw new Exception("Relation not found: '%s'", array($name));
 	}
 
-	$rel = new Relation($this->app, $this, $def);
+	$rel = new Relation($this, $def);
 	if ($def['owner'] or $def['one']) {
 		return $rel->first();
 	}
@@ -267,7 +264,7 @@ function related($name) {
 	}
 
 	//cache?
-	$sel = new Selection($this->app);
+	$sel = new Selection;
 	$sel->from($table)->where(array($foreignKey => $this->getPrimaryId()));
 
 	if ($def['many']) {

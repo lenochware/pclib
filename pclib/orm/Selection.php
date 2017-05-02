@@ -26,10 +26,8 @@ use pclib\system\BaseObject;
  */
 class Selection extends BaseObject implements \Iterator {
 
-protected $app;
-
 /** var Db */
-protected $db;
+public $db;
 
 /** Array of sql query clausules. */
 protected $query = array();
@@ -44,10 +42,10 @@ protected $position = 0;
 
 protected $cachedTemplate;
 
-function __construct(\pclib\App $app)
+function __construct()
 {
-	$this->app = $app;
-	$this->db = $this->app->getService('db');
+	parent::__construct();
+	$this->service('db');
 	$this->clear();
 }
 
@@ -95,7 +93,8 @@ function valid()
  */
 protected function newModel($data)
 {
-	$model = $this->app->newModel($this->query['from']);
+	$className = $this->getModelClass($this->query['from']);
+	$model = new $className($this->query['from']);
 
 	if (!$this->cachedTemplate) {
 		$this->cachedTemplate = $model->getTemplate();
@@ -111,9 +110,14 @@ protected function newModel($data)
 	return $model;
 }
 
-protected function getModelName()
+protected function getModelClass($tableName)
 {
-	return $this->app->getClassName($this->query['from'], 'model');
+	$className = ucfirst($tableName).'Model';
+	$path = 'models/'.$className.'.php';
+
+	if (!file_exists($path)) return '\pclib\orm\Model';
+	require_once($path);
+	return ucfirst($tableName).'Model';
 }
 
 /**
@@ -122,11 +126,15 @@ protected function getModelName()
  */
 public function __call($name, $args)
 {
-	$modelClass = $this->getModelName();
-	array_unshift($args, $this);
+	$modelClass = $this->getModelClass($this->query['from']);
 	$methodName = 'select'.ucfirst($name);
-	return call_user_func_array(array($modelClass, $methodName), $args); 
-	//parent::__call($name, $args);
+	if (method_exists($modelClass, $methodName)) {
+		array_unshift($args, $this);
+		return call_user_func_array(array($modelClass, $methodName), $args); 
+	}
+	else {
+		return parent::__call($name, $args);
+	}
 }
 
 /**
@@ -196,7 +204,7 @@ function first($n = 1) {
 protected function tryModify()
 {
 	if ($this->result) {
-		throw new Exception('Cannot modify open selection.');
+		throw new \pclib\Exception('Cannot modify open selection.');
 	}
 }
 
