@@ -55,11 +55,11 @@ protected $accessRole;
 protected static $columnsCache = array();
 
 /**
- * Create empty model.
- * @param Db $db
+ * Create new model.
  * @param string $tableName Database table
+ * @param array $values Model values
  */
-function __construct($tableName, $values = array())
+function __construct($tableName, array $values = array())
 {
 	parent::__construct();
 
@@ -71,6 +71,18 @@ function __construct($tableName, $values = array())
 
 	$this->tableName = $tableName;
 	$this->setValues($values);
+}
+
+/**
+ * Create new model and store it to database.
+ * @param string $tableName Database table
+ * @param array $values Model values
+ */
+static function create($tableName, array $values = array())
+{
+	$model = new self($tableName, $values);
+	$model->save();
+	return $model;
 }
 
 /**
