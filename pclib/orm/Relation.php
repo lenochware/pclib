@@ -58,7 +58,7 @@ function getJoinTableName()
 function getJoinCondition()
 {
 	if ($this->getType() == 'many_to_many') {
-		throw new NotImplementedException;
+		throw new pclib\NotImplementedException;
 	}
 
 	$t1 = $this->model->getTableName();
@@ -83,7 +83,7 @@ function save(Model $model)
 			throw new Exception('Cannot save owner relation.');
 			break;
 		case 'many_to_many':
-			throw new NotImplementedException;
+			throw new pclib\NotImplementedException;
 			break;
 	}
 }
@@ -104,7 +104,7 @@ function clear()
 			$this->from($table)->where(array('ID' => $this->model->getValue($foreignKey)));
 			break;
 		case 'many_to_many':
-			throw new NotImplementedException;
+			throw new pclib\NotImplementedException;
 			$joinTable = 	$this->getJoinTableName();
 			list($k1,$k2) = explode(',', $foreignKey);
 			$this->from($table)->where(array('ID' => $this->model->getValue($foreignKey)));
