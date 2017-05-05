@@ -564,7 +564,7 @@ function __toString()
 {
 	try {
 		return json_encode($this->getValues());
-	} catch (Exception $e) {
+	} catch (\Exception $e) {
 		trigger_error($e->getMessage(), E_USER_ERROR);
 	}	
 }

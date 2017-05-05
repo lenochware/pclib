@@ -171,7 +171,7 @@ function find($id)
 	return $model->find($id);
 }
 
-function update($values)
+function update(array $values)
 {
 	foreach ($this as $model) {
 		$model->setValues($values);
@@ -388,7 +388,7 @@ function __toString()
 			$s.= "$key: $value<br>";
 		}
 		return $s;
-	} catch (Exception $e) {
+	} catch (\Exception $e) {
 		trigger_error($e->getMessage(), E_USER_ERROR);
 	}
 
