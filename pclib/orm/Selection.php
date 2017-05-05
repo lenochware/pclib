@@ -232,7 +232,11 @@ function limit($limit, $offset = 0)
 	return $this;
 }
 
-//selectRaw, raw, getRaw, selectRow?
+/**
+ * Execute selection and return array of rows.
+ * @param array|string $columns List of columns to select
+ * @return array $rows
+ */
 function select($columns)
 {
 	$this->tryModify();
@@ -266,6 +270,26 @@ function where($s)
 	if(!isset($this->query['where'])) $this->query['where'] = array();
 	if (is_array($s)) $s = $this->createFieldList(' AND ', $s);
 	$this->query['where'][] = $s;
+	return $this;
+}
+
+/**
+ * Set where condition. Fluent interface.
+ * @param $relName Name of relation
+ * @param $s Condition used on relation
+ * @return Selection $this
+ */
+function whereJoin($relName, $s)
+{
+	$this->tryModify();
+
+	$rel = new Relation($this->newModel(null), $relName);
+
+	$table = $rel->params['table'];
+	$join = $rel->getJoinCondition();
+
+	if(!isset($this->query['whereJoin'])) $this->query['whereJoin'] = array();
+	$this->query['whereJoin'][] = "(SELECT COUNT(*) FROM $table WHERE $join AND ($s))>=1";
 	return $this;
 }
 
@@ -343,6 +367,7 @@ function getSql()
 	
 	$sql = 'SELECT '.implode(',', $select).' FROM '.$from;
 	if ($where)  $sql .= ' WHERE '.implode(' AND ', array_unique($where));
+	if ($whereJoin)  $sql .= ($where? '':' WHERE ').implode(' AND ', array_unique($whereJoin));
 	if ($group)  $sql .= ' GROUP BY '.$group;
 	if ($having) $sql .= ' HAVING '.implode(' AND ', array_unique($having));
 	if ($order)  $sql .= ' ORDER BY '.implode(',', $order);

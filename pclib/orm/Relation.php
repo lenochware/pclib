@@ -55,6 +55,20 @@ function getJoinTableName()
 	return implode('_', $names);
 }
 
+function getJoinCondition()
+{
+	if ($this->getType() == 'many_to_many') {
+		throw new NotImplementedException;
+	}
+
+	$t1 = $this->model->getTableName();
+	$k1 = 'ID'; //TODO: nacist z modelu
+	$t2 = $this->params['table'];
+	$k2 = $this->params['key'];
+
+	return "$t1.$k1=$t2.$k2";
+}
+
 function save(Model $model)
 {
 	$foreignKey = $this->params['key'];
