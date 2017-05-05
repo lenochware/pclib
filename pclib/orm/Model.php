@@ -255,21 +255,18 @@ public function __set($name, $value)
  * Return related model or selection of models.
  * Relation $name must be defined in template elements
  */
-function related($name) {
-	$def = $this->getTemplate()->elements[$name];
-	if (!$def['type'] == 'relation') {
-		throw new Exception("Relation not found: '%s'", array($name));
-	}
+function related($name)
+{
+	$rel = new Relation($this, $name);
 
-	$rel = new Relation($this, $def);
-	if ($def['owner'] or $def['one']) {
+	if ($rel->params['owner'] or $rel->params['one']) {
 		return $rel->first();
 	}
 	else return $rel;
 
 
-	$table = $def['table'];
-	$foreignKey = $def['key'];
+	$table = $rel->params['table'];
+	$foreignKey = $rel->params['key'];
 
 	if (!$table or !$foreignKey) {
 		throw new Exception("Missing table or key name.");
@@ -279,7 +276,7 @@ function related($name) {
 	$sel = new Selection;
 	$sel->from($table)->where(array($foreignKey => $this->getPrimaryId()));
 
-	if ($def['many']) {
+	if ($rel->params['many']) {
 		return $sel;
 	}
 	else {

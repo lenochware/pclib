@@ -16,11 +16,17 @@ use pclib;
 
 class Relation extends Selection
 {
-	protected $params;
+	public $params;
 	protected $model;
 
-function __construct(Model $model, array $params)
+function __construct(Model $model, $name)
 {
+	$params = $model->getTemplate()->elements[$name];
+
+	if ($params['type'] != 'relation') {
+		throw new Exception("Relation not found: '%s'", array($name));
+	}
+
 	if (!$params['table'] or !$params['key']) {
 		throw new Exception("Missing table or key name.");
 	}
