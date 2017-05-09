@@ -112,12 +112,12 @@ protected function newModel($data)
 
 protected function getModelClass($tableName)
 {
-	$className = ucfirst($tableName).'Model';
+	$className = ucfirst(strtolower($tableName)).'Model';
 	$path = 'models/'.$className.'.php';
 
 	if (!file_exists($path)) return '\pclib\orm\Model';
 	require_once($path);
-	return ucfirst($tableName).'Model';
+	return $className;
 }
 
 /**

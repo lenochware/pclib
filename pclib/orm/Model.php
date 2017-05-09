@@ -65,8 +65,8 @@ function __construct($tableName, array $values = array())
 
 	$this->service('db');
 
-	if (!$tableName) {
-		throw new Exception("Empty table name.");
+	if (!preg_match("/^\w+$/", $tableName)) {
+		throw new Exception("Invalid table name.");
 	}
 
 	$this->tableName = $tableName;
@@ -263,25 +263,6 @@ function related($name)
 		return $rel->first();
 	}
 	else return $rel;
-
-
-	$table = $rel->params['table'];
-	$foreignKey = $rel->params['key'];
-
-	if (!$table or !$foreignKey) {
-		throw new Exception("Missing table or key name.");
-	}
-
-	//cache?
-	$sel = new Selection;
-	$sel->from($table)->where(array($foreignKey => $this->getPrimaryId()));
-
-	if ($rel->params['many']) {
-		return $sel;
-	}
-	else {
-		return $sel->first();
-	}
 }
 
 /**
