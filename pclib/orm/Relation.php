@@ -13,6 +13,7 @@
 
 namespace pclib\orm;
 use pclib;
+use pclib\Exception;
 
 class Relation extends Selection
 {
@@ -94,20 +95,30 @@ function clear()
 
 	$table = $this->params['table'];
 	$foreignKey = $this->params['key'];
+	$primaryKey = $this->model->getPrimaryId();
+
+	// if (!$primaryKey) { //problem in whereJoin()
+	// 	throw new Exception('Primary key is not defined.');
+	// }
 
 	switch ($this->getType()) {
 		case 'one':
 		case 'many':
-			$this->from($table)->where(array($foreignKey => $this->model->getPrimaryId()));
+			$this->from($table)->where(array($foreignKey => $primaryKey));
 			break;
 		case 'owner':
 			$this->from($table)->where(array('ID' => $this->model->getValue($foreignKey)));
 			break;
 		case 'many_to_many':
-			throw new pclib\NotImplementedException;
-			$joinTable = 	$this->getJoinTableName();
+			$joinTable = $this->getJoinTableName();
 			list($k1,$k2) = explode(',', $foreignKey);
-			$this->from($table)->where(array('ID' => $this->model->getValue($foreignKey)));
+
+			$this->from($table);
+			if(!isset($this->query['whereJoin'])) $this->query['whereJoin'] = array();
+			$this->query['whereJoin'][] = paramStr(
+				"(SELECT COUNT(*) FROM {0} WHERE $table.ID={0}.$k2 and {0}.$k1='{1}')>=1", 
+				array($joinTable, $primaryKey)
+			);
 			break;
 	}
 }

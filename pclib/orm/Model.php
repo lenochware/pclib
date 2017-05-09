@@ -211,7 +211,7 @@ function getPrimaryId()
 function find($id)
 {
 	$this->values = $this->db->select($this->tableName, array($this->primary => $id));
-	if ($this->values) $this->isInDb(true);
+	$this->isInDb((bool)$this->values);
 	return $this->values? $this : null;
 }
 
