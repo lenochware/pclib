@@ -82,7 +82,7 @@ function save(Model $model)
 		case 'one':
 		case 'many':
 			$model->setValue($foreignKey, $this->model->getPrimaryId());
-			$model->save();
+			return $model->save();
 			break;
 		case 'owner':
 			throw new Exception('Cannot save owner relation.');

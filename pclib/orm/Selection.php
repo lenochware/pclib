@@ -228,7 +228,7 @@ protected function execute()
 function limit($limit, $offset = 0)
 {
 	$this->tryModify();
-	$this->query['limit'] = array($limit, $offset);
+	$this->query['limit'] = array((int)$limit, (int)$offset);
 	return $this;
 }
 
@@ -260,6 +260,18 @@ function from($s)
 	return $this;
 }
 
+protected function setWhereParams($s, $args, $offset)
+{
+	if (is_array($s)) {
+		return $this->createFieldList(' AND ', $s);
+	}
+
+	$args = array_slice($args, $offset);
+	if (!$args) return $s;
+	if (is_array($args[0])) $args = $args[0];
+	return $this->db->setParams($s, $args);
+}
+
 /**
  * Set where condition. Fluent interface.
  * @return Selection $this
@@ -268,8 +280,7 @@ function where($s)
 {
 	$this->tryModify();
 	if(!isset($this->query['where'])) $this->query['where'] = array();
-	if (is_array($s)) $s = $this->createFieldList(' AND ', $s);
-	$this->query['where'][] = $s;
+	$this->query['where'][] = $this->setWhereParams($s, func_get_args(), 1);
 	return $this;
 }
 
@@ -284,6 +295,8 @@ function whereJoin($relName, $s)
 	$this->tryModify();
 
 	$rel = new Relation($this->newModel(null), $relName);
+
+	$s = $this->setWhereParams($s, func_get_args(), 2);
 
 	$table = $rel->params['table'];
 	$join = $rel->getJoinCondition();
@@ -334,8 +347,7 @@ function having($s)
 {
 	$this->tryModify();
 	if(!isset($this->query['having'])) $this->query['having'] = array();
-	if (is_array($s)) $s = $this->createFieldList(' AND ', $s);
-	$this->query['having'][] = $s;
+	$this->query['having'][] = $this->setWhereParams($s, func_get_args(), 1);
 	return $this;
 }
 
@@ -384,9 +396,8 @@ function getSql()
 
 protected function createFieldList($separ, array $fieldsArray)
 {
-	//escape keys?
 	foreach($fieldsArray as $k => $v) {
-		$output[] = $k.'='.$this->escape($v);
+		$output[] = $this->db->escape($k,'ident').'='.$this->escape($v);
 	}
 	return implode($separ, $output);
 }
