@@ -59,15 +59,19 @@ function getJoinTableName()
 function getJoinCondition()
 {
 	if ($this->getType() == 'many_to_many') {
-		throw new pclib\NotImplementedException;
+		$t1 = $this->model->getTableName();
+		$t2 = $this->params['table'];
+		$tj = $this->getJoinTableName();
+		list($k1,$k2) = explode(',', $this->params['key']);
+		return "$tj.$k1=$t1.ID and $tj.$k2=$t2.ID";
 	}
-
-	$t1 = $this->model->getTableName();
-	$k1 = 'ID'; //TODO: nacist z modelu
-	$t2 = $this->params['table'];
-	$k2 = $this->params['key'];
-
-	return "$t1.$k1=$t2.$k2";
+	else {
+		$t1 = $this->model->getTableName();
+		$k1 = 'ID'; //TODO: nacist z modelu
+		$t2 = $this->params['table'];
+		$k2 = $this->params['key'];
+		return "$t1.$k1=$t2.$k2";		
+	}
 }
 
 function save(Model $model)

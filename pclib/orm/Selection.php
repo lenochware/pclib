@@ -289,6 +289,13 @@ function whereJoin($relName, $s)
 	$join = $rel->getJoinCondition();
 
 	if(!isset($this->query['whereJoin'])) $this->query['whereJoin'] = array();
+
+	if ($rel->getType() == 'many_to_many') {
+		$joinTable = $rel->getJoinTableName();
+		$this->query['whereJoin'][] = "(SELECT COUNT(*) FROM $table,$joinTable where $join and ($s))>=1";
+		return $this;
+	}
+
 	$this->query['whereJoin'][] = "(SELECT COUNT(*) FROM $table WHERE $join AND ($s))>=1";
 	return $this;
 }
