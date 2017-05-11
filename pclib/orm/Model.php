@@ -77,12 +77,30 @@ function __construct($tableName, array $values = array())
  * Create new model and store it to database.
  * @param string $tableName Database table
  * @param array $values Model values
+ * @param bool $doSave Save to db?
  */
-static function create($tableName, array $values = array())
+static function create($tableName, array $values = array(), $doSave = true)
 {
-	$model = new self($tableName, $values);
-	$model->save();
+	$className = self::className($tableName);
+	$model = new $className($tableName, $values);
+
+	if ($doSave) $model->save();
+
 	return $model;
+}
+
+/**
+ * Return model class name for $tableName and include model source file.
+ * @param string $tableName Database table
+ */
+public static function className($tableName)
+{
+	$className = ucfirst(strtolower($tableName)).'Model';
+	$path = 'models/'.$className.'.php';
+
+	if (!file_exists($path)) return '\pclib\orm\Model';
+	require_once($path);
+	return $className;
 }
 
 /**

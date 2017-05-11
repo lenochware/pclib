@@ -93,7 +93,7 @@ function valid()
  */
 protected function newModel($data)
 {
-	$className = $this->getModelClass($this->query['from']);
+	$className = Model::className($this->query['from']);
 	$model = new $className($this->query['from']);
 
 	if (!$this->cachedTemplate) {
@@ -110,23 +110,13 @@ protected function newModel($data)
 	return $model;
 }
 
-protected function getModelClass($tableName)
-{
-	$className = ucfirst(strtolower($tableName)).'Model';
-	$path = 'models/'.$className.'.php';
-
-	if (!file_exists($path)) return '\pclib\orm\Model';
-	require_once($path);
-	return $className;
-}
-
 /**
  * PHP magic method.
  * Redirect unknown method call to underlying model class.
  */
 public function __call($name, $args)
 {
-	$modelClass = $this->getModelClass($this->query['from']);
+	$modelClass = Model::className($this->query['from']);
 	$methodName = 'select'.ucfirst($name);
 	if (method_exists($modelClass, $methodName)) {
 		array_unshift($args, $this);
