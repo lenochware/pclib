@@ -31,9 +31,6 @@ public $db; //must be public because of service()
 /** Name of source database table. */
 protected $tableName;
 
-/** Primary key column name. */
-protected $primary = 'id';
-
 /** Is model stored in database? */
 protected $inDb = false;
 
@@ -53,6 +50,12 @@ protected $modified = array();
 protected $accessRole;
 
 protected static $columnsCache = array();
+
+protected static $options = array(
+	'primaryKey' => 'ID',
+	'defaultClassName' => '\pclib\orm\Model',
+	'dir' => 'models',
+);
 
 /**
  * Create new model.
@@ -89,6 +92,11 @@ static function create($tableName, array $values = array(), $doSave = true)
 	return $model;
 }
 
+static function setOptions(array $options)
+{
+	self::$options = $options + self::$options;
+}
+
 /**
  * Return model class name for $tableName and include model source file.
  * @param string $tableName Database table
@@ -96,9 +104,9 @@ static function create($tableName, array $values = array(), $doSave = true)
 public static function className($tableName)
 {
 	$className = ucfirst(strtolower($tableName)).'Model';
-	$path = 'models/'.$className.'.php';
+	$path = self::$options['dir'].'/'.$className.'.php';
 
-	if (!file_exists($path)) return '\pclib\orm\Model';
+	if (!file_exists($path)) return self::$options['defaultClassName'];
 	require_once($path);
 	return $className;
 }
@@ -165,7 +173,7 @@ function getTableName()
  */
 protected function getTemplatePath()
 {
-	return 'models/templates/'.ucfirst(strtolower($this->tableName)).'.tpl';
+	return self::$options['dir'].'/templates/'.ucfirst(strtolower($this->tableName)).'.tpl';
 }
 
 /**
@@ -213,12 +221,12 @@ protected function prepareTemplate(Tpl $t)
 
 function setPrimaryId($id)
 {
-	$this->values[$this->primary] = (int)$id;
+	$this->values[self::$options['primaryKey']] = (int)$id;
 }
 
 function getPrimaryId()
 {
-	return $this->values[$this->primary];
+	return $this->values[self::$options['primaryKey']];
 }
 
 /**
@@ -228,7 +236,7 @@ function getPrimaryId()
  */
 function find($id)
 {
-	$this->values = $this->db->select($this->tableName, array($this->primary => $id));
+	$this->values = $this->db->select($this->tableName, array(self::$options['primaryKey'] => $id));
 	$this->isInDb((bool)$this->values);
 	return $this->values? $this : null;
 }
@@ -399,7 +407,7 @@ protected function update()
 
 	if (!$this->validate('update')) return false;
 
-	return $this->db->update($this->tableName, $this->getValuesForSave(), array($this->primary => $id));
+	return $this->db->update($this->tableName, $this->getValuesForSave(), array(self::$options['primaryKey'] => $id));
 }
 
 /** 
@@ -420,7 +428,7 @@ function delete()
 	$this->validateRelated();
 
 	//startTransaction
-	$ok = $this->db->delete($this->tableName, array($this->primary => $id));
+	$ok = $this->db->delete($this->tableName, array(self::$options['primaryKey'] => $id));
 	$this->deleteRelated();
 	//commitTransaction
 
