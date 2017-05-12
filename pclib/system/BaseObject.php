@@ -90,7 +90,7 @@ class BaseObject
 		if ($parentClass = get_parent_class($className)) {
 			$this->loadDefaults($parentClass);
 		}
-		$this->setOptions((array)self::$defaults[$className]);
+		$this->setProperties((array)self::$defaults[$className]);
 		return $this;
 	}
 
@@ -98,7 +98,7 @@ class BaseObject
 	 * Set public properties of object from the array. 
 	 * @param array $defaults Array of parameters to be set.
 	 */
- 	function setOptions(array $defaults)
+ 	function setProperties(array $defaults)
 	{
 		$closure = function($o, $defaults) {
 			foreach ($defaults as $key => $value) {
