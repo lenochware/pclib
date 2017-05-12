@@ -120,7 +120,7 @@ function clear()
 			$this->from($table);
 			if(!isset($this->query['whereJoin'])) $this->query['whereJoin'] = array();
 			$this->query['whereJoin'][] = paramStr(
-				"(SELECT COUNT(*) FROM {0} WHERE $table.ID={0}.$k2 and {0}.$k1='{1}')>=1", 
+				"EXISTS (SELECT * FROM {0} WHERE $table.ID={0}.$k2 and {0}.$k1='{1}')", 
 				array($joinTable, $primaryKey)
 			);
 			break;

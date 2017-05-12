@@ -295,11 +295,11 @@ function whereJoin($relName, $s)
 
 	if ($rel->getType() == 'many_to_many') {
 		$joinTable = $rel->getJoinTableName();
-		$this->query['whereJoin'][] = "(SELECT COUNT(*) FROM $table,$joinTable where $join and ($s))>=1";
+		$this->query['whereJoin'][] = "EXISTS (SELECT * FROM $table,$joinTable where $join and ($s))";
 		return $this;
 	}
 
-	$this->query['whereJoin'][] = "(SELECT COUNT(*) FROM $table WHERE $join AND ($s))>=1";
+	$this->query['whereJoin'][] = "EXISTS (SELECT * FROM $table WHERE $join AND ($s))";
 	return $this;
 }
 
