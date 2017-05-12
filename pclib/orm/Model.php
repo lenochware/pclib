@@ -104,7 +104,7 @@ static function setOptions(array $options)
 public static function className($tableName)
 {
 	$className = ucfirst(strtolower($tableName)).'Model';
-	$path = self::$options['dir'].'/'.$className.'.php';
+	$path = self::getFilePath($className, '.php');
 
 	if (!file_exists($path)) return self::$options['defaultClassName'];
 	require_once($path);
@@ -166,14 +166,18 @@ function getTableName()
 }
 
 /**
- * Return path to template file.
- * Override for your own template names and locations.
- * Default location: 'models/templates/Tablename.tpl'
+ * Return path to model/template file.
+ * Override for your own model/template names and locations.
+ * Default location: 'models/*'
  * @return string $path
  */
-protected function getTemplatePath()
+protected static function getFilePath($name, $ext)
 {
-	return self::$options['dir'].'/templates/'.ucfirst(strtolower($this->tableName)).'.tpl';
+	switch ($ext) {
+		case '.tpl': return self::$options['dir'].'/templates/'.ucfirst(strtolower($name)).'.tpl';
+		case '.php': return self::$options['dir'].'/'.ucfirst(strtolower($name)).'.php';
+		default: throw new Exception('Unknown file extension: %s', $ext);
+	}
 }
 
 /**
@@ -182,7 +186,7 @@ protected function getTemplatePath()
  */
 protected function createTemplate()
 {  
-	$fileName = $this->getTemplatePath();
+	$fileName = self::getFilePath($this->tableName, '.tpl');
 	if (file_exists($fileName)) {
 		$t = new Tpl($fileName);
 	}
