@@ -26,9 +26,9 @@ class Validator extends system\ValidatorBase
 
 	public $dateTimeFormat = '%d.%m.%Y %H:%M%:%S';
 
-	function __construct($path = '')
+	function __construct()
 	{
-		parent::__construct($path);
+		parent::__construct();
 
 		//naatavit primo do array?
 		$this->setRule('email', array($this, 'isEmail'), "Invalid email address!");

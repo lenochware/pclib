@@ -15,7 +15,7 @@
 /**
  * PClib version string
  */
-define('PCLIB_VERSION', '2.2.1');
+define('PCLIB_VERSION', '2.3.0');
 
 /* Find out where library reside. MUST BE an absolute path. */
 if (!defined('PCLIB_DIR')) {
@@ -72,6 +72,9 @@ class Pclib
 			'PCLogger' => '\pclib\Logger',
 			'PCTranslator' => '\pclib\Translator',
 			'PCController' => '\pclib\Controller',
+			'PCModel' => '\pclib\orm\Model',
+			'PCValidator' => '\pclib\Validator',
+			'PCSelection' => '\pclib\orm\Selection',
 			'PCFileStorage' => '\pclib\FileStorage',
 		);
 

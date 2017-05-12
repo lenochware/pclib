@@ -191,6 +191,11 @@ function setArray(array $dataArray, $totalLength = 0)
 	$this->setLength($totalLength ?: count($this->dataArray));
 }
 
+function setSelection(orm\Selection $sel)
+{
+	$this->setQuery($sel->getSql());
+}
+
 /**
  * Enable summarization rows. When $field value changes, summary block
  * is pushed into %grid output.

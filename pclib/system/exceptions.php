@@ -17,7 +17,7 @@ class Exception extends \Exception
 	}
 }
 
-class NotImplementedException extends Exception {}
+class SqlQueryException extends Exception {}
 class RuntimeException extends Exception {}
 class DatabaseException extends Exception {}
 class AuthException extends Exception {}
@@ -27,6 +27,12 @@ class MemberAccessException extends Exception {}
 class FileNotFoundException extends IOException {}
 class NoDatabaseException extends NoValueException {
 	public function __construct($message = 'Database connection required.', 
+		$code = 0, Exception $previous = null) {
+		parent::__construct($message, $code, $previous);
+	}
+}
+class NotImplementedException extends Exception {
+	public function __construct($message = 'Feature is not implemented.', 
 		$code = 0, Exception $previous = null) {
 		parent::__construct($message, $code, $previous);
 	}

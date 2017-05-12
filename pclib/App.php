@@ -530,8 +530,7 @@ function newController($name)
 
 function newModel($name)
 {
-	$className = $this->getClassName($name, 'model');
-	return $className? new $className($this, $name) : null;
+	return orm\Model::create($name, array(), false);
 }
 
 /**

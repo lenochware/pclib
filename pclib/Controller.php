@@ -112,4 +112,28 @@ function redirect($route)
 	$this->app->redirect($route);
 }
 
+/**
+ * Return model for table $tableName.
+ **/
+function model($tableName, $id = null)
+{
+	$model = orm\Model::create($tableName, array(), false);
+	if ($id) {
+		$model->find($id);
+	}
+
+	return $model;
+}
+
+/**
+ * Return orm\Selection class.
+ **/
+function selection($from = null)
+{
+	$sel = new orm\Selection;
+	if ($from) $sel->from($from);
+	return $sel;
+}
+
+
 }
