@@ -45,7 +45,7 @@ class ValidatorBase extends BaseObject
 	protected $rules = array();
 
 	/** Array of [fieldName: errorMessage, ...] */
-	protected $errors;
+	protected $errors = array();
 
 	protected $elements;
 
