@@ -405,8 +405,9 @@ function runDump($fileName, $skipErrors = false)
 **/
 function replace($tab, $data)
 {
-	if (get_class($this->drv) != 'mysql')
+	if (!in_array($this->drv->extension, array('mysql', 'pdo_mysql'))) {
 		throw new NotImplementedException;
+	}
 	
 	if (is_array($data)) {
 		$sep = '';
