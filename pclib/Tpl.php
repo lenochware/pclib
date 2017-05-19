@@ -664,23 +664,29 @@ function print_Env($id, $sub, $value)
  */
 function print_Class($id, $sub, $value)
 {
-	$ignore_list = array('class','block','pager','sort','button');
-
 	if ($id != $this->className) return;
+	$this->eachPrintable(array($this, 'trPrintElement'), $sub);
+}
+
+function eachPrintable($callback, $sub = '')
+{
+	$ignore_list = array('class','block','pager','sort','button');
 
 	foreach($this->elements as $id => $elem) {
 		if ($elem['noprint'] or $elem['skip'] or in_array($elem['type'], $ignore_list)) continue;
-		$this->print_Class_Item($id, $sub);
+		$elem['sub'] = $sub;
+		$callback($elem);
 	}
 }
 
 /**
-	* Implements {tpl.fields} placeholder.
+	* Print element in table layout.
 	* @see print_class();
-	* @copydoc tag-handler
 	*/
-protected function print_Class_Item($id, $sub)
+protected function trPrintElement($elem)
 {
+	$id = $elem['id'];
+
 	print "<tr><td class=\"$id\">";
 	$this->print_Element($id, 'lb', null);
 	print '</td><td>';

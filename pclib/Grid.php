@@ -387,8 +387,11 @@ function print_Sort($id, $sub)
  * @see Tpl::print_class()
  * @copydoc tag-handler
  */
-protected function print_Class_Item($id, $sub)
+protected function trPrintElement($elem)
 {
+	$id = $elem['id'];
+	$sub = $elem['sub'];
+
 	if ($sub == 'labels') {
 		print '<th>';
 		$this->print_Element($id, 'lb', null);

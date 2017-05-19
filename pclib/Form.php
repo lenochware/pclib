@@ -466,27 +466,30 @@ function print_Errors()
 
 /**
  * Print all form elements at once.
- * Uses simple table layout from presentation.
+ * Uses simple table layout for presentation.
  * Implement {form.fields} placeholder.
  * @copydoc tag-handler
  */
 function print_Class($id, $sub, $value)
 {
-	parent::print_Class($id, 'fields', $value);
+	if ($id != $this->className) return;
+	$printFunc = ($this->header['default_print'] == 'div')? 'divPrintElement' : 'trPrintElement';
 
-	print "<tr><td colspan=\"3\">";
+	$this->eachPrintable(array($this, $printFunc), $sub);		
+
+	print ($printFunc == 'trPrintElement')? "<tr><td colspan=\"3\">" : '<div class="form-group buttons">';
 	foreach($this->elements as $id => $elem) {
 		if ($elem['noprint'] or $elem['skip'] or $elem['type'] != 'button') continue;
 		$this->print_Button($id, '', $this->getValue($id));
 		print ' ';
 	}
-	print '</td></tr>';
+	print ($printFunc == 'trPrintElement')? '</td></tr>' : '</div>';
 }
 
 /** Helper for print_class() */
-protected function print_Class_Item($id, $sub)
+protected function trPrintElement($elem)
 {
-	$elem = $this->elements[$id];
+	$id = $elem['id'];
 	if ($elem['hidden']) return;
 	print "<tr><td class=\"$id\">";
 	$this->print_Element($id, 'lb', null);
@@ -497,6 +500,21 @@ protected function print_Class_Item($id, $sub)
 	print '</td><td>';
 	$this->print_Element($id, 'err', null);
 	print '</td></tr>';
+}
+
+/** Helper for print_class() */
+protected function divPrintElement($elem)
+{
+	$id = $elem['id'];
+	if ($elem['hidden']) return;
+	print "<div class=\"form-group\">";
+	$this->print_Element($id, 'lb', null);
+	$value = $this->getValue($id);
+	if (!$this->fireEventElem('onprint',$id, '', $value)) {
+		$this->print_Element($id, '', $value);
+	}
+	$this->print_Element($id, 'err', null);
+	print '</div>';
 }
 
 /**
