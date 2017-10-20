@@ -63,6 +63,12 @@ function __construct($rootdir)
 	$this->service('db');
 }
 
+protected function getDbColumns($data)
+{
+	return array_intersect_key($data, $this->db->columns($this->TABLE));
+}
+
+
 /**
  *  Save file and assign it to the entity.
  *  If file FILE_ID already exists, it is rewritten.
@@ -106,22 +112,19 @@ function saveFile($entity, $file)
 		return;
 	}
 
-	$newfile = array(
+
+	$file += array(
 	'ENTITY_ID' => $entity[0],
 	'ENTITY_TYPE' => $entity[1],
-	'FILE_ID' => $file['FILE_ID'],
 	'FILEPATH' => $dir.$filename,
-	'ORIGNAME' => $file['ORIGNAME'],
-	'ANNOT' => $file['ANNOT'],
-	'MIMETYPE' => $file['MIMETYPE'],
-	'SIZE' => $file['SIZE'],
-	//'USER_ID' => $this->user['ID'],
 	'DT' => date("Y-m-d H:i:s"),
 	);
 
-	$id = $this->db->insert($this->TABLE, $newfile);
+	$id = $this->db->insert($this->TABLE, $this->getDbColumns($file));
 
-	$this->onAfterSave($entity, $newfile, $id);
+	//$id = $this->db->insert($this->TABLE, $newfile);
+
+	$this->onAfterSave($entity, $file, $id);
 	return $id;
 }
 
