@@ -856,10 +856,31 @@ protected function getUrl($elem)
 function addTag($line)
 {
 	$elem = $this->parser->parseLine($line);
-	$this->elements[$elem['id']] = $elem;
+
+	if ($elem['after']) {
+		$this->elements = $this->insertAfter($this->elements, 
+			array($elem['id'] => $elem), $elem['after']
+		);
+	}
+	else {
+		$this->elements[$elem['id']] = $elem;
+	}
 }
 
 
+private function insertAfter(array $a, array $elem, $after)
+{
+	$pos = array_search($after, array_keys($a));
+	if ($pos === false) {
+		return array_merge($a, $elem);
+	}
+
+	return array_merge(
+    array_slice($a, 0, $pos+1),
+    $elem,
+    array_slice($a, $pos+1, null)
+  );
+}
 
 function htmlTag($name, $attr = array(), $content = null, $startTagOnly = false)
 {
