@@ -19,6 +19,7 @@ class Exception extends \Exception
 
 class SqlQueryException extends Exception {}
 class RuntimeException extends Exception {}
+class ApiException extends Exception {}
 class DatabaseException extends Exception {}
 class AuthException extends Exception {}
 class NoValueException extends Exception {}

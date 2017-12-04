@@ -70,6 +70,11 @@ class ErrorHandler extends BaseObject
 		if (in_array('log', $this->options)) $this->logError($e);
 		if (!in_array('display', $this->options)) return;
 
+		if ($e instanceof \pclib\ApiException) {
+			http_response_code(500);
+			die($e->getMessage());
+		}
+
 		if (in_array('develop', $this->options)) {
 			$this->displayError($e);
 		}
