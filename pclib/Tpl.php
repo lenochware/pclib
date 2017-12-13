@@ -704,6 +704,8 @@ protected function trPrintElement($elem)
  */
 function print_Action($id, $sub, $value)
 {
+	if (!isset($this->elements[$id]['route'])) return;
+	
 	$rs = $this->replaceParams($this->elements[$id]['route']);
 	$action = new Action($rs);
 	$ct = $this->app->newController($action->controller);

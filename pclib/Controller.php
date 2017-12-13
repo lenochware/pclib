@@ -101,6 +101,11 @@ public function run($action)
 
 	$action_method = $this->action.$this->ACTION_POSTFIX;
 	$args = $this->getArgs($action_method, $action->params);
+
+	if ($this->action == 'default') {
+		$this->action = $action;
+	}
+
 	return call_user_func_array(array($this, $action_method), $args);
 }
 
