@@ -170,13 +170,18 @@ class TplParser extends BaseObject
 
 	protected function getPartials($templ)
 	{
-		return false;
+		preg_match_all("/^\s*(include.+)$/m",$templ[0], $found);
+		return $found[1]? $found[1] : false;
 	}
 
 	protected function mergePartials($templ, $partials)
 	{
 		foreach ($partials as $line) {
 			$partial = $this->parseLine($line);
+
+			if (!file_exists($partial['file'])) {
+				throw new \pclib\FileNotFoundException("Include file '".$partial['file']."' not found.");
+			}
 
 			$templateStr = file_get_contents($partial['file']);
 			$tpart = $this->split($templateStr);
@@ -186,7 +191,7 @@ class TplParser extends BaseObject
 			}
 
 			$templ[0] .= $tpart[0];
-			$templ[1] .= $tpart[1];
+			$templ[1] = str_replace('{'.$partial['id'].'}', $tpart[1], $templ[1]);
 		}
 
 		return $templ;
