@@ -88,6 +88,11 @@ class TplParser extends BaseObject
 			$line = trim($line);
 			if ($line == '') continue;
 			$elem = $this->parseLine($line);
+			
+			if (isset($elms[$elem['id']])) {
+				throw new \pclib\Exception("Duplicate element '%s'", [$elem['id']]);
+			}
+
 			$elms[$elem['id']] = $elem;
 			$typelist[$elem['type']] = $elem['id'];
 		}
