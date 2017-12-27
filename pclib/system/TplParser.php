@@ -179,10 +179,18 @@ class TplParser extends BaseObject
 		return $found[1]? $found[1] : false;
 	}
 
-	protected function mergePartials($templ, $partials)
+	protected function mergePartials($templ, $partials, $level = 1)
 	{
+		if ($level > 10) {
+			throw new \pclib\Exception("Maximum template nesting level of '10' reached, aborting!");
+		}
+
 		foreach ($partials as $line) {
 			$partial = $this->parseLine($line);
+
+			if (!$partial['file']) {
+				throw new \pclib\NoValueException("Attribute 'file' in 'include' must not be empty.");
+			}			
 
 			if (!file_exists($partial['file'])) {
 				throw new \pclib\FileNotFoundException("Include file '".$partial['file']."' not found.");
@@ -192,7 +200,7 @@ class TplParser extends BaseObject
 			$tpart = $this->split($templateStr);
 
 			if ($tpartPartials = $this->getPartials($tpart)) {
-				$tpart = $this->mergePartials($tpart, $tpartPartials);
+				$tpart = $this->mergePartials($tpart, $tpartPartials, ++$level);
 			}
 
 			$templ[0] .= $tpart[0];
