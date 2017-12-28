@@ -456,3 +456,10 @@
 - Added pclib ORM (beta):
 - Added classes orm\Selection, orm\Model, orm\Relation
 - Added methods ->model() and ->selection() into Controller class
+- Added method Grid->setSelection(orm\Selection $sel)
+
+- Added template tag attribute confirm: link ln confirm "confirm_message"
+- Added including of templates: include INCL1 file "template.tpl"
+- Added default_print "div" into default form template
+- Tpl->addTag() will accept attribute 'after': input I10 ... after "I5"
+- Various improvements and bugfixes
