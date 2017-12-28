@@ -675,7 +675,7 @@ function eachPrintable($callback, $sub = '')
 	foreach($this->elements as $id => $elem) {
 		if ($elem['noprint'] or $elem['skip'] or in_array($elem['type'], $ignore_list)) continue;
 		$elem['sub'] = $sub;
-		$callback($elem);
+		call_user_func($callback, $elem);
 	}
 }
 
