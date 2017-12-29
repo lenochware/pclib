@@ -15,11 +15,24 @@ namespace pclib\orm;
 use pclib;
 use pclib\Exception;
 
+/**
+ * It represents related record(s) of the Model.
+ * Usually you do not instantiate this class manually - it is returned by Model->related() method.
+ * Because it is Selection, you can use where(), order() etc. methods on related records.
+ * Examples: 
+ * - print $book->related('authors'); or in short form: print $book->authors;
+ * - Using where: print $book->authors->where("name='John'");
+ */
 class Relation extends Selection
 {
 	public $params;
 	protected $model;
 
+/**
+ * Constructor.
+ * @param Model $model Owner of the relation
+ * @param string $name Name of the relation - must be specified in model template
+ */
 function __construct(Model $model, $name)
 {
 	$params = $model->getTemplate()->elements[$name];
@@ -56,6 +69,9 @@ function getJoinTableName()
 	return implode('_', $names);
 }
 
+/**
+ * @return string SQL join condition
+ */
 function getJoinCondition()
 {
 	if ($this->getType() == 'many_to_many') {
@@ -74,6 +90,11 @@ function getJoinCondition()
 	}
 }
 
+/**
+ * Save $model as relation of the owner.
+ * Example: Add post to the user: $user->posts->save($post);
+ * @param Model $model Record to be saved.
+ */
 function save(Model $model)
 {
 	$foreignKey = $this->params['key'];
