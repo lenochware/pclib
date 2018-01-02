@@ -527,7 +527,7 @@ protected function getQuery()
 				continue;
 			}
 			$sort = $this->elements[$id]['sort'];
-			$orderby .= ','.(($sort and $sort != '1')? $sort : $id);
+			$orderby .= ','.$this->getOrderByField($id);
 			if ($id != $sval) $orderby .= ' desc';
 		}
 		if ($orderby) $sql .= ' order by '.substr($orderby, 1);
@@ -541,6 +541,18 @@ protected function getQuery()
 
 	return $this->db->query($sql);
 }
+
+//sort bind alphabetically by labels
+protected function getOrderByField($id)
+{
+	$sort = $this->elements[$id]['sort'];
+	if ($this->elements[$id]['type'] == 'bind') {
+		$sortedIds = array_keys($this->getItems($id));
+		if ($sortedIds) return "FIELD($id, ".implode(',', $sortedIds).')';
+	} 
+	return ($sort and $sort != '1')? $sort : $id;
+}
+
 
 /**
  * Use default template for displaying database table content.
