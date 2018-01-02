@@ -15,6 +15,8 @@ protected $app;
 
 protected $queryTime;
 protected $startTime;
+protected $queryTimeSum;
+
 protected $positionDefault = 'position:absolute;top:10px;right:10px;';
 
 protected $updating = false;
@@ -59,6 +61,7 @@ public static function register()
 
 	$events = array(
 		'pclib\App.onBeforeOut' => array($that, 'hook'),
+		'pclib\App.onAfterOut' => array($that, 'hook'),
 		'pclib\App.onBeforeRun' => array($that, 'hook'),
 		'pclib\App.onError' => array($that, 'hook'),
 		'pclib\Db.onBeforeQuery' => array($that, 'hook'),
@@ -74,6 +77,7 @@ public static function register()
 	}
 
 	$that->startTime = microtime(true);
+	$that->queryTimeSum = 0;
 	$that->registered = true;
 }
 
@@ -105,6 +109,14 @@ function onBeforeOut($event)
 	$this->app->layout->values['CONTENT'] .= $this->html();
 }
 
+
+function onAfterOut($event)
+{
+	$message = "Time: ". $this->getTime($this->startTime).' ms, db: '.$this->queryTimeSum.' ms';
+	$this->logger->log('DEBUG', 'time', $message);
+}
+
+
 function onBeforeRun($event)
 {
 	if ($this->app->routestr == 'pclib/debuglog') {
@@ -129,6 +141,7 @@ function onBeforeQuery($event)
 function onAfterQuery($event)
 {
 	$msec = $this->getTime($this->queryTime);
+	$this->queryTimeSum += $msec;
 	$this->logger->log('DEBUG', 'query',
 		preg_replace("/(\s*[\r\n]+\s*)/m", "\\1<br>", $event->data[0]) // \n => <br>
 		." <span style=\"color:blue\">($msec ms)</span>"
