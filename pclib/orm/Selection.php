@@ -137,6 +137,10 @@ function first()
 	return $this->current();
 }
 
+/**
+ * Is Selection empty?
+ * @return bool $isEmpty
+ */
 function isEmpty()
 {
 	if (!$this->getSql()) return true;
@@ -144,6 +148,9 @@ function isEmpty()
 	return !$rows;
 }
 
+/**
+ * Return number of rows in the Selection.
+ */
 function count()
 {
 	if (!$this->getSql()) return 0;
@@ -161,6 +168,9 @@ function find($id)
 	return $model->find($id);
 }
 
+/**
+ * Update records in selection with $values.
+ */
 function update(array $values)
 {
 	foreach ($this as $model) {
@@ -170,6 +180,9 @@ function update(array $values)
 }
 
 
+/**
+ * Delete selection.
+ */
 function delete()
 {
 	foreach ($this as $model) {
@@ -177,6 +190,9 @@ function delete()
 	}
 }
 
+/**
+ * Clone selection.
+ */
 function getClone()
 {
 	$sel = clone $this;
