@@ -71,7 +71,7 @@ function getArgs($actionMethod, array $params)
 /*
  * Return name of the action to be actually called.
  */
-function findAction($action)
+function findActionName($action)
 {
 	if (!$action) $action = 'index';
 
@@ -92,7 +92,7 @@ function findAction($action)
 public function run($action)
 {
 	$this->name = $action->controller;
-	$this->action = $this->findAction($action->method);
+	$this->action = $this->findActionName($action->method);
 	$this->init();
 
 	if (!$this->action) {
