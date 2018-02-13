@@ -270,11 +270,9 @@ protected function getHttpData()
 		elseif($elem['type'] == 'input' and is_string($data[$id])) $data[$id] = trim($data[$id]);
 	}
 
-	if (!$this->fileStorage) {
-		foreach ((array)$_FILES as $id => $aFile) {
-			if($this->elements[$id]['file'] and $aFile['size']) {
-				if (is_string($aFile['name'])) $data[$id] = $aFile['name'];
-			}
+	foreach ((array)$_FILES as $id => $aFile) {
+		if($this->elements[$id]['file'] and $aFile['size']) {
+			if (is_string($aFile['name'])) $data[$id] = $aFile['name'];
 		}
 	}
 
@@ -820,7 +818,7 @@ function preparedValues($skipEmpty = false)
 			continue;
 		}
 
-		if ($this->elements[$id]['file'] and !$this->values[$id]) {
+		if ($this->elements[$id]['file'] and (!$this->values[$id] or $this->hasExtraSave($id))) {
 			continue;
 		}
 
@@ -862,11 +860,13 @@ protected function uploadFs($tableName, $id)
 		$elem = $this->elements[$file['INPUT_ID']];
 		if (!$elem or $elem['nosave']) continue;
 
-		$file['PREFIX'] = $elem['prefix'] ?: strtolower($tableName).'_';
+		$entity = $elem['entity'] ?: $tableName;
+
+		$file['PREFIX'] = $elem['prefix'] ?: strtolower($entity).'_';
 		$files[] = $file;
 	}
 
-	$fs->save(array($id, $tableName), $files);
+	$fs->save(array($id, $entity), $files);
 
 	$errors = $fs->getUploadErrors();
 	if ($errors) {
@@ -956,7 +956,7 @@ function update($tab, $cond)
 	}
 
 	if (count($_FILES)) {
-		$this->upload($tab, $old['ID'], $old);
+		$this->upload($tab, $old['ID'] ?: $old['id'], $old);
 	}
 
 	$this->db->update($tab, $this->preparedValues(), $cond, $params);
@@ -990,7 +990,7 @@ function delete($tab, $cond)
 protected function deleteFiles($tableName, $data)
 {
 	if ($this->fileStorage) {
-		$this->fileStorage->deleteEntity(array($data['ID'], $tableName));
+		$this->fileStorage->deleteEntity(array($data['ID'] ?: $data['id'], $tableName));
 	}
 	else {
 		foreach ($this->elements as $id=>$elem) {
@@ -1107,7 +1107,7 @@ function dbSync($tab)
 	if (!$columns) throw new Exception("Database table '$tab' not found.");
 	foreach($this->elements as $id => $el) {
 		if (!$this->isEditable($id)) continue;
-		if (!$columns[$id]) {
+		if (!$columns[$id] and !$this->hasExtraSave($id)) {
 			$this->elements[$id]['nosave'] = 1;
 			continue;
 		}
@@ -1118,6 +1118,12 @@ function dbSync($tab)
 		if (!$el['size'] or $el['size'] > $columns[$id]['size'])
 			$this->elements[$id]['size'] = $columns[$id]['size'];
 	}
+}
+
+//Has field extra storage for saving?
+protected function hasExtraSave($id)
+{
+	return ($this->elements[$id]['file'] and $this->fileStorage);
 }
 
 function addHidden($name, $value)
