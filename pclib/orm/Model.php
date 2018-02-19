@@ -103,7 +103,7 @@ static function setOptions(array $options)
  */
 public static function className($tableName)
 {
-	$className = ucfirst(strtolower($tableName)).'Model';
+	$className = ucfirst($tableName).'Model';
 	$path = self::getFilePath($className, '.php');
 
 	if (!file_exists($path)) return self::$options['defaultClassName'];
@@ -174,8 +174,8 @@ function getTableName()
 protected static function getFilePath($name, $ext)
 {
 	switch ($ext) {
-		case '.tpl': return self::$options['dir'].'/templates/'.ucfirst(strtolower($name)).'.tpl';
-		case '.php': return self::$options['dir'].'/'.ucfirst(strtolower($name)).'.php';
+		case '.tpl': return self::$options['dir'].'/templates/'.ucfirst($name).'.tpl';
+		case '.php': return self::$options['dir'].'/'.ucfirst($name).'.php';
 		default: throw new Exception('Unknown file extension: %s', $ext);
 	}
 }
