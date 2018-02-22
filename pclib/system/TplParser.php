@@ -203,7 +203,7 @@ class TplParser extends BaseObject
 				$tpart = $this->mergePartials($tpart, $tpartPartials, ++$level);
 			}
 
-			$templ[0] .= $tpart[0];
+			$templ[0] = str_replace($line, $tpart[0], $templ[0]);
 			$templ[1] = str_replace('{'.$partial['id'].'}', $tpart[1], $templ[1]);
 		}
 
