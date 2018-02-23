@@ -179,6 +179,13 @@ class TplParser extends BaseObject
 		return $found[1]? $found[1] : false;
 	}
 
+	protected function getPath($dir)
+	{
+		global $pclib;
+		if (!$pclib->app) return $dir;
+		return paramStr($dir, $pclib->app->paths);
+	}
+
 	protected function mergePartials($templ, $partials, $level = 1)
 	{
 		if ($level > 10) {
@@ -190,13 +197,16 @@ class TplParser extends BaseObject
 
 			if (!$partial['file']) {
 				throw new \pclib\NoValueException("Attribute 'file' in 'include' must not be empty.");
-			}			
-
-			if (!file_exists($partial['file'])) {
-				throw new \pclib\FileNotFoundException("Include file '".$partial['file']."' not found.");
 			}
 
-			$templateStr = file_get_contents($partial['file']);
+
+			$path = $this->getPath($partial['file']);
+
+			if (!file_exists($path)) {
+				throw new \pclib\FileNotFoundException("Include file '".$path."' not found.");
+			}
+
+			$templateStr = file_get_contents($path);
 			$tpart = $this->split($templateStr);
 
 			if ($tpartPartials = $this->getPartials($tpart)) {
