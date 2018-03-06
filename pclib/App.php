@@ -68,6 +68,8 @@ public $onBeforeOut;
 /** Occurs after application output. */ 
 public $onAfterOut;
 
+public $plugins;
+
 /**
  * Load config and sessions, read route.
  * @param string $name Unique name of the application.
@@ -232,6 +234,18 @@ function addConfig($source)
 	}
 
 	$this->configure();
+}
+
+function addPlugins($dir)
+{
+	$this->plugins[] = array();
+  foreach (glob($dir.'/*.php') as $fileName) {
+    require_once($fileName);
+    $pluginName = basename($fileName, '.php');
+    $plugin = new $pluginName($this);
+    $plugin->init();
+   	$this->plugins[] = $plugin;
+  }
 }
 
 /**
