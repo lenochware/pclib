@@ -1009,14 +1009,14 @@ protected function deleteFiles($tableName, $data)
  */
 function content()
 {
-	if (!$this->values) return;
+	if (!$this->values) return array();
 	$content = array();
 
 	foreach ($this->values as $id=>$value) {
 		$elem = $this->elements[$id];
 		if ($elem['lb'] == '') continue;
-		if (is_array($value)) $value = implode(',', $value);
-		if ($elem['noprint']) continue;
+		//if (is_array($value)) $value = implode(',', $value);
+		if ($this->getAttr($elem['id'], 'noprint')) continue;
 		if ($value == '') {
 			$content[$elem['lb']] = $elem['emptylb'];
 			continue;
@@ -1029,10 +1029,16 @@ function content()
 		elseif ($elem['type'] == 'check') {
 			$value = $this->getValue($id);
 			$items = $this->getItems($id, true);
-			foreach($items as $i => $label) {
-				if (in_array($i,$value)) $labels[] = $label;
+			if ($items) {
+				$labels = array();
+				foreach($items as $i => $label) {
+					if (in_array($i,$value)) $labels[] = $label;
+				}
+				$value = implode(', ', $labels);
 			}
-			$value = implode(', ', $labels);
+			else {
+				$value = $this->t($value[0]? 'yes' : 'no');
+			}
 		}
 
 		$content[$elem['lb']] = $value;
