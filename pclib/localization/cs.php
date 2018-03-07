@@ -23,6 +23,7 @@ $messages = array
   'Invalid password!' => 'Chybné heslo!',
   'User does not exists!' => 'Uživatel neexistuje!',
   'This page requires authentication.' => 'Tato stránka vyžaduje autentizaci.',
+  'yes' => 'ano',
 );
 
 ?>
