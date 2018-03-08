@@ -698,7 +698,7 @@ function print_Checkbox($id, $sub, $value, $i = null)
 {
 	$elem  = $this->elements[$id];
 	$cbid = $sub? $sub : 1;
-	$tag = $this->getTag($id, isset($elem['items']));
+	$tag = $this->getTag($id, $elem['items']);
 	$tag['type'] = 'checkbox';
 	$tag['checked'] = in_array($cbid, $value)? 'checked' : null;
 	$tag['value'] = $cbid;
@@ -722,7 +722,7 @@ function print_Radio($id, $sub, $value, $i = null)
 {
 	$elem  = $this->elements[$id];
 	$cbid = $sub? $sub : 1;
-	$tag = $this->getTag($id, isset($elem['items']));
+	$tag = $this->getTag($id, $elem['items']);
 	$tag['type'] = 'radio';
 	$tag['checked'] = ($cbid == $value)? 'checked' : null;
 	$tag['value'] = $cbid;
