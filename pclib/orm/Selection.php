@@ -159,6 +159,30 @@ function count()
 }
 
 /**
+ * Return summary of field $s.
+ * @TODO: verify if $s is valid fieldname.
+ */
+function sum($s)
+{
+	if (!$this->getSql()) return 0;
+	$rows = $this->getClone()->select("sum($s) as n");
+	return (int)$rows[0]['n'];
+}
+
+/**
+ * Return AVG of field $s.
+ * @TODO: verify if $s is valid fieldname.
+ */
+function avg($s)
+{
+	if (!$this->getSql()) return 0;
+	$rows = $this->getClone()->select("avg($s) as n");
+	return (int)$rows[0]['n'];
+}
+
+
+
+/**
  * Find record by primary key.
  * @return Model $model
  */
