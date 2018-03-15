@@ -144,10 +144,10 @@ function login($userName, $password)
 	else {
 		$this->setError($result);
 		if ($user) {
-			$this->log('AUTH_NOTICE', $result, $user->values['ID']);
+			$this->log('AUTH_NOTICE', $result, null, $user->values['ID']);
 		}
 		else {
-			$this->log('AUTH_NOTICE', $result, null, "Failed login of user '$userName'");
+			$this->log('AUTH_NOTICE', $result, "Failed login of user '$userName'");
 		}
 	}
 
