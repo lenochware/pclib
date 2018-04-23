@@ -95,10 +95,10 @@ validateForm: function(form) {
 				for (var j = 0; j < elem.options.length; j++) {
 					if (j > 0) pp += "([^0-9]+)";
 					switch (elem.options.charAt(j)) {
-						case 'd': pp += "(0?[0-9]|[012][0-9]|[3][01])"; break;
-						case 'm': pp += "(0?[0-9]|[01][012])"; break;
-						case 'Y': pp += "[0-9]{4}"; break;
-						case 'y': pp += "[0-9]{2}"; break;
+						case 'd': pp += "(0?[1-9]|[012][1-9]|[12][0-9]|[3][01])"; break;
+						case 'm': pp += "(0?[1-9]|[1][012])"; break;
+						case 'Y': pp += "([0-9]{4})"; break;
+						case 'y': pp += "([0-9]{2})"; break;
 						case 'H': pp += "(0?[0-9]|[01][0-9]|[2][0-3])"; break;
 						case 'M': pp += "(0?[0-9]|[0-5][0-9])"; break;
 						case 'S': pp += "(0?[0-9]|[0-5][0-9])"; break;
