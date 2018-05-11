@@ -225,12 +225,12 @@ function addConfig($source)
 			require $source;
 	}
 
-	$this->config = array_merge($this->config, (array)$config);
+	$this->config = array_replace_recursive($this->config, (array)$config);
 
 	$_env = $this->environment;
 
 	if (is_string($_env) and is_array($$_env)) {
-		$this->config = array_merge($this->config, $$_env);
+		$this->config = array_replace_recursive($this->config, $$_env);
 	}
 
 	$this->configure();
