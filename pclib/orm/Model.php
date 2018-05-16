@@ -230,12 +230,20 @@ protected function prepareTemplate(Tpl $t)
 		'role' => array('rights', 'read', 'write'),
 		'event' => array('cancel_when', 'delete'),
 	);
+	$calculated = array();
+
 	foreach ($t->elements as $id => $el) {
+		if ($el['type'] == 'column' and ($el['get'] or $el['set'])) {
+			$calculated[$id] = $id;
+		}
+
 		if (!$prepare[$el['type']]) continue;
 		foreach ($prepare[$el['type']] as $k) {
 			$t->elements[$id][$k.'_array'] = $el[$k]? explode(',', $el[$k]) : array();
 		}
 	}
+
+	$t->elements['model']['calculated'] = $calculated;
 }
 
 function setPrimaryId($id)
@@ -267,8 +275,18 @@ function find($id)
 function hasColumn($name)
 {
 	$cols = $this->getColumns();
-	$elem = $this->getTemplate()->elements;
-	return (bool)$cols[$name] ?: ($elem[$name]['type'] == 'column');
+	$el = $this->getElement($name);
+	return (bool)$cols[$name] ?: ($el['type'] == 'column');
+}
+
+protected function getElement($name)
+{
+	return $this->getTemplate()->elements[$name];
+}
+
+protected function isCalculated($name)
+{
+	return $this->getTemplate()->elements['model']['calculated'][$name];
 }
 
 /**
@@ -279,7 +297,8 @@ function hasColumn($name)
  */
 public function __get($name)
 {
-	if ($this->getTemplate()->elements[$name]['type'] == 'relation') {
+	$el = $this->getElement($name);
+	if ($el['type'] == 'relation') {
 		return $this->related($name);
 	}
 
@@ -527,6 +546,11 @@ function getValues()
 		$values[$k] = $this->getValue($k);
 	}
 
+	$el = $this->getElement('model');
+	foreach ($el['calculated'] as $k) {
+		$values[$k] = $this->getValue($k);
+	}
+
 	return $values;
 }
 
@@ -555,6 +579,10 @@ function toArray()
  */
 function setValue($name, $value)
 {
+	if ($this->isCalculated($name)) {
+		return $this->setCalculated($name, $value);
+	}
+
 	if (!$this->hasColumn($name)) {
 		$class = get_class($this);
 		throw new MemberAccessException("Cannot write to an undeclared property $class->$name.");    
@@ -572,14 +600,41 @@ function setValue($name, $value)
  */
 function getValue($name)
 {
+	if ($this->isCalculated($name)) {
+		return $this->getCalculated($name);
+	}
+
 	if (!$this->hasColumn($name)) {
 		$class = get_class($this);
-		throw new MemberAccessException("Cannot read an undeclared property $class->$name.");    
+		throw new MemberAccessException("Cannot read an undeclared property $class->$name.");
 	}
 
 	if ( !$this->testRight(array('read', $name)) ) return false;
-
 	return $this->values[$name];
+}
+
+protected function getCalculated($name)
+{
+	$el = $this->getElement($name);
+
+	if (!method_exists($this, $el['get'])) {
+		$class = get_class($this);
+		throw new MemberAccessException("Cannot read calculated field $class->$name.");
+	}
+
+	return call_user_func(array($this, $el['get']));
+}
+
+protected function setCalculated($name, $value)
+{
+	$el = $this->getElement($name);
+
+	if (!method_exists($this, $el['set'])) {
+		$class = get_class($this);
+		throw new MemberAccessException("Cannot write calculated field $class->$name.");
+	}
+
+	return call_user_func(array($this, $el['set']), $value);
 }
 
 /**
