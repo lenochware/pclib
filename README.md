@@ -1,6 +1,6 @@
 # What is PClib?
 
-Lightweight PHP framework for php 5.3+.
+Lightweight PHP framework for php 5.4+.
 For development of small to middle size web applications.
 
 ### Features
@@ -16,7 +16,7 @@ For development of small to middle size web applications.
 
 
 ### Requirements
-- PHP 5.3
+- PHP 5.4
 
 ### Installation
 1. [Download **pclib**](http://pclib.brambor.net/?r=download)
@@ -24,6 +24,10 @@ For development of small to middle size web applications.
 3. Some parts of the library need a few database tables. You can
 found sql-dump in `install/pclib_*.sql`. Import this sql-dump into your database.
 4. Now you are ready to use **pclib**!
+
+or install it using composer:
+
+	composer require lenochware/pclib
 
 ### Examples
 
