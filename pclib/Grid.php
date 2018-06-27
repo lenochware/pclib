@@ -577,11 +577,16 @@ function getExportCsv($options = array())
 	$columns = array();
 	foreach ($this->elements as $id => $elem) {
 		if (in_array($elem['type'], $ignoreList) or $elem['skip']) continue;
-		$columns[$id] = array('name' => $id, 'element' => $elem);
+		$columns[$id] = array('name' => $id, 'comment' => $elem['lb'], 'element' => $elem);
 	}
 
 	$exportGrid = extensions\TemplateFactory::create($templatePath, $columns);
-	$exportGrid->setQuery($this->sql);
+	if ($this->dataArray) {
+		$exportGrid->setArray($this->dataArray);
+	}
+	else {
+		$exportGrid->setQuery($this->sql);
+	}
 	$exportGrid->pager->setPageLen($this->length);
 	$html = $exportGrid->html();
 
