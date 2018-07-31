@@ -644,7 +644,7 @@ protected function setCalculated($name, $value)
 function __toString()
 {
 	try {
-		return json_encode($this->getValues());
+		return json_encode($this->getValues(), JSON_UNESCAPED_UNICODE);
 	} catch (\Exception $e) {
 		trigger_error($e->getMessage(), E_USER_ERROR);
 	}	

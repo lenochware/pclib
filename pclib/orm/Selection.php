@@ -438,13 +438,14 @@ function escape($s) {
 
 /**
  * Return current selection as array.
+ * @param bool $deep Return arrays instead of models
  * @return array $rows Array of models.
  */
-function toArray()
+function toArray($deep = false)
 {
 	$rows = array();
 	foreach ($this as $model) {
-		$rows[] = $model;
+		$rows[] = $deep? $model->toArray() : $model;
 	}
 	return $rows;
 }
