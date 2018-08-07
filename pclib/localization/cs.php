@@ -24,6 +24,7 @@ $messages = array
   'User does not exists!' => 'Uživatel neexistuje!',
   'This page requires authentication.' => 'Tato stránka vyžaduje autentizaci.',
   'yes' => 'ano',
+  'no' => 'ne',
 );
 
 ?>
