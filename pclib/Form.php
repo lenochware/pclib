@@ -1015,8 +1015,7 @@ function content()
 	foreach ($this->values as $id=>$value) {
 		$elem = $this->elements[$id];
 		if ($elem['lb'] == '') continue;
-		//if (is_array($value)) $value = implode(',', $value);
-		if ($this->getAttr($elem['id'], 'noprint')) continue;
+		if ($this->getAttr($elem['id'], 'noprint') or $elem['hidden']) continue;
 		if ($value == '') {
 			$content[$elem['lb']] = $elem['emptylb'];
 			continue;
