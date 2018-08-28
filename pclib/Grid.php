@@ -282,7 +282,8 @@ function saveSession()
 **/
 static function invalidate($sessName)
 {
-	$this->app->deleteSession("$sessName.hash");
+	global $pclib;
+	$pclib->app->deleteSession("$sessName.hash");
 }
 
 
