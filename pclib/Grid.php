@@ -565,42 +565,52 @@ function create($tableName)
 
 /**
  * Return content of the grid as csv-text.
- * @param array $options [templatePath: '', csv-separ: ';', csv-row-separ: "\r\n"]
+ * @param array $options [csv-separ: ';', csv-row-separ: "\r\n"]
  * @return string csv-text
  */
-function getExportCsv($options = array())
+function getExportCsv($options = [])
 {
-	$templatePath = $options['templatePath'] ?: PCLIB_DIR.'assets/export-csv.tpl';
+	$this->pager->setPageLen($this->length);
+	$elements = $this->elements;
+	$values = $this->getValues();
+	$this->values['items'] = $values;
 
-	$ignoreList = array('class','block','pager','sort','link');
+	$options += ['csv-separ' => ';', 'csv-row-separ' => "\r\n"];
+	
+	$ignore_list = array('class','block','pager','sort');
 
-	$columns = array();
-	foreach ($this->elements as $id => $elem) {
-		if (in_array($elem['type'], $ignoreList) or $elem['skip']) continue;
-		$columns[$id] = array('name' => $id, 'comment' => $elem['lb'], 'element' => $elem);
+	$elms = [];
+	foreach($this->elements as $id => $elem) {
+		if ($elem['noprint'] or $elem['skip'] or in_array($elem['type'], $ignore_list)) continue;
+		unset($elem['title'], $elem['size']);
+		$elms[$id] = $elem;
+		$last_id = $id;
+	}
+	$this->elements = $elms;
+
+	ob_start();
+
+	foreach($elms as $id => $elem) {
+		print $elem['lb'] ?: $elem['id'];
+		if ($id != $last_id) print $options['csv-separ'];
+	}
+	print $options['csv-row-separ'];
+
+	foreach ($values as $i => $row) {
+		foreach($elms as $id => $elem) {
+			if (!$this->fireEventElem('onprint', $id, '', $row[$id]))
+				$this->print_Element($id, '', $row[$id]);
+
+			if ($id != $last_id) print $options['csv-separ'];
+		}
+		if($values[$i+1]) print $options['csv-row-separ'];
 	}
 
-	$exportGrid = extensions\TemplateFactory::create($templatePath, $columns);
-	if ($this->dataArray) {
-		$exportGrid->setArray($this->dataArray);
-	}
-	else {
-		$exportGrid->setQuery($this->sql);
-	}
-	$exportGrid->pager->setPageLen($this->length);
-	$html = $exportGrid->html();
+	$this->elements = $elements;
 
-	$trans = array(
-		"\n" => '',
-		"\r" => '',
-		";" => ',',
-		"<csv-separ>" => $options['csv-separ'] ?: ';',
-		"<csv-row-separ>" => $options['csv-row-separ'] ?: "\r\n",
-	);
-
-	$trans[$trans['<csv-separ>']] = ($trans['<csv-separ>'] == ';')? ',' : ';';
-
-	return strtr($html, $trans);
+	$output = ob_get_contents();
+	ob_end_clean();
+	return $output;
 }
 
 /**
