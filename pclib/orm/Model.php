@@ -269,6 +269,29 @@ function find($id)
 }
 
 /** 
+ * Return model for table $tableName.
+ **/
+protected function getModel($tableName, $id = null)
+{
+	$model = self::create($tableName, array(), false);
+	if ($id) {
+		$model->find($id);
+	}
+
+	return $model;
+}
+
+/**
+ * Return orm\Selection class.
+ **/
+protected function selection($from = null)
+{
+	$sel = new orm\Selection;
+	if ($from) $sel->from($from);
+	return $sel;
+}
+
+/** 
  * Check if model has column $name. 
  * @return bool $yes
  */
