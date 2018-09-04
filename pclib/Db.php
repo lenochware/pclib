@@ -556,6 +556,30 @@ function fetchAll($res = null, $fmt = 'a')
 	return $rows;
 }
 
+/**
+ * Begins a transaction.
+ */
+public function beginTransaction()
+{
+	$this->query('START TRANSACTION');
+}
+/**
+ * Commits statements in a transaction.
+ */
+
+public function commit()
+{
+	$this->query('COMMIT');
+}
+
+/**
+ * Rollback changes in a transaction.
+ */
+public function rollback()
+{
+	$this->query('ROLLBACK');
+}
+
 /** Return current database name */
 function dbName()
 {
