@@ -44,13 +44,13 @@ function saveSession()
  */
 function bookmark($level, $title, $route = null, $url = null)
 {
-	if ($route) list($temp, $url) = explode('?', $this->app->router->createUrl($route));
+	if ($route) $url = $this->app->router->createUrl($route);
 
 	$maxlevel =& $this->bookmarks[-1]['maxlevel'];
 	for ($i = $maxlevel; $i > $level; $i--) { unset($this->bookmarks[$i]); }
 	$maxlevel = $level;
 
-	$this->bookmarks[$level]['url'] = isset($url)? $url : $_SERVER['QUERY_STRING'];
+	$this->bookmarks[$level]['url'] = isset($url)? $url : $_SERVER['REQUEST_URI'];
 	$this->bookmarks[$level]['title'] = $title;
 }
 
@@ -80,7 +80,7 @@ function getNavig($options = array())
 		if ($i == $maxlevel and !$options['lastlink'])
 			$navig[] = "<span $alt>$title</span>";
 		else
-			$navig[] = "<a href=\"".$this->app->indexFile."?$url\" $alt>$title</a>";
+			$navig[] = "<a href=\"$url\" $alt>$title</a>";
 
 	}
 
