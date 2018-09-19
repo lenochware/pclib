@@ -150,6 +150,7 @@ class ErrorHandler extends BaseObject
 			'trace' => $e->getTraceAsString(),
 			'htmlTrace' => $this->getHtmlTrace($e),
 			'route' => $_REQUEST['r'],
+			'timestamp' => date('Y-m-d H:i:s'),
 		);
 		return $values;
 	}
@@ -203,7 +204,7 @@ class ErrorHandler extends BaseObject
 			$error = $this->getValues($e);
 			
 			$this->service('logger')->log($error['severity'], $error['severity'],
-				paramStr("{exceptionClass}: {message} in '{file}' on line {line} processing '{route}'", $error)
+				paramStr("{exceptionClass}: {message} in '{file}' on line {line} processing '{route}' at {timestamp}", $error)
 			);
 		}
 		catch(\Exception $ex) {
