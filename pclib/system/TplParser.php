@@ -14,6 +14,8 @@
 
 namespace pclib\system;
 
+use pclib\system\ElementsDef;
+
 /**
  * Parse pclib template with pclib-elements code.
  * Example: $parsed = $parser->parse($templateStr);
@@ -113,10 +115,7 @@ class TplParser extends BaseObject
 		$type = array_shift($terms);
 		$id = array_shift($terms);
 
-		$elem = array(
-			'id' => $id,
-			'type' => $type,
-		);
+		$elem = ElementsDef::getElement($id, $type);
 
 		while ($term = array_shift($terms)) {
 			$value = ($terms and $terms[0][0] == "\"")? $this->readQTerm($terms) : 1;
