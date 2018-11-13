@@ -90,7 +90,8 @@ class BaseObject
 		if ($parentClass = get_parent_class($className)) {
 			$this->loadDefaults($parentClass);
 		}
-		$this->setProperties((array)self::$defaults[$className]);
+
+		$this->setProperties(array_get(self::$defaults, $className, []));
 		return $this;
 	}
 

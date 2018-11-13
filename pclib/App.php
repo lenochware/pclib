@@ -229,7 +229,7 @@ function addConfig($source)
 
 	$_env = $this->environment;
 
-	if (is_string($_env) and is_array($$_env)) {
+	if (is_string($_env) and isset($$_env)) {
 		$this->config = array_replace_recursive($this->config, $$_env);
 	}
 
@@ -464,9 +464,9 @@ function getSession($name, $ns = null)
 	if (!$ns) $ns = $this->name;
 	if (strpos($name, '.')) {
 		list($n1,$n2) = explode('.', $name);
-		return $_SESSION[$ns][$n1][$n2];
+		return @$_SESSION[$ns][$n1][$n2];
 	}
-	return $_SESSION[$ns][$name];
+	return @$_SESSION[$ns][$name];
 }
 
 /**

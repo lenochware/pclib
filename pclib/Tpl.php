@@ -533,6 +533,7 @@ function print_Number($id, $sub, $value)
 function print_String($id, $sub, $s)
 {
 	$elem = $this->elements[$id];
+	$title = '';
 
 	//format database date...
 	if (isset($elem['date']))
@@ -541,8 +542,9 @@ function print_String($id, $sub, $s)
 	if (isset($elem['size'])) {
 		if (!isset($elem['endian'])) $elem['endian'] = '...';
 		if(utf8_strlen($s) > $elem['size'] + 2/*add length of endian*/) {
-			if ($elem['tooltip'])
+			if ($elem['tooltip']) {
 				$title = utf8_htmlspecialchars($s);
+			}
 			$s = utf8_substr($s, 0, $elem['size']) . $elem['endian'];
 		}
 	}
@@ -550,8 +552,9 @@ function print_String($id, $sub, $s)
 	if ($elem['format'])
 		$s = $this->formatStr($s, $elem['format']);
 
-	if ($title)
+	if ($title) {
 		$s = "<span title=\"$title\">$s</span>";
+	}
 
 	print $s;
 }
@@ -777,7 +780,7 @@ protected function print_BlockRow($block, $rowno = null)
 
 		if ($strip == TplParser::TPL_ELEM) {
 			 $strip = $this->document[++$i];
-			 list($id,$sub) = explode('.', $strip);
+			 @list($id,$sub) = explode('.', $strip);
 
 			 if ($this->elements[$id]['noprint']) { $this->print_Empty($id, $sub); continue; }
 

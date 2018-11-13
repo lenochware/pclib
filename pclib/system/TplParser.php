@@ -227,7 +227,7 @@ class TplParser extends BaseObject
 		$bstack = array(); $block = null;
 		foreach ($document as $key=>$strip) {
 			if ($strip == self::TPL_ELEM) {
-				list($id,$sub) = explode('.',$document[$key+1]);
+				@list($id,$sub) = explode('.',$document[$key+1]);
 				if ($elements[$id] and !$elements[$id]['block'])
 					$elements[$id]['block'] = $block;
 			}

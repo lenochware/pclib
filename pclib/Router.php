@@ -54,7 +54,7 @@ function getAction()
 	$action = new Action($_GET);
 
 	//%form button has been pressed, set route accordingly.
-	if ($_REQUEST['pcl_form_submit']) {
+	if (@$_REQUEST['pcl_form_submit']) {
 		$action->method = $_REQUEST['pcl_form_submit'];
 	}
 
@@ -154,7 +154,7 @@ class Action
 
 		foreach($ra as $section) {
 			if ($section == '__GET__') { $params += $_GET; continue; }
-			list($name,$value) = explode(':', $section);
+			@list($name,$value) = explode(':', $section);
 			if (isset($value)) $params[$name] = $value;
 			else $path[] = $section;
 		}
@@ -168,7 +168,7 @@ class Action
 			$this->module = array_shift($path);
 		}
 		$this->controller = $path[0];
-		$this->method = $path[1];
+		$this->method = array_get($path, 1);
 	}
 
 	/**
@@ -177,8 +177,8 @@ class Action
 	 */
 	function fromArray($get)
 	{
-		$this->path = $get['r'];
-		list($this->controller, $this->method) = explode('/', $this->path);
+		$this->path = array_get($get, 'r', '');
+		@list($this->controller, $this->method) = explode('/', $this->path);
 		unset($get['r']);
 		$this->params = $get;
 	}
