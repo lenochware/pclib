@@ -322,4 +322,9 @@ function startsWith($s, $substr)
 	return (strpos($s, $substr) === 0);
 }
 
+function array_get($a, $key, $default = null)
+{
+	return isset($a[$key])? $a[$key] : $default;
+}
+
 ?>
