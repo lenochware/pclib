@@ -33,6 +33,7 @@ class ElementsDef extends BaseObject
 		],
 		'string' => [
 			'format' => null,
+			'tooltip' => null,
 		],
 		'head' => [
 			'noversion' => null,
@@ -42,9 +43,15 @@ class ElementsDef extends BaseObject
 			'href' => null,
 			'action' => null,
 			'route' => null,
+			'singlepage' => null,
 		],		
 		'bind' => [
-			//'field' => null,
+			'bitfield' => null,
+			'format' => null,
+			'list' => null,
+			'query' => null,
+			'lookup' => null,
+			'emptylb' => null,
 		],
 		'link' => [
 			'href' => null,

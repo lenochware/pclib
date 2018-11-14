@@ -165,7 +165,7 @@ function setQuery($sql)
 
 	$this->hash = $hash;
 	array_shift ($args);
-	if (is_array($args[0])) $args = $args[0];
+	if (is_array(array_get($args, 0))) $args = $args[0];
 
 	$sql = $this->db->setParams($sql, $args + (array)$this->filter);
 	$sql = str_replace("\n", " \n ", strtr($sql, "\r\t","  "));
@@ -375,7 +375,7 @@ function print_Sort($id, $sub)
 {
 	$url = $this->sortUrl($id);
 	$curId = array_get($this->sortArray, $id);
-	
+
 	$dir = ($curId == $id)? 'up':'dn';
 	print "<a href=\"$url\" class=\"sort $dir\">";
 	print $this->elements[$id]['lb']? $this->elements[$id]['lb']:$id;

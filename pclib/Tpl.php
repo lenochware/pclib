@@ -446,7 +446,7 @@ function create($tableName)
 /** Return computed value of element $id. */
 function compute($id)
 {
-	$items = $this->elements[$id]['items'];
+	$items = array_get($this->elements[$id], 'items');
 	if (!$items) {
 		$items = explode(',', $this->elements[$id]['loop']);
 		if (count($items)) $this->elements[$id]['items'] = $items;
@@ -583,7 +583,7 @@ function print_Bind($id, $sub, $value)
 	else {
 		if(isset($items[$value])) $value = $items[$value];
 		elseif(isset($value,$items['*'])) $value = $items['*'];
-		else $value = $items[$elem['default']];
+		else $value = array_get($items, $elem['default']);
 	}
 
 	if (!isset($value)) $value = $elem['emptylb'];
@@ -978,20 +978,22 @@ protected function toString($value) {
 function getItems($id)
 {
 	$elem = $this->elements[$id];
-	$items = $elem['items'];
-	if (!isset($items)) {
-		$items = array();
-		if ($elem['list']) $items = $this->getLkpList($elem['list']);
-		elseif ($elem['query'])  $items = $this->getLkpQuery($elem['query']);
-		elseif ($elem['lookup']) $items = $this->getLkpLookup($elem['lookup']);
-		elseif ($elem['datasource']) $items = $this->getDataSource($elem['datasource']);
-
-		if ($this->translator) {
-			$items = $this->translator->translateArray($items);
-		}
-
-		$this->elements[$id]['items'] = $items;
+	if (isset($elem['items'])) {
+		return $elem['items'];
 	}
+
+	$items = array();
+	if ($elem['list']) $items = $this->getLkpList($elem['list']);
+	elseif ($elem['query'])  $items = $this->getLkpQuery($elem['query']);
+	elseif ($elem['lookup']) $items = $this->getLkpLookup($elem['lookup']);
+	elseif ($elem['datasource']) $items = $this->getDataSource($elem['datasource']);
+
+	if ($this->translator) {
+		$items = $this->translator->translateArray($items);
+	}
+
+	$this->elements[$id]['items'] = $items;
+
 	return $items;
 }
 
