@@ -96,7 +96,7 @@ function translate($s, array $params = null)
 	if ($this->autoUpdate and !array_key_exists($s, $this->cache))
 		$this->getStorage()->saveDefault($this->pageName, $s);
 
-	$ts = $this->cache[$s];
+	$ts = array_get($this->cache, $s);
 	if (!$ts) $ts = $s;
 	if ($params) $ts = vsprintf ($ts, $params);
 	return $ts;

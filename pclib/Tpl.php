@@ -347,13 +347,13 @@ function getValue($id)
 		return $this->getVariable($id);
 	}
 
-	$elem = $this->elements[$id];
+	$elem = array_get($this->elements, $id);
 	if (isset($elem['loop'])) return $this->compute($id);
 	if (isset($elem['field'])) $id = $elem['field'];
 	
 	foreach ($this->inBlock as &$block) {
 		$rowno = $this->elements[$block]['rowno'];
-		$value = isset($rowno)? $this->values[$block][$rowno][$id] : $this->values[$block][$id];
+		$value = array_get(isset($rowno)? $this->values[$block][$rowno] : $this->values[$block], $id);
 		if (isset($value)) break;
 	}
 
@@ -741,7 +741,7 @@ function print_Block($block)
 	array_unshift($this->inBlock, $block);
 
 	if ($b['repeat']) $count = $b['repeat'];
-	else $count = $this->values[$block][0]? count($this->values[$block]):0;
+	else $count = isset($this->values[$block][0])? count($this->values[$block]):0;
 
 	if ($count) {
 		for ($rowno = 0; $rowno < $count; $rowno++) {
@@ -1047,7 +1047,7 @@ private function callback_getvalue_db($param)
 
 private function callback_getvalue($param)
 {
-	list($id,$sub) = explode('.', $param[1]);
+	@list($id,$sub) = explode('.', $param[1]);
 	if ($id == 'GET') {
 		if ($sub) return $_GET[$sub];
 		else return '__GET__';

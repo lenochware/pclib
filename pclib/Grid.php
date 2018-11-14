@@ -75,8 +75,9 @@ protected function _init()
 
 	$this->baseUrl = $this->getBaseUrl();
 
-	if ($_GET['grid'] == $this->name or !$_GET['grid']) {
-		if ($_GET['page']) {
+	$getName = array_get($_GET, 'grid');
+	if ($getName == $this->name or !$getName) {
+		if (isset($_GET['page'])) {
 			$this->page = $_GET['page'];
 		}
 	}
@@ -335,7 +336,7 @@ function print_Pager($id, $sub)
 
 	if ($this->pager->getValue('maxpage') < 2 and !$el['nohide']) return;
 
-	if ($this->values[$pgid]) {
+	if (isset($this->values[$pgid])) {
 		print $this->values[$pgid];
 		return;
 	}
@@ -352,14 +353,15 @@ function print_Pager($id, $sub)
 protected function sortUrl($id)
 {
 	$sa = $this->sortArray;
+	$curId = array_get($sa, $id);
 
 	if ($this->multiSort) {
-		if ($sa[$id] == $id.':d') unset($sa[$id]);
-		else $sa[$id] = ($sa[$id] == $id)? $id.':d' : $id;
+		if ($curId == $id.':d') unset($sa[$id]);
+		else $sa[$id] = ($curId == $id)? $id.':d' : $id;
 		$s = implode(',', $sa);
 	}
 	else {
-		$s = ($sa[$id] == $id)? $id.':d' : $id;
+		$s = ($curId == $id)? $id.':d' : $id;
 	}
 
 	return $this->baseUrl."sort=$s&page=1";
@@ -372,14 +374,16 @@ protected function sortUrl($id)
 function print_Sort($id, $sub)
 {
 	$url = $this->sortUrl($id);
-	$dir = ($this->sortArray[$id] == $id)? 'up':'dn';
+	$curId = array_get($this->sortArray, $id);
+	
+	$dir = ($curId == $id)? 'up':'dn';
 	print "<a href=\"$url\" class=\"sort $dir\">";
 	print $this->elements[$id]['lb']? $this->elements[$id]['lb']:$id;
 	print "</a>";
 
 	if (!$this->renderSortIcons) return;
 	$imageDir = $this->config['pclib.directories']['assets'];
-	if (!$this->sortArray[$id]) $dir = 'no';
+	if (!$curId) $dir = 'no';
 	print "<img src=\"$imageDir/sort_$dir.gif\"".($this->useXhtml? ' />' : '>');
 }
 
@@ -522,6 +526,7 @@ protected function getQuery()
 
 	if ($this->sortArray) {
 		if ($lpos = stripos($sql, ' order by ')) $sql = substr($sql, 0, $lpos);
+		$orderby = '';
 		foreach($this->sortArray as $id => $sval) {
 			if (!$this->elements[$id]) {
 				unset($this->sortArray[$id]);

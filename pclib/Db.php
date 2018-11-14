@@ -100,11 +100,11 @@ protected function parseDsn($dsn)
 	 'path'   => substr($dsa['path'],1),
 	 'dbname' => $path[0],
 	 'user'   => $dsa['user'],
-	 'passw'  => $dsa['pass'],
+	 'passw'  => array_get($dsa, 'pass'),
 	 'codepage' => $path[1]? $path[1] : null
 	);
 	//new way of adding options e.g. ?charset=utf8
-	if ($dsa['query']) parse_str($dsa['query'], $dsarray['options']);
+	if (isset($dsa['query'])) parse_str($dsa['query'], $dsarray['options']);
 
 	if ($dsarray['driver'] == 'sqlite') $dsarray['codepage'] = null;
 	if ($dsarray['codepage']) $dsarray['options']['charset'] = $dsarray['codepage'];

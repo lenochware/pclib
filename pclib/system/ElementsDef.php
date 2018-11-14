@@ -21,14 +21,15 @@ class ElementsDef extends BaseObject
 {
 	static $elem = [
 		'base' => [
-		'block' => null,
-		'default' => null,
-		'noprint' => null,
-		'onprint' => null,
-		'escape' => null,
-		'noescape' => null,
-		'attr' => null,
-		'html' => null,
+			'block' => null,
+			'default' => null,
+			'noprint' => null,
+			'onprint' => null,
+			'escape' => null,
+			'noescape' => null,
+			'attr' => null,
+			'html' => null,
+			'lb' => null,
 		],
 		'string' => [
 			'format' => null,
@@ -38,7 +39,9 @@ class ElementsDef extends BaseObject
 			'inline' => null,
 		],
 		'class' => [
-			'form' => null,
+			'href' => null,
+			'action' => null,
+			'route' => null,
 		],		
 		'bind' => [
 			//'field' => null,
@@ -51,6 +54,10 @@ class ElementsDef extends BaseObject
 			'popup' => null,
 			'field' => null,
 			'confirm' => null,
+		],
+		'pager' => [
+			'ul' => null,
+			'size' => null,
 		]
 	];
 

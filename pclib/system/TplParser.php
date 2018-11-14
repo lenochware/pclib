@@ -260,7 +260,7 @@ class TplParser extends BaseObject
 				}
 
 				$document[$key+1] = $block;
-				if ($elements[$block]['begin']) {
+				if (isset($elements[$block]['begin'])) {
 					throw new Exception("Block name '%s' is already used.", array($block));
 				}
 				$elements[$block]['id']    = $block;
@@ -268,6 +268,14 @@ class TplParser extends BaseObject
 				$elements[$block]['block'] = end($bstack);
 				$elements[$block]['begin'] = $key + 2;
 				$elements[$block]['end'] = $elements['pcl_document']['end'];
+
+				$elements[$block] += [
+					'noprint' => null, 
+					'if' => null, 
+					'ifnot' => null, 
+					'repeat' => null,
+					'else' => null,
+				];
 			}
 		}
 
