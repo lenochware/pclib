@@ -20,6 +20,7 @@ namespace pclib\system;
 class ElementsDef extends BaseObject
 {
 	static $elem = [
+		'base' => [
 		'block' => null,
 		'default' => null,
 		'noprint' => null,
@@ -27,14 +28,41 @@ class ElementsDef extends BaseObject
 		'escape' => null,
 		'noescape' => null,
 		'attr' => null,
+		'html' => null,
+		],
+		'string' => [
+			'format' => null,
+		],
+		'head' => [
+			'noversion' => null,
+			'inline' => null,
+		],
+		'class' => [
+			'form' => null,
+		],		
+		'bind' => [
+			//'field' => null,
+		],
+		'link' => [
+			'href' => null,
+			'action' => null,
+			'route' => null,
+			'img' => null,
+			'popup' => null,
+			'field' => null,
+			'confirm' => null,
+		]
 	];
+
 
 	static function getElement($id, $type)
 	{
-		$elem = self::$elem;
+		$lkpType = in_array($type, ['select', 'radio', 'check'])? 'bind' : $type;
+
+		$elem = isset(self::$elem[$lkpType])? self::$elem[$lkpType] : [];
 		$elem['id'] = $id;
 		$elem['type'] = $type;
-		return $elem;
+		return self::$elem['base']  + $elem;
 	}
 
 }
