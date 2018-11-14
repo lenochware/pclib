@@ -105,7 +105,7 @@ public function addScripts()
 	$scripts = func_get_args();
 	if (is_array($scripts[0])) $scripts = $scripts[0];
 	
-	if (is_array($this->values[$id])) {
+	if (isset($this->values[$id])) {
 		$this->values[$id] = array_merge($this->values[$id], $scripts);
 	}
 	else $this->values[$id] = $scripts;

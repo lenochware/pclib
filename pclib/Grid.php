@@ -444,7 +444,7 @@ protected function getValues()
 	$rows = $this->db->fetchAll($q);
 
 	//sumgrid hack...
-	if (count($rows) > $this->pager->getValue('pglen')) $last = array_pop($rows);
+	$last = (count($rows) > $this->pager->getValue('pglen'))? array_pop($rows) : null;
 	if ($this->sumArray) $this->sumArray['items']['last'] = $last;
 
 	return $rows;
@@ -649,8 +649,8 @@ private function sumFieldEquals(array $sum)
 {
 	$rowno = $this->elements['items']['rowno'];
 	if ($this->sumArray['items']['pos'] > $sum['pos']) $rowno--;
-	$v1 = $this->values['items'][$rowno][$sum['field']];
-	$v2 = $this->values['items'][$rowno+1][$sum['field']];
+	$v1 = @$this->values['items'][$rowno][$sum['field']];
+	$v2 = @$this->values['items'][$rowno+1][$sum['field']];
 	if ($rowno == $this->pager->getValue('pglen')-1) $v2 = $this->sumArray['items']['last'][$sum['field']];
 	return ($v1 == $v2);
 }

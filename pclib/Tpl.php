@@ -353,7 +353,10 @@ function getValue($id)
 	
 	foreach ($this->inBlock as &$block) {
 		$rowno = $this->elements[$block]['rowno'];
-		$value = array_get(isset($rowno)? $this->values[$block][$rowno] : $this->values[$block], $id);
+
+		if (isset($this->values[$block])) {
+			$value = array_get(isset($rowno)? $this->values[$block][$rowno] : $this->values[$block], $id);
+		}
 		if (isset($value)) break;
 	}
 
@@ -676,7 +679,10 @@ function eachPrintable($callback, $sub = '')
 	$ignore_list = array('class','block','pager','sort','button');
 
 	foreach($this->elements as $id => $elem) {
-		if ($elem['noprint'] or $elem['skip'] or in_array($elem['type'], $ignore_list)) continue;
+		if (array_get($elem, 'noprint') or array_get($elem, 'skip') or in_array($elem['type'], $ignore_list)) {
+			continue;
+		}
+
 		$elem['sub'] = $sub;
 		call_user_func($callback, $elem);
 	}

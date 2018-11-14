@@ -35,6 +35,9 @@ class ElementsDef extends BaseObject
 			'format' => null,
 			'tooltip' => null,
 		],
+		'number' => [
+			'format' => null,
+		],
 		'head' => [
 			'noversion' => null,
 			'inline' => null,

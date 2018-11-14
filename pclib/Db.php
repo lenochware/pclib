@@ -759,9 +759,8 @@ protected function getSelectSql($dsstr, $args)
 		if (strpos($dsstr,':')) list($tab, $flds) = explode(':', $dsstr);
 		else {$tab = $dsstr; $flds = '*';}
 		$sql = "select $flds from $tab";
-		$cond = $args[0];
-		if ($cond) {
-			$sql .= " where ".$this->getWhereSql($cond, null); array_shift($args); 
+		if (isset($args[0])) {
+			$sql .= " where ".$this->getWhereSql($args[0], null); array_shift($args); 
 		}
 	}
 	elseif ($this->isSql($dsstr, 'select') or $this->isSql($dsstr, '(select')) $sql = $dsstr;
