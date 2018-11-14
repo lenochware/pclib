@@ -348,8 +348,8 @@ function getValue($id)
 	}
 
 	$elem = $this->elements[$id];
-	if ($elem['loop']) return $this->compute($id);
-	if ($elem['field']) $id = $elem['field'];
+	if (isset($elem['loop'])) return $this->compute($id);
+	if (isset($elem['field'])) $id = $elem['field'];
 	
 	foreach ($this->inBlock as &$block) {
 		$rowno = $this->elements[$block]['rowno'];
@@ -357,7 +357,7 @@ function getValue($id)
 		if (isset($value)) break;
 	}
 
-	if (!isset($value)) $value = $this->values[$id];
+	if (!isset($value)) $value = isset($this->values[$id])? $this->values[$id] : null;
 	return (is_numeric($value) or $value)? $value : $elem['default'];
 }
 
@@ -759,12 +759,12 @@ protected function print_BlockRow($block, $rowno = null)
 {
 	$b = $this->elements[$block];
 
-	if (is_scalar($this->values[$block])) {
+	if (is_scalar(array_get($this->values, $block))) {
 		print $this->values[$block];
 		return;
 	}
 
-	if ($this->values[$block]) {
+	if (isset($this->values[$block])) {
 		$begin = $b['begin'];
 		$end = $b['else']? $b['else'] : $b['end'];
 	}

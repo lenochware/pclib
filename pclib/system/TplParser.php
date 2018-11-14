@@ -79,7 +79,7 @@ class TplParser extends BaseObject
 
 		$elms['pcl_document'] = array(
 			'type' => 'block',
-			'begin'=> 0, 'end' => 0
+			'begin'=> 0, 'end' => 0, 'else' => null
 		);
 
 		if (trim($s) == '') return $elms;
@@ -227,7 +227,7 @@ class TplParser extends BaseObject
 		foreach ($document as $key=>$strip) {
 			if ($strip == self::TPL_ELEM) {
 				@list($id,$sub) = explode('.',$document[$key+1]);
-				if ($elements[$id] and !$elements[$id]['block'])
+				if (isset($elements[$id]) and !$elements[$id]['block'])
 					$elements[$id]['block'] = $block;
 			}
 

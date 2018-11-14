@@ -16,7 +16,7 @@
 $config = array(
 	'pclib.errors' => array('display', 'develop', /*,'log','template'=>'error.tpl' */),
 	'pclib.locale' => array('date' => '%d. %m. %Y', 'datetime' => '%d.%m.%Y %H:%M%:%S'),
-	'pclib.logger' => array(/*'log' => array('ALL')*/),
+	'pclib.logger' => array('log' => ['ALL']),
 	'pclib.compatibility' => array(
 		'tpl_syntax' => false,
 		'sql_syntax' => false,
