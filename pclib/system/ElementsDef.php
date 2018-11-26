@@ -30,6 +30,7 @@ class ElementsDef extends BaseObject
 			'attr' => null,
 			'html' => null,
 			'lb' => null,
+			'hidden' => null,
 		],
 		'string' => [
 			'format' => null,
@@ -47,6 +48,12 @@ class ElementsDef extends BaseObject
 			'action' => null,
 			'route' => null,
 			'singlepage' => null,
+			'ajaxget' => null,
+			'submitted' => null,
+			'noformtag' => null,
+			'table' => null,
+			'get' => null,
+			'jsvalid' => null,
 		],		
 		'bind' => [
 			'bitfield' => null,
@@ -68,11 +75,16 @@ class ElementsDef extends BaseObject
 		'pager' => [
 			'ul' => null,
 			'size' => null,
+		],
+		'input' => [
+			'file' => null,
+			'size' => null,
+			'ajaxget' => null,
 		]
 	];
 
 
-	static function getElement($id, $type)
+	static function getElement($id, $type, $templateClass)
 	{
 		$lkpType = in_array($type, ['select', 'radio', 'check'])? 'bind' : $type;
 

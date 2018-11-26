@@ -110,7 +110,7 @@ function __construct($path = '', $sessName = '')
 	$this->app = $pclib->app;
 	$this->config = $this->app->config;
 	$this->escapeHtmlFunction = array($this, 'escapeHtml');
-	$this->parser = new TplParser;
+	$this->parser = new TplParser($this->className);
 	$this->parser->legacyBlockSyntax = $this->config['pclib.compatibility']['tpl_syntax'];
 
 	$this->sessName = $sessName;

@@ -26,16 +26,19 @@ class TplParser extends BaseObject
 	const TPL_SEPAR = "\x02";
 	const TPL_BLOCK = "\x03";
 
+	protected $templateClass;
+
 	public $translator;
 
 	public $legacyBlockSyntax = false;
 
 	public $translateAttrib = array('lb' => 1, 'hint' => 1, 'html_title' => 1);
 
-	function __construct()
+	function __construct($templateClass)
 	{
 		parent::__construct();
 		$this->service('translator', false);
+		$this->templateClass = $templateClass;
 	}
 
 	/** 
@@ -44,7 +47,7 @@ class TplParser extends BaseObject
 	 * @return array $parsed [$elements, $body]
 	 */
 	function parse($templateStr)
-	{ 	
+	{
 		$templ = $this->split($templateStr);
 		if ($partials = $this->getPartials($templ)) {
 			$templ = $this->mergePartials($templ, $partials);
@@ -115,7 +118,7 @@ class TplParser extends BaseObject
 		$type = array_shift($terms);
 		$id = array_shift($terms);
 
-		$elem = ElementsDef::getElement($id, $type);
+		$elem = ElementsDef::getElement($id, $type, $this->templateClass);
 
 		while ($term = array_shift($terms)) {
 			$value = ($terms and $terms[0][0] == "\"")? $this->readQTerm($terms) : 1;
