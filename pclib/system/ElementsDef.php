@@ -30,11 +30,14 @@ class ElementsDef extends BaseObject
 			'attr' => null,
 			'html' => null,
 			'lb' => null,
+			'skip' => null,
 		],
 		'base_form' => [
+			'size' => null,
 			'hidden' => null,
 			'required' => null,
 			'hint' => null,
+			'ajaxget' => null,
 		],		
 		'string' => [
 			'format' => null,
@@ -67,6 +70,10 @@ class ElementsDef extends BaseObject
 			'jsvalid' => null,
 			'default_print' => null,
 		],
+		'pager' => [
+			'ul' => null,
+			'size' => null,
+		],
 		'bind' => [
 			'bitfield' => null,
 			'format' => null,
@@ -74,6 +81,8 @@ class ElementsDef extends BaseObject
 			'query' => null,
 			'lookup' => null,
 			'emptylb' => null,
+			'columns' => null,
+			'noemptylb' => null,
 		],
 		'link' => [
 			'href' => null,
@@ -84,15 +93,28 @@ class ElementsDef extends BaseObject
 			'field' => null,
 			'confirm' => null,
 		],
-		'pager' => [
-			'ul' => null,
-			'size' => null,
+		'button' => [
+			'href' => null,
+			'action' => null,
+			'route' => null,
+			'img' => null,
+			'popup' => null,
+			'field' => null,
+			'confirm' => null,
+			'tag' => null,
+			'onclick' => null,
+			'submit' => null,
 		],
 		'input' => [
+			'date' => null,
 			'file' => null,
-			'size' => null,
-			'ajaxget' => null,
-		]
+			'multiple' => null,
+			'maxlength' => null,
+			'password' => null,
+		],
+		'text' => [
+			'maxlength' => null,
+		],
 	];
 
 

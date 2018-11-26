@@ -273,8 +273,9 @@ protected function getHttpData()
 			continue;
 		}
 
-		if ($elem['type'] == 'check' and !$data[$id] and !$elem['noprint']) $data[$id] = array();
-		elseif($elem['type'] == 'input' and is_string($data[$id])) $data[$id] = trim($data[$id]);
+		$val = array_get($data, $id);
+		if ($elem['type'] == 'check' and !$val and !$elem['noprint']) $data[$id] = array();
+		elseif($elem['type'] == 'input' and is_string($val)) $data[$id] = trim($val);
 	}
 
 	foreach ((array)$_FILES as $id => $aFile) {
@@ -389,7 +390,9 @@ function print_Element($id, $sub, $value)
 
 	if ($sub == 'err') {
 		print '<span class="err">';
-		print $this->invalid[$id];
+		if (isset($this->invalid[$id])) {
+			print $this->invalid[$id];
+		}
 		print '</span>';
 		return;
 	}
@@ -484,6 +487,7 @@ function print_Class($id, $sub, $value)
 
 	print ($printFunc == 'trPrintElement')? "<tr><td colspan=\"3\">" : '<div class="form-group buttons">';
 	foreach($this->elements as $id => $elem) {
+		if ($id == 'pcl_document') continue;
 		if ($elem['noprint'] or $elem['skip'] or $elem['type'] != 'button') continue;
 		$this->print_Button($id, '', $this->getValue($id));
 		print ' ';
@@ -529,8 +533,11 @@ protected function divPrintElement($elem)
 function print_Label($id)
 {
 	$elem = $this->elements[$id];
+	$class = [];
+	if ($elem['required']) $class[] = 'required';
 	if (isset($this->invalid[$id])) $class[] = 'err';
-	if ($elem['required']) $attr = ' class="required"';
+	$attr = '';
+	if ($class) $attr = ' class="'.implode(' ',$class).'"';
 	if ($this->header['ajax']) $attr .= " id=\"xl_$id\"";
 	print "<label for=\"$id\"$attr>";
 	print $elem['lb']? $elem['lb'] : $id;
@@ -793,7 +800,7 @@ function print_Select($id, $sub, $value)
 		$i = $this->escape($i);
 		$label = $this->escape($label);
 
-		$options[$group] .= "<option value=\"$i\"$ch>$label</option>";
+		$options[$group] = array_get($options, $group)."<option value=\"$i\"$ch>$label</option>";
 	}
 	if ($options['_nogroup_']) $html .= $options['_nogroup_'];
 	else {
