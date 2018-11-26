@@ -34,6 +34,7 @@ class ElementsDef extends BaseObject
 		'base_form' => [
 			'hidden' => null,
 			'required' => null,
+			'hint' => null,
 		],		
 		'string' => [
 			'format' => null,

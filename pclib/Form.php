@@ -88,16 +88,16 @@ protected function _init()
 	}
 
 	foreach ($this->elements as $id=>$elem) {
-		if ($elem['hidden']) $this->hidden[$id] = $id;
-		if ($elem['file'] and $elem['type'] == 'input')
+		if (isset($elem['hidden'])) $this->hidden[$id] = $id;
+		if (isset($elem['file']) and $elem['type'] == 'input')
 			$this->header['fileupload'] = 1;
-		if ($elem['ajaxget']) $this->header['ajax'] = 1;
-		if (strpos($elem['size'],'/')) {
+		$this->header['ajax'] = isset($elem['ajaxget']);
+		if (strpos(array_get($elem, 'size'), '/')) {
 			list($sz,$ml) = explode('/',$elem['size']);
 			$this->elements[$id]['size'] = $sz;
 			$this->elements[$id]['maxlength'] = $ml;
 		}
-		if ($elem['type'] == 'check' and $elem['default']) {
+		if ($elem['type'] == 'check' and isset($elem['default'])) {
 			$this->elements[$id]['default'] = explode(',', $elem['default']);
 		}
 	}
@@ -106,17 +106,24 @@ protected function _init()
 		$this->dbSync($this->header['table']);
 	}
 
-	if ($_REQUEST['submitted'] != $this->name) return;
+	$request = $_REQUEST + [
+		'submitted' => null, 
+		'pcl_form_submit' => null, 
+		'csrf_token' => null, 
+		'ajax_id' => null
+	];
 
-	$this->submitted = $_REQUEST['pcl_form_submit'] ?: true;
+	if ($request['submitted'] != $this->name) return;
+
+	$this->submitted = $request['pcl_form_submit'] ?: true;
 
 	if ($this->header['csrf']
-		and $_REQUEST['csrf_token'] != $this->getCsrfToken()
+		and $request['csrf_token'] != $this->getCsrfToken()
 	) throw new AuthException("CSRF authorization failed.");
 
 
-	if ($_REQUEST['ajax_id']) {
-		$this->ajax_id = pcl_ident($_REQUEST['ajax_id']);
+	if ($request['ajax_id']) {
+		$this->ajax_id = pcl_ident($request['ajax_id']);
 		$this->header['get'] = 1;
 	}
 
@@ -308,7 +315,7 @@ protected function getTag($id, $ignoreHtmlAttr = false)
 	$class = array();
 	if ($elem['html']['class']) $class[] = $elem['html']['class'];
 	if ($this->getAttr($id, 'noedit')) $class[] = 'disabled';
-	if ($this->invalid[$id]) $class[] = 'err';
+	if (isset($this->invalid[$id])) $class[] = 'err';
 	if ($elem['required']) $class[] = 'required';
 	$tag['class'] = $class;
 
@@ -522,9 +529,8 @@ protected function divPrintElement($elem)
 function print_Label($id)
 {
 	$elem = $this->elements[$id];
-	if ($elem['required']) $class[] = 'required';
-	if ($this->invalid[$id]) $class[] = 'err';
-	if ($class) $attr = ' class="'.implode(' ',$class).'"';
+	if (isset($this->invalid[$id])) $class[] = 'err';
+	if ($elem['required']) $attr = ' class="required"';
 	if ($this->header['ajax']) $attr .= " id=\"xl_$id\"";
 	print "<label for=\"$id\"$attr>";
 	print $elem['lb']? $elem['lb'] : $id;
