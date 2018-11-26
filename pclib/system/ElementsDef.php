@@ -30,8 +30,11 @@ class ElementsDef extends BaseObject
 			'attr' => null,
 			'html' => null,
 			'lb' => null,
-			'hidden' => null,
 		],
+		'base_form' => [
+			'hidden' => null,
+			'required' => null,
+		],		
 		'string' => [
 			'format' => null,
 			'tooltip' => null,
@@ -43,18 +46,26 @@ class ElementsDef extends BaseObject
 			'noversion' => null,
 			'inline' => null,
 		],
-		'class' => [
+		'class_tpl' => [
+		],
+		'class_grid' => [
 			'href' => null,
 			'action' => null,
 			'route' => null,
 			'singlepage' => null,
+		],
+		'class_form' => [
+			'href' => null,
+			'action' => null,
+			'route' => null,
 			'ajaxget' => null,
 			'submitted' => null,
 			'noformtag' => null,
 			'table' => null,
 			'get' => null,
 			'jsvalid' => null,
-		],		
+			'default_print' => null,
+		],
 		'bind' => [
 			'bitfield' => null,
 			'format' => null,
@@ -86,12 +97,22 @@ class ElementsDef extends BaseObject
 
 	static function getElement($id, $type, $templateClass)
 	{
-		$lkpType = in_array($type, ['select', 'radio', 'check'])? 'bind' : $type;
+		if ($type == 'class') {
+			$elem = self::$elem['class_'.$templateClass];
+		}
+		else {
+			$lkpType = in_array($type, ['select', 'radio', 'check'])? 'bind' : $type;
+			$elem = isset(self::$elem[$lkpType])? self::$elem[$lkpType] : [];			
+		}
 
-		$elem = isset(self::$elem[$lkpType])? self::$elem[$lkpType] : [];
 		$elem['id'] = $id;
 		$elem['type'] = $type;
-		return self::$elem['base']  + $elem;
+		
+		if ($templateClass == 'form') {
+			$elem = self::$elem['base_form'] + $elem;
+		}
+
+		return self::$elem['base'] + $elem;
 	}
 
 }
