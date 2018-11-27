@@ -89,9 +89,14 @@ protected function _init()
 
 	foreach ($this->elements as $id=>$elem) {
 		if (isset($elem['hidden'])) $this->hidden[$id] = $id;
-		if (isset($elem['file']) and $elem['type'] == 'input')
+		if (isset($elem['file']) and $elem['type'] == 'input') {
 			$this->header['fileupload'] = 1;
-		$this->header['ajax'] = isset($elem['ajaxget']);
+		}
+
+    if (isset($elem['ajaxget'])) {
+    	$this->header['ajax'] = true;
+    }
+
 		if (strpos(array_get($elem, 'size'), '/')) {
 			list($sz,$ml) = explode('/',$elem['size']);
 			$this->elements[$id]['size'] = $sz;
@@ -836,22 +841,22 @@ function preparedValues($skipEmpty = false)
 			continue;
 		}
 
-		if ($this->elements[$id]['file'] and (!$this->values[$id] or $this->hasExtraSave($id))) {
+		if (isset($this->elements[$id]['file']) and (!$this->values[$id] or $this->hasExtraSave($id))) {
 			continue;
 		}
 
 		if ($fmt = $this->getAttr($id, 'format')) 
 			$value = $this->formatStr($value, $fmt);
 
-		if ($elem['date'])
+		if (isset($elem['date']))
 			$value = $this->toSqlDate($value, $elem['date']);
 
-		if ($elem['number'] and $elem['number'] != 'strict')
+		if (isset($elem['number']) and $elem['number'] != 'strict')
 			$value = $this->toNumber($value);
 
 		if (is_array($value)) $value = $this->toBitField($value);
 
-		if ($elem['onsave']) 
+		if (isset($elem['onsave'])) 
 			$value = $this->fireEventElem('onsave', $id, '', $value);
 
 		$values[$id] = $value;

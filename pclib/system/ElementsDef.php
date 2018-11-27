@@ -63,6 +63,7 @@ class ElementsDef extends BaseObject
 			'action' => null,
 			'route' => null,
 			'ajaxget' => null,
+			'ajax' => null,
 			'submitted' => null,
 			'noformtag' => null,
 			'table' => null,
@@ -70,10 +71,23 @@ class ElementsDef extends BaseObject
 			'jsvalid' => null,
 			'default_print' => null,
 		],
+		'class_gridform' => [
+			'href' => null,
+			'action' => null,
+			'route' => null,
+			'singlepage' => null,
+			'submitted' => null,
+			'noformtag' => null,
+			'table' => null,
+			'get' => null,
+			'jsvalid' => null,
+			'default_print' => null,
+		],		
 		'pager' => [
 			'ul' => null,
 			'size' => null,
 			'nohide' => null,
+			'pglen' => null,
 		],
 		'bind' => [
 			'bitfield' => null,
@@ -81,6 +95,7 @@ class ElementsDef extends BaseObject
 			'list' => null,
 			'query' => null,
 			'lookup' => null,
+			'datasource' => null,
 			'emptylb' => null,
 			'columns' => null,
 			'noemptylb' => null,
@@ -140,7 +155,7 @@ class ElementsDef extends BaseObject
 		$elem['id'] = $id;
 		$elem['type'] = $type;
 		
-		if ($templateClass == 'form') {
+		if ($templateClass == 'form' or $templateClass == 'gridform') {
 			$elem = self::$elem['base_form'] + $elem;
 		}
 

@@ -65,7 +65,7 @@ function __construct($path = '', $sessName = '')
 	$this->form->elements = $this->elements;
 	$this->form->_init();
 	
-	if ($_REQUEST['submitted'] == $this->name) {
+	if (array_get($_REQUEST, 'submitted') == $this->name) {
 		$this->submitted = $_REQUEST['pcl_form_submit'] ?: true;
 		$this->values = $this->getHttpData();
 	}
