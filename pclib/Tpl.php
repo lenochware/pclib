@@ -792,9 +792,6 @@ protected function print_BlockRow($block, $rowno = null)
 
 			 $value = $this->getValue($id);
 
-			 /*if ($func = $this->elements[$id]['print']) {
-				 $go = $this->callback($func, $id, $sub, $value);
-			 }*/
 			 if (!$this->fireEventElem('onprint',$id,$sub,$value))
 				 $this->print_Element($id, $sub, $value);
 		}

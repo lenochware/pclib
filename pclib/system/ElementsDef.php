@@ -73,6 +73,7 @@ class ElementsDef extends BaseObject
 		'pager' => [
 			'ul' => null,
 			'size' => null,
+			'nohide' => null,
 		],
 		'bind' => [
 			'bitfield' => null,

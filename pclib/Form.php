@@ -633,7 +633,12 @@ function print_Button($id, $sub, $value)
 {
 	$elem = $this->elements[$id];
 	$url = $this->getUrl($elem);
-	$onclick = $elem['onclick'] ?: $elem['html']['onclick'];
+
+	$onclick = $elem['onclick'];
+	if (!$onclick and isset($elem['html']['onclick'])) {
+		$onclick = $elem['html']['onclick'];
+	};
+
 	$tagname = $this->useButtonTag? 'button':'input';
 	if ($elem['tag']) $tagname = $elem['tag'];
 
@@ -1253,7 +1258,7 @@ protected function head()
 		'id' => $this->name,
 		'name' => null,
 		'class' => $ha['class']? array($ha['class']) : null,
-		'__attr' => $ha['attr'],
+		'__attr' => array_get($ha, 'attr'),
 	);
 
 	if ($ha) $tag += $ha;

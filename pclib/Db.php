@@ -726,7 +726,7 @@ function setParams($sql, $params)
 	$empty = false;
 	foreach($found[2] as $i => $key) {
 		$from[] = $found[0][$i];
-		if (strlen($params[$key]) == 0) {
+		if (strlen(array_get($params, $key)) == 0) {
 			$empty = true;
 			if ($found[1][$i] == '#') $to[] = '__PCL_EMPTY0__';
 			else $to[] = '__PCL_EMPTYS__';
