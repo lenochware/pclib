@@ -104,7 +104,9 @@ protected function htmlTree($level = 0)
 {
 	$html = $this->htmlListBegin($level);
 
-	while($node = $this->nodes[$this->i++]) {
+	while(isset($this->nodes[$this->i])) {
+
+		$node = $this->nodes[$this->i++];
 		
 		if (!$node['ACTIVE']) {
 			$this->skipInactive($node);
@@ -122,7 +124,8 @@ protected function htmlTree($level = 0)
 			return $html;
 		}
 		else {
-			if ($this->nodes[$this->i]['LEVEL'] > $node['LEVEL']) $node['HASCHILD'] = true;
+			$next = array_get($this->nodes, $this->i);
+			if ($next['LEVEL'] > $node['LEVEL']) $node['HASCHILD'] = true;
 			$html .= $this->htmlListNode($node);
 		}
 	}
@@ -146,11 +149,11 @@ private function skipInactive($inactiveNode)
  */
 protected function htmlListNode($node)
 {
-	$class = $node['HASCHILD']? ($node['EXPANDED']? 'folder open' : 'folder closed') : 'item';
-	$class = trim($node['CLASS'].' '.$class);
-	if ($class) $node['ATTR'] = trim($node['ATTR']." class=\"$class\"");
-	if (!$node['ID']) $node['ID'] = $this->i;
-	if ($node['ROUTE']) {
+	$class = array_get($node, 'HASCHILD')? (array_get($node, 'EXPANDED')? 'folder open' : 'folder closed') : 'item';
+	$class = trim(array_get($node, 'CLASS').' '.$class);
+	if ($class) $node['ATTR'] = trim(array_get($node, 'ATTR')." class=\"$class\"");
+	if (!isset($node['ID'])) $node['ID'] = $this->i;
+	if (isset($node['ROUTE'])) {
 		$node['URL'] = $this->service('router')->createUrl($node['ROUTE']);
 	}
 
@@ -223,7 +226,7 @@ private function readLine($line, $cells)
 {
 	$part = explode($this->CELL_SEPAR, $line);
 	$node = array();
-	foreach($cells as $i=>$name) { $node[$name] = $part[$i]; }
+	foreach($cells as $i=>$name) { $node[$name] = array_get($part, $i); }
 	$path = $node['PATH']; unset($node['PATH']);
 	$node['LEVEL'] = substr_count($path, $this->LEVEL_SEPAR);
 	$node['LABEL'] = $node['LEVEL']? substr($path,strrpos($path, $this->LEVEL_SEPAR)+strlen($this->LEVEL_SEPAR)) : $path;
