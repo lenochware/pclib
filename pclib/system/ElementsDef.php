@@ -75,6 +75,8 @@ class ElementsDef extends BaseObject
 			'href' => null,
 			'action' => null,
 			'route' => null,
+			'ajaxget' => null,
+			'ajax' => null,
 			'singlepage' => null,
 			'submitted' => null,
 			'noformtag' => null,

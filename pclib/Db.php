@@ -203,6 +203,8 @@ function setLimit($numrows, $offset = 0)
 **/
 function query($_sql, $param = null)
 {
+	$res = null;
+	
 	if (isset($param) and !is_array($param)) {
 		$param = func_get_args();
 		array_shift($param);
@@ -212,7 +214,9 @@ function query($_sql, $param = null)
 	$event = $this->onBeforeQuery($sql);
 	if ($event and !$event->propagate) return;
 
-	if (!$this->disabled) $res = $this->drv->query($sql);
+	if (!$this->disabled) {
+		$res = $this->drv->query($sql);
+	}
 	
 	if ($this->logging > 1 and !$this->drv->error) {
 		$this->messages[] = "(n) Proceed $sql";
@@ -340,6 +344,7 @@ function insert($tab, $data)
 		
 	if (is_array($data)) {
 		$sep = '';
+		$kstr = $vstr = '';
 		foreach($data as $k => $v) {
 			$kstr .= $sep.$this->drv->quote($k);
 			if (is_null($v)) $vstr .= $sep."NULL";
@@ -628,7 +633,7 @@ function export($dba, $fmt = 'html')
 	if (!$dba) return '';
 	if (is_resource($dba)) $dba = $this->fetchAll($dba);
 	if (is_string($dba)) $dba = $this->selectAll($dba);
-	if (is_array($dba) and !is_array($dba[0])) $dba = array($dba);
+	if (is_array($dba) and !is_array(array_get($dba, 0))) $dba = array($dba);
 	
 	switch ($fmt) {
 	case 'html':
