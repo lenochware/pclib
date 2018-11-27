@@ -308,13 +308,13 @@ protected function getTag($id, $ignoreHtmlAttr = false)
 	if ($this->getAttr($id, 'noedit')) $tag[] = 'disabled';
 	if ($html5) {
 		if ($elem['required']) $tag[] = 'required';
-		if ($elem['pattern']) $tag['pattern'] = $elem['pattern'];
+		if (isset($elem['pattern'])) $tag['pattern'] = $elem['pattern'];
 	}
 
 	$tag['placeholder'] = $elem['hint'];
 
 	$class = array();
-	if ($elem['html']['class']) $class[] = $elem['html']['class'];
+	if (isset($elem['html']['class'])) $class[] = $elem['html']['class'];
 	if ($this->getAttr($id, 'noedit')) $class[] = 'disabled';
 	if (isset($this->invalid[$id])) $class[] = 'err';
 	if ($elem['required']) $class[] = 'required';
@@ -586,12 +586,12 @@ function print_Input($id, $sub, $value)
 
 		if ($html5) {
 			if ($elem['date']) $type = 'date';
-			else if ($elem['number']) $type = 'number';
-			else if ($elem['email'])  $type = 'email';
-			else if ($elem['tel'])  $type = 'tel';
-			else if ($elem['website'])  $type = 'website';
-			else if ($elem['color'])  $type = 'color';
-			else if ($elem['time']) {
+			else if (isset($elem['number'])) $type = 'number';
+			else if (isset($elem['email']))  $type = 'email';
+			else if (isset($elem['tel']))  $type = 'tel';
+			else if (isset($elem['website']))  $type = 'website';
+			else if (isset($elem['color']))  $type = 'color';
+			else if (isset($elem['time'])) {
 				$type = 'time';
 				$tag['step'] = 1800;
 			}
@@ -802,7 +802,7 @@ function print_Select($id, $sub, $value)
 
 		$options[$group] = array_get($options, $group)."<option value=\"$i\"$ch>$label</option>";
 	}
-	if ($options['_nogroup_']) $html .= $options['_nogroup_'];
+	if (isset($options['_nogroup_'])) $html .= $options['_nogroup_'];
 	else {
 		foreach($options as $group => $content) {
 			$html .= "<optgroup label=\"$group\">$content</optgroup>";
@@ -1283,7 +1283,7 @@ protected function head()
 		 $hidden['pclib_jsvalid'] = $this->getValidationString();
 	}
 
-	if ($this->header['fileupload']) $tag['enctype'] = 'multipart/form-data';
+	if (isset($this->header['fileupload'])) $tag['enctype'] = 'multipart/form-data';
 
 	$html = $this->htmlTag('form', $tag, null, true)."\n";
 
@@ -1353,7 +1353,7 @@ private function getValidationString()
 		$rule = $options = '';
 		$required = $elem['required'];
 		foreach($rules as $testrule) {
-			if ($elem[$testrule]) {
+			if (isset($elem[$testrule]) and $elem[$testrule]) {
 				$rule = $testrule;
 				break;
 			}
@@ -1361,7 +1361,7 @@ private function getValidationString()
 		if (!$rule and !$required) continue;
 
 		if ($rule) {
-			if ($elem[$rule] === 1 and $defaults[$rule]) $options = $defaults[$rule];
+			if ($elem[$rule] === 1 and isset($defaults[$rule])) $options = $defaults[$rule];
 			else $options = $elem[$rule];
 		}
 

@@ -98,6 +98,7 @@ class ElementsDef extends BaseObject
 			'action' => null,
 			'route' => null,
 			'img' => null,
+			'glyph' => null,
 			'popup' => null,
 			'field' => null,
 			'confirm' => null,
@@ -111,8 +112,15 @@ class ElementsDef extends BaseObject
 			'multiple' => null,
 			'maxlength' => null,
 			'password' => null,
+			'email' => null,
+			'number' => null,
+			'pattern' => null,
+			'range' => null,
 		],
 		'text' => [
+			'maxlength' => null,
+		],
+		'listinput' => [
 			'maxlength' => null,
 		],
 	];

@@ -818,7 +818,7 @@ protected function print_BlockRow($block, $rowno = null)
 function getPopup($id, $attr, $url)
 {
 		if ($attr == '1') $attr = '800x600';
-		list($size,$attr) = explode(' ', $attr);
+		@list($size,$attr) = explode(' ', $attr);
 		switch ($attr) {
 		case 'full': $poppar='toolbar=1,location=1,menubar=1,scrollbars=1,resizable=1';
 		break;
@@ -896,7 +896,7 @@ private function insertAfter(array $a, array $elem, $after)
 function htmlTag($name, $attr = array(), $content = null, $startTagOnly = false)
 {
 	$html = '<'.$name;
-	if($attr['__attr']) {
+	if(isset($attr['__attr'])) {
 		$html .= ' '.$attr['__attr'];
 		unset($attr['__attr']);
 	}

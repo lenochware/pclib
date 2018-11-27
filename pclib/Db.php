@@ -723,10 +723,11 @@ function setParams($sql, $params)
 	preg_match_all($pat, $sql, $found);
 	if (!$found[0]) return $sql;
 	$from = $to = array();
+	$empty = false;
 	foreach($found[2] as $i => $key) {
 		$from[] = $found[0][$i];
 		if (strlen($params[$key]) == 0) {
-			$empty = 1;
+			$empty = true;
 			if ($found[1][$i] == '#') $to[] = '__PCL_EMPTY0__';
 			else $to[] = '__PCL_EMPTYS__';
 		}
