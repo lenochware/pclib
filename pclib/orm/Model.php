@@ -263,7 +263,7 @@ function getPrimaryId()
  */
 function find($id)
 {
-	$this->values = $this->db->select($this->tableName, array(self::$options['primaryKey'] => $id));
+	$this->values = $this->db->select($this->tableName, array(self::$options['primaryKey'] => $id)) ?: [];
 	$this->isInDb((bool)$this->values);
 	return $this->values? $this : null;
 }

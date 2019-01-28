@@ -123,8 +123,10 @@ function redirect($route)
 function model($tableName, $id = null)
 {
 	$model = orm\Model::create($tableName, array(), false);
+	
 	if ($id) {
-		$model->find($id);
+		$found = $model->find($id);
+		if (!$found) return null;
 	}
 
 	return $model;
