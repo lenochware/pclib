@@ -57,6 +57,14 @@ function getUrl()
 	return sprintf("%s%s%s", $scheme, $_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI']);
 }
 
+/** Return root Url. */
+function getRootUrl()
+{
+	$scheme = $this->isSSL()? 'https://' : 'http://';
+	return sprintf("%s%s%s", $scheme, $_SERVER['HTTP_HOST'], $this->getBaseUrl());	
+}
+
+
 /** 
  * Return client IP address. 
  * Warning: Can be faked!
