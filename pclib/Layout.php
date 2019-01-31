@@ -148,7 +148,7 @@ function print_Head($id, $sub, $value)
 		$scripts = array_merge($scripts, (array)$value);
 	}
 
-	foreach($scripts as $script) {
+	foreach(array_unique($scripts) as $script) {
 		if (!file_exists($script)) {
 			throw new FileNotFoundException("File '$script' not found.");
 		}
