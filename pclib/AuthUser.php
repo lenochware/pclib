@@ -110,6 +110,7 @@ function getCredentials()
  */
 function passwordVerify($password)
 {
+	if (!$password) return false;
 	$cred = $this->getCredentials();
 
 	if ($this->hasDefaultPassword()) {

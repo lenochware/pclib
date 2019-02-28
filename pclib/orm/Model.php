@@ -286,7 +286,7 @@ protected function getModel($tableName, $id = null)
  **/
 protected function selection($from = null)
 {
-	$sel = new orm\Selection;
+	$sel = new \pclib\orm\Selection;
 	if ($from) $sel->from($from);
 	return $sel;
 }
