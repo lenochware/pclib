@@ -1353,7 +1353,7 @@ private function getValidationString()
 		}
 
 		switch($rule) {
-			case 'number': if($options != 'strict') continue; break;
+			case 'number': if($options != 'strict') continue 2; break;
 			case 'date': $options = preg_replace("/[^dmyhms]/i","", $options); break;
 			case 'file': $options = strtr($options, array('.' => '\.', '*' => '.*', '?' => '.')); break;
 		}
