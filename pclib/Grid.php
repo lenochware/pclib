@@ -600,7 +600,9 @@ function getExportCsv($options = [])
 
 	foreach ($values as $i => $row) {
 		foreach($elms as $id => $elem) {
+			if (!$this->fireEventElem('onprint',$id,'',$row[$id])) {
 			$this->print_Element($id, '', $row[$id]);
+			}
 			if ($id != $last_id) print $options['csv-separ'];
 		}
 		if($values[$i+1]) print $options['csv-row-separ'];
