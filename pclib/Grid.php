@@ -66,6 +66,12 @@ protected $page;
 
 private $hash;
 
+/** Occurs before output of the row. */
+public $onBeforeRow;
+
+/** Occurs after output of the row. */
+public $onAfterRow;
+
 /**
  * Initialization - must be called after load()
  */
@@ -655,6 +661,10 @@ private function sumFieldEquals(array $sum)
 
 protected function print_BlockRow($block, $rowno = null)
 {
+	if ($block == 'items') {
+		$this->onBeforeRow($this->values[$block][$rowno], $rowno);
+	}
+
 	if ($this->sumArray and $block == 'items') {
 		ob_start();
 		parent::print_BlockRow($block, $rowno);
@@ -673,6 +683,10 @@ protected function print_BlockRow($block, $rowno = null)
 	}
 	else {
 		parent::print_BlockRow($block, $rowno);
+	}
+
+	if ($block == 'items') {
+		$this->onAfterRow($this->values[$block][$rowno], $rowno);
 	}
 }
 
