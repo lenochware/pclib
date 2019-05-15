@@ -27,7 +27,7 @@ class AuthManager extends AuthBase
 /** var Db */
 public $db;
 
-public $USERNAME_PATTERN = "/^[a-z0-9\._-]+$/i";
+public $USERNAME_PATTERN = "/^[a-z0-9\._\-\@]+$/i";
 
 public $defaultPasswordLength = 8;
 
