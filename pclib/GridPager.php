@@ -160,7 +160,7 @@ class GridPager extends system\BaseObject
 		else {
 			$url = $this->getUrl($this->getValue($id));
 			$lb = $this->t(ucfirst($id));
-			$val = "<a href=\"$url\">$lb</a>";
+			$val = "<a href=\"$url\" class=\"page-link\">$lb</a>";
 		}
 		
 		return sprintf($this->patternItem, $cssClass, $val);
