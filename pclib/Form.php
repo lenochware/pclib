@@ -1002,22 +1002,33 @@ protected function deleteFiles($tableName, $data)
 	}
 }
 
-/**
- * Return array of label => value(s) pairs for all elements of the %form.
- * Helper for showing %form content to the end user. Used in mailTo().
- * @return array $values
- */
-function content()
+function getVisibleIds()
 {
-	if (!$this->values) return array();
-	$content = array();
+	$list = [];
 
-	foreach ($this->values as $id=>$value) {
+	foreach ($this->values as $id => $value) {
 		$elem = $this->elements[$id];
 		if ($elem['lb'] == '') continue;
 		if ($this->getAttr($elem['id'], 'noprint') or $elem['hidden']) continue;
+		$list[] = $id;
+	}
+
+	return $list;
+}
+
+function getVisibleElements()
+{
+	$list = [];
+
+	if (!$this->values) return [];
+
+	foreach ($this->getVisibleIds() as $id) {
+		$elem = $this->elements[$id];
+		$value = $this->values[$id];
+
 		if ($value == '') {
-			$content[$elem['lb']] = $elem['emptylb'];
+			$elem['value_text'] = $elem['emptylb'];
+			$list[] = $elem;
 			continue;
 		}
 
@@ -1040,7 +1051,26 @@ function content()
 			}
 		}
 
-		$content[$elem['lb']] = $value;
+		$elem['value_text'] = $value;
+
+		$list[] = $elem;
+	}
+
+	return $list;
+}
+
+/**
+ * Return array of label => value(s) pairs for all elements of the %form.
+ * Helper for showing %form content to the end user. Used in mailTo().
+ * @return array $values
+ */
+function content()
+{
+	if (!$this->values) return array();
+	$content = array();
+
+	foreach ($this->getVisibleElements() as $elem) {
+		$content[$elem['lb']] = $elem['value_text'];
 	}
 
 	return $content;
