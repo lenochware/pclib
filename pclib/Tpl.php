@@ -145,7 +145,7 @@ private function getAccessor($name) {
 
 function __get($name)
 {
-	if ($name{0} == '_')
+	if ($name[0] == '_')
 		return $this->getAccessor(substr($name,1));
 	else
 		return parent::__get($name);
@@ -153,7 +153,7 @@ function __get($name)
 
 function __set($name, $value)
 {
-	if ($name{0} == '_')
+	if ($name[0] == '_')
 		$this->values[substr($name,1)] = $value;
 	else
 		parent::__set($name, $value);

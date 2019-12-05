@@ -155,7 +155,7 @@ function print_Head($id, $sub, $value)
 		
 		$version = $this->elements[$id]['noversion']? '' : '?v='.filemtime($script);
 		$ext = substr($script, strrpos($script, '.'));
-		if ($script{0} != '/') $script = BASE_URL.$script;
+		if ($script[0] != '/') $script = BASE_URL.$script;
 		switch($ext) {
 		case '.js': print "<script language=\"JavaScript\" src=\"$script$version\"></script>\n"; break;
 		case '.css': print "<link rel=\"stylesheet\" type=\"text/css\" href=\"$script$version\">\n"; break;

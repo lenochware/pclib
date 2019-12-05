@@ -140,7 +140,7 @@ function mkident($s, $options = '')
 	if (strlen($options) == 1) {
 	 if(ctype_alnum($options)) $o1 = $options; else $o2 = $options;
 	}
-	else { $o1 = $options{1}; $o2 = $options{0}; }
+	else { $o1 = $options[1]; $o2 = $options[0]; }
 
 	switch($o1) {
 		case 'u': $s = ucwords($s);    break;

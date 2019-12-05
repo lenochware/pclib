@@ -807,7 +807,7 @@ private function parseSetClausule($sql)
 	foreach($found[1] as $i => $key) {
 		$data[$key] = trim($found[2][$i]);
 		if (strcasecmp($data[$key], 'null') == 0) $data[$key] = null;
-		if ($data[$key]{0} == "'" and substr($data[$key],-1) == "'")
+		if ($data[$key][0] == "'" and substr($data[$key],-1) == "'")
 			$data[$key] = substr($data[$key],1,-1);
 	}
 	return $data;
