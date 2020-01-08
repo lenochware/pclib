@@ -653,6 +653,10 @@ function print_Button($id, $sub, $value)
 		$onclick = "window.location='$url';";
 	}
 
+	if ($onclick) {
+	  	$onclick = $this->replaceParams($onclick);
+	}
+
 	$tag['onclick'] = $onclick;
 	print $this->htmlTag($tagname, $tag, $content);
 }
