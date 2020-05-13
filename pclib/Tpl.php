@@ -117,6 +117,10 @@ function __construct($path = '', $sessName = '')
 	$this->loadSession();
 
 	if ($path) {
+		if (strpos($path, '{') !== false) {
+			$path = $this->app->path($path);
+		}
+		
 		$this->name = extractpath($path, '%f');
 		$this->load($path);
 		$this->init();
@@ -708,9 +712,9 @@ function print_Action($id, $sub, $value)
 	
 	$rs = $this->replaceParams($this->elements[$id]['route']);
 	$action = new Action($rs);
-	$ct = $this->app->newController($action->controller);
+	$ct = $this->app->newController($action->controller, $action->module);
 	if (!$ct) {
-		printf($this->t('Page not found: "%s"'), $action->controller);
+		printf($this->t('Page not found: "%s"'), $action->controller.' '.$action->module);
 	}
 	else print $ct->run($action);
 }
@@ -1018,7 +1022,7 @@ protected function getDataSource($name)
 	}
 	else {
 		$action = new Action($this->replaceParams($name));
-		$ct = $this->app->newController($action->controller);
+		$ct = $this->app->newController($action->controller, $action->module);
 		if (!$ct) throw new Exception("Cannot get datasource '%s'", array($name));
 		$args = $ct->getArgs($action->method, $action->params);
 		return call_user_func_array(array($ct, $action->method), $args);

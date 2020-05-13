@@ -148,12 +148,15 @@ function print_Head($id, $sub, $value)
 		$scripts = array_merge($scripts, (array)$value);
 	}
 
-	foreach(array_unique($scripts) as $script) {
-		if (!file_exists($script)) {
-			throw new FileNotFoundException("File '$script' not found.");
+	foreach(array_unique($scripts) as $script)
+	{	
+		$path = paramStr('{basedir}/'.$script, $this->app->paths);
+
+		if (!file_exists($path)) {
+			throw new FileNotFoundException("File '$path' not found.");
 		}
 		
-		$version = $this->elements[$id]['noversion']? '' : '?v='.filemtime($script);
+		$version = $this->elements[$id]['noversion']? '' : '?v='.filemtime($path);
 		$ext = substr($script, strrpos($script, '.'));
 		if ($script[0] != '/') $script = BASE_URL.$script;
 		switch($ext) {

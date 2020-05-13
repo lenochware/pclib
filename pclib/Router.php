@@ -205,7 +205,16 @@ class Action
 	function fromArray($get)
 	{
 		$this->path = $get['r'];
-		list($this->controller, $this->method) = explode('/', $this->path);
+		$path = explode('/', $this->path);
+		$n = count($path);
+
+		if ($n >= 3) {
+			$path = array_slice($path, -3);
+			$this->module = array_shift($path);
+		}
+		$this->controller = $path[0];
+		$this->method = $path[1];
+		
 		unset($get['r']);
 		$this->params = $get;
 	}
