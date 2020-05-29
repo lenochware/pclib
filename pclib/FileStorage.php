@@ -128,6 +128,49 @@ function saveFile($entity, $file)
 	return $id;
 }
 
+/** Copy file $file['SRC_PATH'] into file-storage. */
+function copyFile($entity, $file)
+{
+	//$this->onBeforeSave($entity, $file);
+
+	if (!(int)$entity[0] or !$entity[1]) {
+		throw new Exception('Cannot save file - invalid entity.');
+	}
+
+	if ($this->fileInBlackList($file['ORIGNAME'])) {
+		$this->errors[$file['INPUT_ID']] = 'File type is not allowed.';
+		return;
+	}
+
+	$dir = $this->getDir($this->dirNameFormat, $file);
+	$filename = $this->getFileName($this->fileNameFormat, $file);
+
+	$found = $this->findOne(array(
+		'ENTITY_ID'  =>$entity[0],
+		'ENTITY_TYPE'=>$entity[1],
+		'FILE_ID'=>$file['FILE_ID'],
+	));
+	if ($found) $this->delete($found['ID']);
+
+	$ok = copy($file['SRC_PATH'], $this->rootdir.$dir.$filename);
+	if (!$ok) {
+		$this->errors[$file['INPUT_ID']] = "Uploading '".$file['ORIGNAME']."' failed.";
+		return;
+	}
+
+	$file += array(
+	'ENTITY_ID' => $entity[0],
+	'ENTITY_TYPE' => $entity[1],
+	'FILEPATH' => $dir.$filename,
+	'DT' => date("Y-m-d H:i:s"),
+	);
+
+	$id = $this->db->insert($this->TABLE, $this->getDbColumns($file));
+
+	//$this->onAfterSave($entity, $file, $id);
+	return $id;
+}
+
 /**
  *  Save all files in $files array and assign these files to entity $entity.
  *  \param $entity associative array with entity data
