@@ -166,7 +166,7 @@ function sum($s)
 {
 	if (!$this->getSql()) return 0;
 	$rows = $this->getClone()->select("sum($s) as n");
-	return (int)$rows[0]['n'];
+	return +$rows[0]['n'];
 }
 
 /**
@@ -177,7 +177,7 @@ function avg($s)
 {
 	if (!$this->getSql()) return 0;
 	$rows = $this->getClone()->select("avg($s) as n");
-	return (int)$rows[0]['n'];
+	return +$rows[0]['n'];
 }
 
 

@@ -91,12 +91,19 @@ function getJoinCondition()
 }
 
 /**
- * Save $model as relation of the owner.
+ * Save $record as relation of the owner.
  * Example: Add post to the user: $user->posts->save($post);
- * @param Model $model Record to be saved.
+ * @param Model|array $record Record to be saved.
  */
-function save(Model $model)
+function save($record)
 {
+	if ($record instanceof Model) {
+		$model = $record;
+	}
+	else {
+		$model = new Model($this->params['table'], $record);
+	}
+
 	$foreignKey = $this->params['key'];
 
 	switch ($this->getType()) {
