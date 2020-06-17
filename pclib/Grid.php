@@ -380,13 +380,15 @@ function print_Sort($id, $sub)
 {
 	$url = $this->sortUrl($id);
 	$dir = ($this->sortArray[$id] == $id)? 'up':'dn';
-	print "<a href=\"$url\" class=\"sort $dir\">";
+	$active = $this->sortArray[$id]? 'active' : '';
+
+	print "<a href=\"$url\" class=\"sort $dir $active\">";
 	print $this->elements[$id]['lb']? $this->elements[$id]['lb']:$id;
 	print "</a>";
 
 	if (!$this->renderSortIcons) return;
 	$imageDir = $this->config['pclib.directories']['assets'];
-	if (!$this->sortArray[$id]) $dir = 'no';
+	if (!$active) $dir = 'no';
 	print "<img src=\"$imageDir/sort_$dir.gif\"".($this->useXhtml? ' />' : '>');
 }
 
