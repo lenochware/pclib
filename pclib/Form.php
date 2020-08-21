@@ -799,6 +799,12 @@ function print_Select($id, $sub, $value)
 			$html .= "<optgroup label=\"$group\">$content</optgroup>";
 		}
 	}
+	
+	if ($elem['multiple']) {
+		$tag['name'] .= '[]';
+		$tag['multiple'] = 1;
+	}
+
 	$html = $this->htmlTag('select', $tag, $html).$this->ieFix($id,$tag['name'],$value);
 	print $html;
 }
