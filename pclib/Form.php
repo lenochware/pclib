@@ -782,12 +782,23 @@ function print_Select($id, $sub, $value)
 	$options = array();
 	$html = $elem['noemptylb']? '':'<option value="">'.$this->t($emptylb).'</option>';
 
+	if ($elem['multiple'] and $value and !is_array($value))
+	{
+		$value = explode(',', $value);
+	}
+
 	$group = '_nogroup_';
 	foreach ($items as $i => $item) {
 		if (is_array($item)) list($label,$group) = $item;
 		else $label = $item;
 
-		$ch = ((string)$i == (string)$value)? ' selected="selected"' : '';
+		if (is_array($value)) {
+			$ch = (in_array($i, $value))? ' selected="selected"' : '';
+		}
+		else {
+			$ch = ((string)$i == (string)$value)? ' selected="selected"' : '';
+		}
+
 		$i = $this->escape($i);
 		$label = $this->escape($label);
 
@@ -840,6 +851,10 @@ function preparedValues($skipEmpty = false)
 
 		if ($elem['number'] and $elem['number'] != 'strict')
 			$value = $this->toNumber($value);
+
+		if (is_array($value) and $elem['multiple']) {
+			$value = implode(',', $value);
+		}
 
 		if (is_array($value)) $value = $this->toBitField($value);
 
