@@ -267,6 +267,7 @@ protected function getHttpData()
 		}
 
 		if ($elem['type'] == 'check' and !$data[$id] and !$elem['noprint']) $data[$id] = array();
+		elseif ($elem['type'] == 'select' and $elem['multiple'] and !$data[$id] and !$elem['noprint']) $data[$id] = array();
 		elseif($elem['type'] == 'input' and is_string($data[$id])) $data[$id] = trim($data[$id]);
 	}
 
