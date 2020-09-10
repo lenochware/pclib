@@ -1135,15 +1135,15 @@ function dbSync($tab)
 	if (!$columns) throw new Exception("Database table '$tab' not found.");
 	foreach($this->elements as $id => $el) {
 		if (!$this->isEditable($id)) continue;
-		if (!$columns[$id] and !$this->hasExtraSave($id)) {
+		if (!isset($columns[$id]) and !$this->hasExtraSave($id)) {
 			$this->elements[$id]['nosave'] = 1;
 			continue;
 		}
 		if ($columns[$id]['type'] != 'string') continue;
-		if (!$el['maxlength'])
+		if (!isset($el['maxlength']))
 			$this->elements[$id]['maxlength'] = $columns[$id]['size'];
 		if ($el['type'] != 'input') continue;
-		if (!$el['size'] or $el['size'] > $columns[$id]['size'])
+		if (!isset($el['size']) or $el['size'] > $columns[$id]['size'])
 			$this->elements[$id]['size'] = $columns[$id]['size'];
 	}
 }

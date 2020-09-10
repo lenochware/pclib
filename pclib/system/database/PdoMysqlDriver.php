@@ -94,7 +94,7 @@ function indexes($table)
 function columns($table)
 {
 	if (strpos($table, '.')) list($dbname, $table) = explode('.', $table);
-	if (!$dbname) $dbname = $this->dbName();
+	if (@!$dbname) $dbname = $this->dbName();
 
 	$q = $this->query(
 	"SELECT * FROM INFORMATION_SCHEMA.COLUMNS
@@ -133,7 +133,7 @@ private function u_type($type, $size)
 	$type = $native[$type];
 	if (!$type) return array(null, $size);
 	$type = explode(':', $type);
-	if (!$type[1]) $type[1] = $size;
+	if (@!$type[1]) $type[1] = $size;
 	return $type;
 }
 

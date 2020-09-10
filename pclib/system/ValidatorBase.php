@@ -218,6 +218,7 @@ class ValidatorBase extends BaseObject
 		}
 
 		foreach ((array)$elem as $rule => $param) {
+			if (is_null($param)) continue;
 			if (!$this->hasRule($rule)) {
 				 if ($this->skipUndefinedRule or in_array($rule, $this->ignoredAttributes)) {
 					continue;

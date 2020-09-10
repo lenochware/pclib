@@ -34,7 +34,6 @@ class ElementsDef extends BaseObject
 			'format' => null,
 			'tooltip' => null,
 			'size' => null,
-			'hidden' => null,
 			'required' => null,
 		],
 
@@ -51,7 +50,7 @@ class ElementsDef extends BaseObject
 			'get' => null,
 			'jsvalid' => null,
 			'default_print' => null,
-		],		
+		],
 
 		'pager' => [
 			'ul' => null,
@@ -71,7 +70,8 @@ class ElementsDef extends BaseObject
 			'columns' => null,
 			'noemptylb' => null,
 			'hint' => null,
-			'ajaxget' => null,			
+			'ajaxget' => null,
+			'hidden' => null,
 		],
 
 		'link' => [
@@ -87,7 +87,7 @@ class ElementsDef extends BaseObject
 			'onclick' => null,
 			'submit' => null,
 			'hint' => null,
-			'ajaxget' => null,			
+			'ajaxget' => null,
 		],
 
 		'input' => [
@@ -101,7 +101,8 @@ class ElementsDef extends BaseObject
 			'pattern' => null,
 			'range' => null,
 			'hint' => null,
-			'ajaxget' => null,			
+			'ajaxget' => null,
+			'hidden' => null,
 		],
 	];
 
