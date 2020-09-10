@@ -98,7 +98,7 @@ class ValidatorBase extends BaseObject
 	 */
 	function setError($id, $messageId, array $args = array())
 	{
-		$mEl = $this->elements[$id.'.'.$messageId];
+		$mEl = array_get($this->elements, $id.'.'.$messageId);
 
 		if ($mEl['type'] == 'message') {
 			$message = $mEl['text'];
@@ -253,7 +253,7 @@ class ValidatorBase extends BaseObject
 
 		foreach ($keys as $key) {
 			if (in_array($elements[$key]['type'], $this->ignoredElements)) continue;
-			if (!$this->validateElement($values[$key], (array)$elements[$key])) $ok = false;
+			if (!$this->validateElement(array_get($values, $key), (array)array_get($elements, $key))) $ok = false;
 		}
 
 		return $ok;

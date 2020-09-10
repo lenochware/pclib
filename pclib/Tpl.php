@@ -1054,7 +1054,7 @@ private function callback_getvalue($param)
 {
 	@list($id,$sub) = explode('.', $param[1]);
 	if ($id == 'GET') {
-		if ($sub) return $_GET[$sub];
+		if ($sub) return array_get($_GET, $sub);
 		else return '__GET__';
 	}
 	else return $this->getValue($param[1]);

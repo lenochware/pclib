@@ -205,7 +205,7 @@ protected function sessionHash($data)
 		 $remoteAddr    	//We fight against session stealing
 		 .$this->realm
 		 .$data['ID']     //Forbid changing user or role
-		 .$data['ROLES']
+		 .implode(',', $data['roles'])
 		 .$this->secret
 		 );
 }
