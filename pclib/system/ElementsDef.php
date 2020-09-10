@@ -31,37 +31,18 @@ class ElementsDef extends BaseObject
 			'html' => null,
 			'lb' => null,
 			'skip' => null,
-		],
-		'base_form' => [
+			'format' => null,
+			'tooltip' => null,
 			'size' => null,
 			'hidden' => null,
 			'required' => null,
-			'hint' => null,
-			'ajaxget' => null,
-		],		
-		'string' => [
-			'format' => null,
-			'tooltip' => null,
 		],
-		'number' => [
-			'format' => null,
-		],
-		'head' => [
-			'noversion' => null,
-			'inline' => null,
-		],
-		'class_tpl' => [
-		],
-		'class_grid' => [
+
+		'class' => [
 			'href' => null,
 			'action' => null,
 			'route' => null,
 			'singlepage' => null,
-		],
-		'class_form' => [
-			'href' => null,
-			'action' => null,
-			'route' => null,
 			'ajaxget' => null,
 			'ajax' => null,
 			'submitted' => null,
@@ -70,28 +51,16 @@ class ElementsDef extends BaseObject
 			'get' => null,
 			'jsvalid' => null,
 			'default_print' => null,
-		],
-		'class_gridform' => [
-			'href' => null,
-			'action' => null,
-			'route' => null,
-			'ajaxget' => null,
-			'ajax' => null,
-			'singlepage' => null,
-			'submitted' => null,
-			'noformtag' => null,
-			'table' => null,
-			'get' => null,
-			'jsvalid' => null,
-			'default_print' => null,
 		],		
+
 		'pager' => [
 			'ul' => null,
 			'size' => null,
 			'nohide' => null,
 			'pglen' => null,
 		],
-		'bind' => [
+
+		'selector' => [
 			'bitfield' => null,
 			'format' => null,
 			'list' => null,
@@ -101,17 +70,11 @@ class ElementsDef extends BaseObject
 			'emptylb' => null,
 			'columns' => null,
 			'noemptylb' => null,
+			'hint' => null,
+			'ajaxget' => null,			
 		],
+
 		'link' => [
-			'href' => null,
-			'action' => null,
-			'route' => null,
-			'img' => null,
-			'popup' => null,
-			'field' => null,
-			'confirm' => null,
-		],
-		'button' => [
 			'href' => null,
 			'action' => null,
 			'route' => null,
@@ -123,7 +86,10 @@ class ElementsDef extends BaseObject
 			'tag' => null,
 			'onclick' => null,
 			'submit' => null,
+			'hint' => null,
+			'ajaxget' => null,			
 		],
+
 		'input' => [
 			'date' => null,
 			'file' => null,
@@ -134,32 +100,48 @@ class ElementsDef extends BaseObject
 			'number' => null,
 			'pattern' => null,
 			'range' => null,
-		],
-		'text' => [
-			'maxlength' => null,
-		],
-		'listinput' => [
-			'maxlength' => null,
+			'hint' => null,
+			'ajaxget' => null,			
 		],
 	];
 
 
-	static function getElement($id, $type, $templateClass)
+	static function getElement($id, $type)
 	{
-		if ($type == 'class') {
-			$elem = self::$elem['class_'.$templateClass];
-		}
-		else {
-			$lkpType = in_array($type, ['select', 'radio', 'check'])? 'bind' : $type;
-			$elem = isset(self::$elem[$lkpType])? self::$elem[$lkpType] : [];			
+		switch ($type) {
+			case 'class':
+				$elem = self::$elem['class'];
+				break;
+		
+			case 'select':
+			case 'radio':
+			case 'check':
+			case 'bind':
+					$elem = self::$elem['selector'];
+				break;
+
+			case 'input':	
+			case 'text':
+			case 'listinput':
+					$elem = self::$elem['input'];
+				break;
+
+			case 'button':
+			case 'link':
+						$elem = self::$elem['link'];
+				break;
+
+			case 'pager':
+						$elem = self::$elem['pager'];
+				break;
+
+			default:
+						$elem = [];
+				break;
 		}
 
 		$elem['id'] = $id;
 		$elem['type'] = $type;
-		
-		if ($templateClass == 'form' or $templateClass == 'gridform') {
-			$elem = self::$elem['base_form'] + $elem;
-		}
 
 		return self::$elem['base'] + $elem;
 	}
