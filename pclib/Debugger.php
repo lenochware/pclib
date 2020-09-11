@@ -169,7 +169,7 @@ protected function strDump(array $meta, array $options = array())
 		$opened = isset($options['opened'])? $options['opened'] : ($node['type'] == 'array');
 
 
-		if (isset($node['indexed']) and !$node['nested'] and $node['printsize'] < 500) {
+		if (array_get($node, 'indexed') and !$node['nested'] and $node['printsize'] < 500) {
 			$html .= $name.': '.$value;
 			$html .= $this->strSimpleArray($nodes);
 			continue;
