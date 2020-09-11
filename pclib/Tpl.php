@@ -348,8 +348,8 @@ function getValue($id)
 	}
 
 	$elem = array_get($this->elements, $id);
-	if (@$elem['loop']) return $this->compute($id);
-	if (@$elem['field']) $id = $elem['field'];
+	if (!empty($elem['loop'])) return $this->compute($id);
+	if (!empty($elem['field'])) $id = $elem['field'];
 	
 	foreach ($this->inBlock as &$block) {
 		$rowno = $this->elements[$block]['rowno'];

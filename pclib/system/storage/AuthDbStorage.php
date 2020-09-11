@@ -29,7 +29,7 @@ function getUser($userName)
 	$this->service('db');
 	$user = new AuthUser;
 	$user->values = $this->getData($userName);
-	$userId = @$user->values['ID'];
+	$userId = array_get($user->values, 'ID');
 	if (!$userId) return null;
 
 	$user->values['roles'] = $this->getRoles($userId);

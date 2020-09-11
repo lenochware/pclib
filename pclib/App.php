@@ -378,7 +378,7 @@ function getPaths()
  */
 function t($s)
 {
-	$translator = @$this->services['translator'];
+	$translator = array_get($this->services, 'translator');
 	if ($translator) $s = $translator->translate($s);
 	$args = array_slice(func_get_args(), 1);
 	if ($args) {
