@@ -104,7 +104,7 @@ protected function parseDsn($dsn)
 	 'codepage' => $path[1]? $path[1] : null
 	);
 	//new way of adding options e.g. ?charset=utf8
-	if (isset($dsa['query'])) parse_str($dsa['query'], $dsarray['options']);
+	if (!empty($dsa['query'])) parse_str($dsa['query'], $dsarray['options']);
 
 	if ($dsarray['driver'] == 'sqlite') $dsarray['codepage'] = null;
 	if ($dsarray['codepage']) $dsarray['options']['charset'] = $dsarray['codepage'];

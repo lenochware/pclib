@@ -87,7 +87,7 @@ class ValidatorBase extends BaseObject
 	 */
 	function hasRule($rule)
 	{
-		return is_callable($this->rules[$rule]);
+		return !empty($this->rules[$rule]);
 	}
 
 	/**

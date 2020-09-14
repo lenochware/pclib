@@ -77,7 +77,7 @@ protected function _init()
 
 	$getName = array_get($_GET, 'grid');
 	if ($getName == $this->name or !$getName) {
-		if (isset($_GET['page'])) {
+		if (!empty($_GET['page'])) {
 			$this->page = $_GET['page'];
 		}
 	}
@@ -336,7 +336,7 @@ function print_Pager($id, $sub)
 
 	if ($this->pager->getValue('maxpage') < 2 and !$el['nohide']) return;
 
-	if (isset($this->values[$pgid])) {
+	if (!empty($this->values[$pgid])) {
 		print $this->values[$pgid];
 		return;
 	}

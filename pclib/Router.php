@@ -54,7 +54,7 @@ function getAction()
 	$action = new Action($_GET);
 
 	//%form button has been pressed, set route accordingly.
-	if (isset($_REQUEST['pcl_form_submit'])) {
+	if (!empty($_REQUEST['pcl_form_submit'])) {
 		$action->method = $_REQUEST['pcl_form_submit'];
 	}
 

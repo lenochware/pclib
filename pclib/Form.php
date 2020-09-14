@@ -88,12 +88,12 @@ protected function _init()
 	}
 
 	foreach ($this->elements as $id=>$elem) {
-		if (isset($elem['hidden'])) $this->hidden[$id] = $id;
-		if (isset($elem['file']) and $elem['type'] == 'input') {
+		if (!empty($elem['hidden'])) $this->hidden[$id] = $id;
+		if (!empty($elem['file']) and $elem['type'] == 'input') {
 			$this->header['fileupload'] = 1;
 		}
 
-    if (isset($elem['ajaxget'])) {
+    if (!empty($elem['ajaxget'])) {
     	$this->header['ajax'] = true;
     }
 
@@ -102,7 +102,7 @@ protected function _init()
 			$this->elements[$id]['size'] = $sz;
 			$this->elements[$id]['maxlength'] = $ml;
 		}
-		if ($elem['type'] == 'check' and isset($elem['default'])) {
+		if ($elem['type'] == 'check' and !empty($elem['default'])) {
 			$this->elements[$id]['default'] = explode(',', $elem['default']);
 		}
 	}
@@ -187,9 +187,9 @@ function validate()
 protected function validateElementCallback($event)
 {
 	$elem = $event->data[1];
-	$id = $elem['id'];
+	$id = array_get($elem, 'id');
 
-	if (!$this->isEditable($id)) {
+	if (!$id or !$this->isEditable($id)) {
 		$event->propagate = false;
 		$event->result = true;
 		return;
@@ -313,15 +313,15 @@ protected function getTag($id, $ignoreHtmlAttr = false)
 	if ($this->getAttr($id, 'noedit')) $tag[] = 'disabled';
 	if ($html5) {
 		if ($elem['required']) $tag[] = 'required';
-		if (isset($elem['pattern'])) $tag['pattern'] = $elem['pattern'];
+		if (!empty($elem['pattern'])) $tag['pattern'] = $elem['pattern'];
 	}
 
 	$tag['placeholder'] = $elem['hint'];
 
 	$class = array();
-	if (isset($elem['html']['class'])) $class[] = $elem['html']['class'];
+	if (!empty($elem['html']['class'])) $class[] = $elem['html']['class'];
 	if ($this->getAttr($id, 'noedit')) $class[] = 'disabled';
-	if (isset($this->invalid[$id])) $class[] = 'err';
+	if (!empty($this->invalid[$id])) $class[] = 'err';
 	if ($elem['required']) $class[] = 'required';
 	$tag['class'] = $class;
 
@@ -395,7 +395,7 @@ function print_Element($id, $sub, $value)
 
 	if ($sub == 'err') {
 		print '<span class="err">';
-		if (isset($this->invalid[$id])) {
+		if (!empty($this->invalid[$id])) {
 			print $this->invalid[$id];
 		}
 		print '</span>';
@@ -504,7 +504,7 @@ function print_Class($id, $sub, $value)
 protected function trPrintElement($elem)
 {
 	$id = $elem['id'];
-	if ($elem['hidden']) return;
+	if (!empty($elem['hidden'])) return;
 	print "<tr><td class=\"$id\">";
 	$this->print_Element($id, 'lb', null);
 	print '</td><td>';
@@ -540,7 +540,7 @@ function print_Label($id)
 	$elem = $this->elements[$id];
 	$class = [];
 	if ($elem['required']) $class[] = 'required';
-	if (isset($this->invalid[$id])) $class[] = 'err';
+	if (!empty($this->invalid[$id])) $class[] = 'err';
 	$attr = '';
 	if ($class) $attr = ' class="'.implode(' ',$class).'"';
 	if ($this->header['ajax']) $attr .= " id=\"xl_$id\"";
@@ -591,12 +591,12 @@ function print_Input($id, $sub, $value)
 
 		if ($html5) {
 			if ($elem['date']) $type = 'date';
-			else if (isset($elem['number'])) $type = 'number';
-			else if (isset($elem['email']))  $type = 'email';
-			else if (isset($elem['tel']))  $type = 'tel';
-			else if (isset($elem['website']))  $type = 'website';
-			else if (isset($elem['color']))  $type = 'color';
-			else if (isset($elem['time'])) {
+			else if (!empty($elem['number'])) $type = 'number';
+			else if (!empty($elem['email']))  $type = 'email';
+			else if (!empty($elem['tel']))  $type = 'tel';
+			else if (!empty($elem['website']))  $type = 'website';
+			else if (!empty($elem['color']))  $type = 'color';
+			else if (!empty($elem['time'])) {
 				$type = 'time';
 				$tag['step'] = 1800;
 			}
@@ -640,7 +640,7 @@ function print_Button($id, $sub, $value)
 	$url = $this->getUrl($elem);
 
 	$onclick = $elem['onclick'];
-	if (!$onclick and isset($elem['html']['onclick'])) {
+	if (!$onclick and !empty($elem['html']['onclick'])) {
 		$onclick = $elem['html']['onclick'];
 	};
 
@@ -841,22 +841,22 @@ function preparedValues($skipEmpty = false)
 			continue;
 		}
 
-		if (isset($this->elements[$id]['file']) and (!$this->values[$id] or $this->hasExtraSave($id))) {
+		if (!empty($this->elements[$id]['file']) and (!$this->values[$id] or $this->hasExtraSave($id))) {
 			continue;
 		}
 
 		if ($fmt = $this->getAttr($id, 'format')) 
 			$value = $this->formatStr($value, $fmt);
 
-		if (isset($elem['date']))
+		if (!empty($elem['date']))
 			$value = $this->toSqlDate($value, $elem['date']);
 
-		if (isset($elem['number']) and $elem['number'] != 'strict')
+		if (!empty($elem['number']) and $elem['number'] != 'strict')
 			$value = $this->toNumber($value);
 
 		if (is_array($value)) $value = $this->toBitField($value);
 
-		if (isset($elem['onsave'])) 
+		if (!empty($elem['onsave'])) 
 			$value = $this->fireEventElem('onsave', $id, '', $value);
 
 		$values[$id] = $value;
@@ -1135,15 +1135,15 @@ function dbSync($tab)
 	if (!$columns) throw new Exception("Database table '$tab' not found.");
 	foreach($this->elements as $id => $el) {
 		if (!$this->isEditable($id)) continue;
-		if (!isset($columns[$id]) and !$this->hasExtraSave($id)) {
+		if (empty($columns[$id]) and !$this->hasExtraSave($id)) {
 			$this->elements[$id]['nosave'] = 1;
 			continue;
 		}
 		if ($columns[$id]['type'] != 'string') continue;
-		if (!isset($el['maxlength']))
+		if (empty($el['maxlength']))
 			$this->elements[$id]['maxlength'] = $columns[$id]['size'];
 		if ($el['type'] != 'input') continue;
-		if (!isset($el['size']) or $el['size'] > $columns[$id]['size'])
+		if (empty($el['size']) or $el['size'] > $columns[$id]['size'])
 			$this->elements[$id]['size'] = $columns[$id]['size'];
 	}
 }
@@ -1293,7 +1293,7 @@ protected function head()
 		 $hidden['pclib_jsvalid'] = $this->getValidationString();
 	}
 
-	if (isset($this->header['fileupload'])) $tag['enctype'] = 'multipart/form-data';
+	if (!empty($this->header['fileupload'])) $tag['enctype'] = 'multipart/form-data';
 
 	$html = $this->htmlTag('form', $tag, null, true)."\n";
 
@@ -1363,7 +1363,7 @@ private function getValidationString()
 		$rule = $options = '';
 		$required = $elem['required'];
 		foreach($rules as $testrule) {
-			if (isset($elem[$testrule]) and $elem[$testrule]) {
+			if (!empty($elem[$testrule])) {
 				$rule = $testrule;
 				break;
 			}
@@ -1371,7 +1371,7 @@ private function getValidationString()
 		if (!$rule and !$required) continue;
 
 		if ($rule) {
-			if ($elem[$rule] === 1 and isset($defaults[$rule])) $options = $defaults[$rule];
+			if ($elem[$rule] === 1 and !empty($defaults[$rule])) $options = $defaults[$rule];
 			else $options = $elem[$rule];
 		}
 

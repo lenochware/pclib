@@ -354,7 +354,7 @@ function getValue($id)
 	foreach ($this->inBlock as &$block) {
 		$rowno = $this->elements[$block]['rowno'];
 
-		if (isset($this->values[$block])) {
+		if (!empty($this->values[$block])) {
 			$value = array_get(isset($rowno)? $this->values[$block][$rowno] : $this->values[$block], $id);
 		}
 		if (isset($value)) break;
@@ -679,7 +679,7 @@ function eachPrintable($callback, $sub = '')
 	$ignore_list = array('class','block','pager','sort','button');
 
 	foreach($this->elements as $id => $elem) {
-		if (array_get($elem, 'noprint') or array_get($elem, 'skip') or in_array($elem['type'], $ignore_list)) {
+		if (in_array($elem['type'], $ignore_list) or $elem['noprint'] or $elem['skip']) {
 			continue;
 		}
 
@@ -983,7 +983,7 @@ protected function toString($value) {
 function getItems($id)
 {
 	$elem = $this->elements[$id];
-	if (isset($elem['items'])) {
+	if (!empty($elem['items'])) {
 		return $elem['items'];
 	}
 
