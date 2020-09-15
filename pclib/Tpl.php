@@ -351,17 +351,20 @@ function getValue($id)
 		return $this->getVariable($id);
 	}
 
-	$elem = $this->elements[$id];
-	if ($elem['loop']) return $this->compute($id);
-	if ($elem['field']) $id = $elem['field'];
+	$elem = array_get($this->elements, $id);
+	if (!empty($elem['loop'])) return $this->compute($id);
+	if (!empty($elem['field'])) $id = $elem['field'];
 	
 	foreach ($this->inBlock as &$block) {
 		$rowno = $this->elements[$block]['rowno'];
-		$value = isset($rowno)? $this->values[$block][$rowno][$id] : $this->values[$block][$id];
+
+		if (!empty($this->values[$block])) {
+			$value = array_get(isset($rowno)? $this->values[$block][$rowno] : $this->values[$block], $id);
+		}
 		if (isset($value)) break;
 	}
 
-	if (!isset($value)) $value = $this->values[$id];
+	if (!isset($value)) $value = isset($this->values[$id])? $this->values[$id] : null;
 	return (is_numeric($value) or $value)? $value : $elem['default'];
 }
 
@@ -450,7 +453,7 @@ function create($tableName)
 /** Return computed value of element $id. */
 function compute($id)
 {
-	$items = $this->elements[$id]['items'];
+	$items = array_get($this->elements[$id], 'items');
 	if (!$items) {
 		$items = explode(',', $this->elements[$id]['loop']);
 		if (count($items)) $this->elements[$id]['items'] = $items;
@@ -537,6 +540,7 @@ function print_Number($id, $sub, $value)
 function print_String($id, $sub, $s)
 {
 	$elem = $this->elements[$id];
+	$title = '';
 
 	//format database date...
 	if (isset($elem['date']))
@@ -545,8 +549,9 @@ function print_String($id, $sub, $s)
 	if (isset($elem['size'])) {
 		if (!isset($elem['endian'])) $elem['endian'] = '...';
 		if(utf8_strlen($s) > $elem['size'] + 2/*add length of endian*/) {
-			if ($elem['tooltip'])
+			if ($elem['tooltip']) {
 				$title = utf8_htmlspecialchars($s);
+			}
 			$s = utf8_substr($s, 0, $elem['size']) . $elem['endian'];
 		}
 	}
@@ -554,8 +559,9 @@ function print_String($id, $sub, $s)
 	if ($elem['format'])
 		$s = $this->formatStr($s, $elem['format']);
 
-	if ($title)
+	if ($title) {
 		$s = "<span title=\"$title\">$s</span>";
+	}
 
 	print $s;
 }
@@ -584,7 +590,7 @@ function print_Bind($id, $sub, $value)
 	else {
 		if(isset($items[$value])) $value = $items[$value];
 		elseif(isset($value,$items['*'])) $value = $items['*'];
-		else $value = $items[$elem['default']];
+		else $value = array_get($items, $elem['default']);
 	}
 
 	if (!isset($value)) $value = $elem['emptylb'];
@@ -677,7 +683,10 @@ function eachPrintable($callback, $sub = '')
 	$ignore_list = array('class','block','pager','sort','button');
 
 	foreach($this->elements as $id => $elem) {
-		if ($elem['noprint'] or $elem['skip'] or in_array($elem['type'], $ignore_list)) continue;
+		if (in_array($elem['type'], $ignore_list) or $elem['noprint'] or $elem['skip']) {
+			continue;
+		}
+
 		$elem['sub'] = $sub;
 		call_user_func($callback, $elem);
 	}
@@ -742,7 +751,7 @@ function print_Block($block)
 	array_unshift($this->inBlock, $block);
 
 	if ($b['repeat']) $count = $b['repeat'];
-	else $count = $this->values[$block][0]? count($this->values[$block]):0;
+	else $count = isset($this->values[$block][0])? count($this->values[$block]):0;
 
 	if ($count) {
 		for ($rowno = 0; $rowno < $count; $rowno++) {
@@ -760,12 +769,14 @@ protected function print_BlockRow($block, $rowno = null)
 {
 	$b = $this->elements[$block];
 
-	if (is_scalar($this->values[$block])) {
+	$bval = array_get($this->values, $block);
+
+	if (is_scalar($bval)) {
 		print $this->values[$block];
 		return;
 	}
 
-	if ($this->values[$block]) {
+	if ($bval) {
 		$begin = $b['begin'];
 		$end = $b['else']? $b['else'] : $b['end'];
 	}
@@ -781,15 +792,12 @@ protected function print_BlockRow($block, $rowno = null)
 
 		if ($strip == TplParser::TPL_ELEM) {
 			 $strip = $this->document[++$i];
-			 list($id,$sub) = explode('.', $strip);
+			 @list($id,$sub) = explode('.', $strip);
 
 			 if ($this->elements[$id]['noprint']) { $this->print_Empty($id, $sub); continue; }
 
 			 $value = $this->getValue($id);
 
-			 /*if ($func = $this->elements[$id]['print']) {
-				 $go = $this->callback($func, $id, $sub, $value);
-			 }*/
 			 if (!$this->fireEventElem('onprint',$id,$sub,$value))
 				 $this->print_Element($id, $sub, $value);
 		}
@@ -813,7 +821,7 @@ protected function print_BlockRow($block, $rowno = null)
 function getPopup($id, $attr, $url)
 {
 		if ($attr == '1') $attr = '800x600';
-		list($size,$attr) = explode(' ', $attr);
+		@list($size,$attr) = explode(' ', $attr);
 		switch ($attr) {
 		case 'full': $poppar='toolbar=1,location=1,menubar=1,scrollbars=1,resizable=1';
 		break;
@@ -891,7 +899,7 @@ private function insertAfter(array $a, array $elem, $after)
 function htmlTag($name, $attr = array(), $content = null, $startTagOnly = false)
 {
 	$html = '<'.$name;
-	if($attr['__attr']) {
+	if(isset($attr['__attr'])) {
 		$html .= ' '.$attr['__attr'];
 		unset($attr['__attr']);
 	}
@@ -979,20 +987,22 @@ protected function toString($value) {
 function getItems($id)
 {
 	$elem = $this->elements[$id];
-	$items = $elem['items'];
-	if (!isset($items)) {
-		$items = array();
-		if ($elem['list']) $items = $this->getLkpList($elem['list']);
-		elseif ($elem['query'])  $items = $this->getLkpQuery($elem['query']);
-		elseif ($elem['lookup']) $items = $this->getLkpLookup($elem['lookup']);
-		elseif ($elem['datasource']) $items = $this->getDataSource($elem['datasource']);
-
-		if ($this->translator) {
-			$items = $this->translator->translateArray($items);
-		}
-
-		$this->elements[$id]['items'] = $items;
+	if (!empty($elem['items'])) {
+		return $elem['items'];
 	}
+
+	$items = array();
+	if ($elem['list']) $items = $this->getLkpList($elem['list']);
+	elseif ($elem['query'])  $items = $this->getLkpQuery($elem['query']);
+	elseif ($elem['lookup']) $items = $this->getLkpLookup($elem['lookup']);
+	elseif ($elem['datasource']) $items = $this->getDataSource($elem['datasource']);
+
+	if ($this->translator) {
+		$items = $this->translator->translateArray($items);
+	}
+
+	$this->elements[$id]['items'] = $items;
+
 	return $items;
 }
 
@@ -1048,9 +1058,9 @@ private function callback_getvalue_db($param)
 
 private function callback_getvalue($param)
 {
-	list($id,$sub) = explode('.', $param[1]);
+	@list($id,$sub) = explode('.', $param[1]);
 	if ($id == 'GET') {
-		if ($sub) return $_GET[$sub];
+		if ($sub) return array_get($_GET, $sub);
 		else return '__GET__';
 	}
 	else return $this->getValue($param[1]);

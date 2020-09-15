@@ -14,6 +14,8 @@
 
 namespace pclib\system;
 
+use pclib\system\ElementsDef;
+
 /**
  * Parse pclib template with pclib-elements code.
  * Example: $parsed = $parser->parse($templateStr);
@@ -42,7 +44,7 @@ class TplParser extends BaseObject
 	 * @return array $parsed [$elements, $body]
 	 */
 	function parse($templateStr)
-	{ 	
+	{
 		$templ = $this->split($templateStr);
 		if ($partials = $this->getPartials($templ)) {
 			$templ = $this->mergePartials($templ, $partials);
@@ -77,7 +79,7 @@ class TplParser extends BaseObject
 
 		$elms['pcl_document'] = array(
 			'type' => 'block',
-			'begin'=> 0, 'end' => 0
+			'begin'=> 0, 'end' => 0, 'else' => null
 		);
 
 		if (trim($s) == '') return $elms;
@@ -113,10 +115,7 @@ class TplParser extends BaseObject
 		$type = array_shift($terms);
 		$id = array_shift($terms);
 
-		$elem = array(
-			'id' => $id,
-			'type' => $type,
-		);
+		$elem = ElementsDef::getElement($id, $type);
 
 		while ($term = array_shift($terms)) {
 			$value = ($terms and $terms[0][0] == "\"")? $this->readQTerm($terms) : 1;
@@ -227,8 +226,9 @@ class TplParser extends BaseObject
 		$bstack = array(); $block = null;
 		foreach ($document as $key=>$strip) {
 			if ($strip == self::TPL_ELEM) {
-				list($id,$sub) = explode('.',$document[$key+1]);
-				if ($elements[$id] and !$elements[$id]['block'])
+				$aid = explode('.',$document[$key+1]);
+				$id = $aid[0];
+				if (isset($elements[$id]) and !$elements[$id]['block'])
 					$elements[$id]['block'] = $block;
 			}
 
@@ -261,7 +261,7 @@ class TplParser extends BaseObject
 				}
 
 				$document[$key+1] = $block;
-				if ($elements[$block]['begin']) {
+				if (isset($elements[$block]['begin'])) {
 					throw new Exception("Block name '%s' is already used.", array($block));
 				}
 				$elements[$block]['id']    = $block;
@@ -269,6 +269,14 @@ class TplParser extends BaseObject
 				$elements[$block]['block'] = end($bstack);
 				$elements[$block]['begin'] = $key + 2;
 				$elements[$block]['end'] = $elements['pcl_document']['end'];
+
+				$elements[$block] += [
+					'noprint' => null, 
+					'if' => null, 
+					'ifnot' => null, 
+					'repeat' => null,
+					'else' => null,
+				];
 			}
 		}
 

@@ -141,8 +141,15 @@ protected function strSimpleArray(array $nodes = null)
  */
 protected function spanBox($id, $title, $content, $opened = true, $css_title = 'cursor:pointer')
 {
-	if ($opened) $css_dots = "style=\"display:none\"";
-	else $css_content = "style=\"display:none\"";
+	$css_dots = $css_content = '';
+
+	if ($opened) {
+		$css_dots = "style=\"display:none\"";
+	}
+	else {
+		$css_content = "style=\"display:none\"";
+	}
+
 	return "<span style=\"$css_title\" onclick=\"var e=document.getElementById('$id');e.nextSibling.style.display=e.style.display;e.style.display=(e.style.display=='none'?'inline':'none');\">$title</span><span id=\"$id\" $css_content>$content</span><span $css_dots> ...\n</span>";
 }
 
@@ -158,11 +165,11 @@ protected function strDump(array $meta, array $options = array())
 		$html .= $lpad;
 		$name = $node['name'];
 		$value = $node['value'];
-		$nodes = $node['nodes'];
+		$nodes = array_get($node, 'nodes');
 		$opened = isset($options['opened'])? $options['opened'] : ($node['type'] == 'array');
 
 
-		if ($node['indexed'] and !$node['nested'] and $node['printsize'] < 500) {
+		if (array_get($node, 'indexed') and !$node['nested'] and $node['printsize'] < 500) {
 			$html .= $name.': '.$value;
 			$html .= $this->strSimpleArray($nodes);
 			continue;
@@ -285,9 +292,11 @@ protected function traceArray($e = null)
 
 	$maxlen = array(0,0);
 	foreach(array_reverse($strace) as $call) {
-		if ($call['class'] == get_class($this)) break;
-		if ($call['class'])
+
+		if (isset($call['class'])) {
+			if ($call['class'] == get_class($this)) break;
 			$call['function'] = $call['class'].$call['type'].$call['function'];
+		}
 		$call['relpath'] = $this->relpath($call['file']);
 
 		if($this->useHtml) {
@@ -367,7 +376,7 @@ function tracePath($levels = 100, $e = null)
 function errorDump($message, $e = null)
 {
 	global $pclib;
-	$s = ($this->useHtml and $pclib->utf8)? '<meta charset="utf-8">':'';
+	$s = $this->useHtml? '<meta charset="utf-8">':'';
 	$s .= $message.' ';
 	if ($this->useHtml) {
 		$s .= $this->spanBox($this->uniqId(), $this->tracePath(2,$e),

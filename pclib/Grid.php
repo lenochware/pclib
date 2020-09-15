@@ -81,8 +81,9 @@ protected function _init()
 
 	$this->baseUrl = $this->getBaseUrl();
 
-	if ($_GET['grid'] == $this->name or !$_GET['grid']) {
-		if ($_GET['page']) {
+	$getName = array_get($_GET, 'grid');
+	if ($getName == $this->name or !$getName) {
+		if (!empty($_GET['page'])) {
 			$this->page = $_GET['page'];
 		}
 	}
@@ -170,7 +171,7 @@ function setQuery($sql)
 
 	$this->hash = $hash;
 	array_shift ($args);
-	if (is_array($args[0])) $args = $args[0];
+	if (is_array(array_get($args, 0))) $args = $args[0];
 
 	$sql = $this->db->setParams($sql, $args + (array)$this->filter);
 	$sql = str_replace("\n", " \n ", strtr($sql, "\r\t","  "));
@@ -342,7 +343,7 @@ function print_Pager($id, $sub)
 
 	if ($this->pager->getValue('maxpage') < 2 and !$el['nohide']) return;
 
-	if ($this->values[$pgid]) {
+	if (!empty($this->values[$pgid])) {
 		print $this->values[$pgid];
 		return;
 	}
@@ -359,14 +360,15 @@ function print_Pager($id, $sub)
 protected function sortUrl($id)
 {
 	$sa = $this->sortArray;
+	$curId = array_get($sa, $id);
 
 	if ($this->multiSort) {
-		if ($sa[$id] == $id.':d') unset($sa[$id]);
-		else $sa[$id] = ($sa[$id] == $id)? $id.':d' : $id;
+		if ($curId == $id.':d') unset($sa[$id]);
+		else $sa[$id] = ($curId == $id)? $id.':d' : $id;
 		$s = implode(',', $sa);
 	}
 	else {
-		$s = ($sa[$id] == $id)? $id.':d' : $id;
+		$s = ($curId == $id)? $id.':d' : $id;
 	}
 
 	return $this->baseUrl."sort=$s&page=1";
@@ -379,16 +381,17 @@ protected function sortUrl($id)
 function print_Sort($id, $sub)
 {
 	$url = $this->sortUrl($id);
-	$dir = ($this->sortArray[$id] == $id)? 'up':'dn';
-	$active = $this->sortArray[$id]? 'active' : '';
+	$curId = array_get($this->sortArray, $id);
+	$active = $curId? 'active' : '';
 
+	$dir = ($curId == $id)? 'up':'dn';
 	print "<a href=\"$url\" class=\"sort $dir $active\">";
 	print $this->elements[$id]['lb']? $this->elements[$id]['lb']:$id;
 	print "</a>";
 
 	if (!$this->renderSortIcons) return;
 	$imageDir = $this->config['pclib.directories']['assets'];
-	if (!$active) $dir = 'no';
+	if (!$curId) $dir = 'no';
 	print "<img src=\"$imageDir/sort_$dir.gif\"".($this->useXhtml? ' />' : '>');
 }
 
@@ -449,7 +452,7 @@ protected function getValues()
 	$rows = $this->db->fetchAll($q);
 
 	//sumgrid hack...
-	if (count($rows) > $this->pager->getValue('pglen')) $last = array_pop($rows);
+	$last = (count($rows) > $this->pager->getValue('pglen'))? array_pop($rows) : null;
 	if ($this->sumArray) $this->sumArray['items']['last'] = $last;
 
 	return $rows;
@@ -531,6 +534,7 @@ protected function getQuery()
 
 	if ($this->sortArray) {
 		if ($lpos = stripos($sql, ' order by ')) $sql = substr($sql, 0, $lpos);
+		$orderby = '';
 		foreach($this->sortArray as $id => $sval) {
 			if (!$this->elements[$id]) {
 				unset($this->sortArray[$id]);
@@ -655,15 +659,15 @@ private function sumFieldEquals(array $sum)
 {
 	$rowno = $this->elements['items']['rowno'];
 	if ($this->sumArray['items']['pos'] > $sum['pos']) $rowno--;
-	$v1 = $this->values['items'][$rowno][$sum['field']];
-	$v2 = $this->values['items'][$rowno+1][$sum['field']];
+	$v1 = @$this->values['items'][$rowno][$sum['field']];
+	$v2 = @$this->values['items'][$rowno+1][$sum['field']];
 	if ($rowno == $this->pager->getValue('pglen')-1) $v2 = $this->sumArray['items']['last'][$sum['field']];
 	return ($v1 == $v2);
 }
 
 protected function print_BlockRow($block, $rowno = null)
 {
-	if ($block == 'items') {
+	if ($block == 'items' and isset($rowno)) {
 		$this->onBeforeRow($this->values[$block][$rowno], $rowno);
 	}
 
@@ -687,7 +691,7 @@ protected function print_BlockRow($block, $rowno = null)
 		parent::print_BlockRow($block, $rowno);
 	}
 
-	if ($block == 'items') {
+	if ($block == 'items' and isset($rowno)) {
 		$this->onAfterRow($this->values[$block][$rowno], $rowno);
 	}
 }

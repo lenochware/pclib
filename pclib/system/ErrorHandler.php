@@ -45,8 +45,9 @@ class ErrorHandler extends BaseObject
 	 */	
 	function register()
 	{
-		$codes = $this->options['error_reporting'];
-		set_error_handler(array($this, '_onError'), isset($codes)? $codes : E_ALL ^ E_NOTICE);
+		set_error_handler(array($this, '_onError'), 
+			array_get($this->options, 'error_reporting', E_ALL ^ E_NOTICE)
+		);
 		set_exception_handler(array($this, '_onException'));
 	}
 

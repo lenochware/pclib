@@ -105,7 +105,7 @@ public function addScripts()
 	$scripts = func_get_args();
 	if (is_array($scripts[0])) $scripts = $scripts[0];
 	
-	if (is_array($this->values[$id])) {
+	if (!empty($this->values[$id])) {
 		$this->values[$id] = array_merge($this->values[$id], $scripts);
 	}
 	else $this->values[$id] = $scripts;
@@ -156,7 +156,7 @@ function print_Head($id, $sub, $value)
 			throw new FileNotFoundException("File '$path' not found.");
 		}
 		
-		$version = $this->elements[$id]['noversion']? '' : '?v='.filemtime($path);
+		$version = array_get($this->elements[$id], 'noversion')? '' : '?v='.filemtime($script);
 		$ext = substr($script, strrpos($script, '.'));
 		if ($script[0] != '/') $script = BASE_URL.$script;
 		switch($ext) {
@@ -165,7 +165,7 @@ function print_Head($id, $sub, $value)
 		}
 	}
 
-	$inline = $this->elements[$id]['inline'];
+	$inline = array_get($this->elements[$id], 'inline');
 	if ($inline) print $inline;
 }
 

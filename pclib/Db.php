@@ -100,11 +100,11 @@ protected function parseDsn($dsn)
 	 'path'   => substr($dsa['path'],1),
 	 'dbname' => $path[0],
 	 'user'   => $dsa['user'],
-	 'passw'  => $dsa['pass'],
+	 'passw'  => array_get($dsa, 'pass'),
 	 'codepage' => $path[1]? $path[1] : null
 	);
 	//new way of adding options e.g. ?charset=utf8
-	if ($dsa['query']) parse_str($dsa['query'], $dsarray['options']);
+	if (!empty($dsa['query'])) parse_str($dsa['query'], $dsarray['options']);
 
 	if ($dsarray['driver'] == 'sqlite') $dsarray['codepage'] = null;
 	if ($dsarray['codepage']) $dsarray['options']['charset'] = $dsarray['codepage'];
@@ -203,6 +203,8 @@ function setLimit($numrows, $offset = 0)
 **/
 function query($_sql, $param = null)
 {
+	$res = null;
+	
 	if (isset($param) and !is_array($param)) {
 		$param = func_get_args();
 		array_shift($param);
@@ -212,7 +214,9 @@ function query($_sql, $param = null)
 	$event = $this->onBeforeQuery($sql);
 	if ($event and !$event->propagate) return;
 
-	if (!$this->disabled) $res = $this->drv->query($sql);
+	if (!$this->disabled) {
+		$res = $this->drv->query($sql);
+	}
 	
 	if ($this->logging > 1 and !$this->drv->error) {
 		$this->messages[] = "(n) Proceed $sql";
@@ -340,6 +344,7 @@ function insert($tab, $data)
 		
 	if (is_array($data)) {
 		$sep = '';
+		$kstr = $vstr = '';
 		foreach($data as $k => $v) {
 			$kstr .= $sep.$this->drv->quote($k);
 			if (is_null($v)) $vstr .= $sep."NULL";
@@ -628,7 +633,7 @@ function export($dba, $fmt = 'html')
 	if (!$dba) return '';
 	if (is_resource($dba)) $dba = $this->fetchAll($dba);
 	if (is_string($dba)) $dba = $this->selectAll($dba);
-	if (is_array($dba) and !is_array($dba[0])) $dba = array($dba);
+	if (is_array($dba) and !is_array(array_get($dba, 0))) $dba = array($dba);
 	
 	switch ($fmt) {
 	case 'html':
@@ -723,10 +728,11 @@ function setParams($sql, $params)
 	preg_match_all($pat, $sql, $found);
 	if (!$found[0]) return $sql;
 	$from = $to = array();
+	$empty = false;
 	foreach($found[2] as $i => $key) {
 		$from[] = $found[0][$i];
-		if (strlen($params[$key]) == 0) {
-			$empty = 1;
+		if (strlen(array_get($params, $key)) == 0) {
+			$empty = true;
 			if ($found[1][$i] == '#') $to[] = '__PCL_EMPTY0__';
 			else $to[] = '__PCL_EMPTYS__';
 		}
@@ -759,9 +765,8 @@ protected function getSelectSql($dsstr, $args)
 		if (strpos($dsstr,':')) list($tab, $flds) = explode(':', $dsstr);
 		else {$tab = $dsstr; $flds = '*';}
 		$sql = "select $flds from $tab";
-		$cond = $args[0];
-		if ($cond) {
-			$sql .= " where ".$this->getWhereSql($cond, null); array_shift($args); 
+		if (isset($args[0])) {
+			$sql .= " where ".$this->getWhereSql($args[0], null); array_shift($args); 
 		}
 	}
 	elseif ($this->isSql($dsstr, 'select') or $this->isSql($dsstr, '(select')) $sql = $dsstr;

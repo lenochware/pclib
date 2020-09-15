@@ -15,7 +15,7 @@
 /**
  * PClib version string
  */
-define('PCLIB_VERSION', '2.3.5');
+define('PCLIB_VERSION', '2.4.0');
 
 /* Find out where library reside. MUST BE an absolute path. */
 if (!defined('PCLIB_DIR')) {
@@ -90,7 +90,7 @@ class Pclib
 		ini_set('docref_root', 'http://php.net/');
 
 		//%form button hack
-		if (is_array($_REQUEST['pcl_form_submit'])) {
+		if (is_array(array_get($_REQUEST, 'pcl_form_submit'))) {
 			$tmp = array_keys($_REQUEST['pcl_form_submit']);
 			$_REQUEST['pcl_form_submit'] = $tmp[0];
 		}
