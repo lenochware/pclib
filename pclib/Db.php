@@ -91,6 +91,8 @@ protected function parseDsn($dsn)
 	}
 	
 	$dsa = parse_url($dsn);
+	if (!isset($dsa['scheme'])) return [];
+
 	$path = explode('/', $dsa['path']);
 	if (!$path[0]) array_shift($path);
 
@@ -125,6 +127,10 @@ protected function parseDsn($dsn)
 **/
 function connect($dataSource)
 {
+	if (empty($dataSource)) {
+		throw new \InvalidArgumentException('Invalid connection parameters.');
+	}
+
 	if(is_string($dataSource)) {
 		$dsarray = $this->parseDsn($dataSource);
 	}
@@ -133,7 +139,7 @@ function connect($dataSource)
 	}
 	else throw new \InvalidArgumentException('Invalid connection parameters.');
 	
-	$this->dataSource = $dataSource;
+	$this->dataSource = $dataSource;	
 
 	$drvname = pcl_ident($dsarray['driver']);
 	

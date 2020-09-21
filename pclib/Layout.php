@@ -66,7 +66,9 @@ function getNavig($options = array())
 	$default = array('separ' => ' / ', 'lastlink' => false, 'ul' => false);
 	$options += $default;
 
+	$navig = [];
 	$maxlevel = $this->bookmarks[-1]['maxlevel'];
+
 	for($i = 0; $i <= $maxlevel; $i++) {
 		if (!isset($this->bookmarks[$i])) continue;
 		$url   = $this->bookmarks[$i]['url'];
