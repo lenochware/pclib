@@ -242,6 +242,7 @@ function field($dsstr)
 	$this->setLimit(1);
 	$res = $this->query($sql);
 	$data = $this->drv->fetch($res, 'r');
+	if (!$data) return null;
 	return $data[0];
 }
 

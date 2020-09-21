@@ -254,12 +254,14 @@ function loadSession()
 	if (!$this->sessName) return;
 	$s = $this->app->getSession($this->sessName);
 
-	$this->sql    = $s['sql'];
-	$this->hash   = $s['hash'];
-	$this->length = $s['length'];
-	$this->filter = $s['filter'];
-	$this->sortArray = $s['sortarray'];
-	$this->page = $s['page'];
+	if ($s) {
+		$this->sql    = $s['sql'];
+		$this->hash   = $s['hash'];
+		$this->length = $s['length'];
+		$this->filter = $s['filter'];
+		$this->sortArray = $s['sortarray'];
+		$this->page = $s['page'];		
+	}
 }
 
 /**

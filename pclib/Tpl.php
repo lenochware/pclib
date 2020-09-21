@@ -129,8 +129,12 @@ function __construct($path = '', $sessName = '')
 
 protected function _init()
 {
-	$this->header =& $this->elements[$this->className];
-	if($this->header['name']) $this->name = $this->header['name'];
+	if (isset($this->elements[$this->className])) {
+		$this->header =& $this->elements[$this->className];
+	}
+	else $this->header = [];
+
+	if(isset($this->header['name'])) $this->name = $this->header['name'];
 	if (!$this->name) $this->name = $this->className;	
 }
 
@@ -871,7 +875,7 @@ function addTag($line)
 {
 	$elem = $this->parser->parseLine($line);
 
-	if ($elem['after']) {
+	if (isset($elem['after'])) {
 		$this->elements = $this->insertAfter($this->elements, 
 			array($elem['id'] => $elem), $elem['after']
 		);

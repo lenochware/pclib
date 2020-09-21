@@ -58,7 +58,7 @@ function getArgs($actionMethod, array $params)
 	$args = array();
 	$rm = new \ReflectionMethod($this, $actionMethod);
 	foreach($rm->getParameters() as $param)  {
-		$param_value = $params[$param->name];
+		$param_value = array_get($params, $param->name);
 		if (!strlen($param_value) and !$param->isOptional()) {
 			$this->app->error('Required parameter "%s" for page "%s" missing.', null, $param->name, get_class($this) .'/'.$this->action);
 		}

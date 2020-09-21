@@ -219,8 +219,8 @@ function loadSession()
 	if (!$this->sessName) return;
 	$s = $this->app->getSession($this->sessName);
 
-	$this->values  = $s['values'];
-	$this->invalid = $s['invalid'];
+	$this->values  = array_get($s, 'values');
+	$this->invalid = array_get($s, 'invalid');
 }
 
 /**
@@ -701,8 +701,8 @@ function print_Checkbox_Radio_Group($id, $sub, $value)
 		return;
 	}
 
-	$class = $elem['html']['class'];
-	$style = $elem['html']['style'];
+	$class = array_get($elem['html'], 'class');
+	$style = array_get($elem['html'], 'style');
 	$class = trim(($is_radio?'radio':'checkbox').'-group '.$class);
 	if ($c = $elem['columns'])
 		$style = "-moz-columns:$c;-webkit-columns:$c;columns:$c;".$style;
@@ -1318,7 +1318,7 @@ protected function head()
 	$tag = array(
 		'id' => $this->name,
 		'name' => null,
-		'class' => $ha['class']? array($ha['class']) : null,
+		'class' => (!empty($ha['class']))? array($ha['class']) : null,
 		'__attr' => array_get($ha, 'attr'),
 	);
 

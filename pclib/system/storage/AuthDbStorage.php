@@ -68,6 +68,8 @@ function getCredentials($userId)
 protected function getData($userName)
 {
 	$data = $this->db->select($this->USERS_TAB, "USERNAME='{0}'", $userName);
+	if (!$data) return [];
+	
 	$data['USES_DPASSW'] = ($data['PASSW'] == '');
 	
 	unset($data['PASSW'], $data['DPASSW']);

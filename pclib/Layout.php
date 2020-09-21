@@ -22,6 +22,7 @@ public $MESSAGE_PATTERN = '<div class="%s">%s</div>';
 function loadSession()
 {
 	$this->bookmarks = $this->app->getSession('pclib.bookmarks');
+	if (!isset($this->bookmarks[-1])) $this->bookmarks[-1]['maxlevel'] = -1;
 }
 
 /** Save application state to session. */
@@ -67,6 +68,7 @@ function getNavig($options = array())
 
 	$maxlevel = $this->bookmarks[-1]['maxlevel'];
 	for($i = 0; $i <= $maxlevel; $i++) {
+		if (!isset($this->bookmarks[$i])) continue;
 		$url   = $this->bookmarks[$i]['url'];
 		$title = $this->bookmarks[$i]['title'];
 		$alt = '';

@@ -88,6 +88,7 @@ class ElementsDef extends BaseObject
 			'onclick' => null,
 			'submit' => null,
 			'hint' => null,
+			'hash' => null,
 			'ajaxget' => null,
 		],
 

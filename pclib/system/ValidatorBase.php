@@ -100,7 +100,7 @@ class ValidatorBase extends BaseObject
 	{
 		$mEl = array_get($this->elements, $id.'.'.$messageId);
 
-		if ($mEl['type'] == 'message') {
+		if ($mEl and $mEl['type'] == 'message') {
 			$message = $mEl['text'];
 		}
 		else {

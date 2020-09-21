@@ -181,7 +181,7 @@ protected function htmlTree($level = 0)
 		}
 		else {
 			$next = array_get($this->nodes, $this->i);
-			if ($next['LEVEL'] > $node['LEVEL']) $node['HASCHILD'] = true;
+			if (isset($next) and $next['LEVEL'] > $node['LEVEL']) $node['HASCHILD'] = true;
 			$html .= $this->htmlListNode($node);
 		}
 	}
