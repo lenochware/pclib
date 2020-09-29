@@ -189,11 +189,8 @@ class Action
 		$this->path = implode('/', $path);
 		$this->params = $params;
 
-		$n = count($path);
-		if ($n >= 3) {
-			$path = array_slice($path, -3);
-			$this->module = array_shift($path);
-		}
+		if (!empty($path[2])) $this->module = array_shift($path);
+
 		$this->controller = $path[0];
 		$this->method = array_get($path, 1);
 	}
@@ -206,12 +203,9 @@ class Action
 	{
 		$this->path = array_get($get, 'r', '');
 		$path = explode('/', $this->path);
-		$n = count($path);
-
-		if ($n >= 3) {
-			$path = array_slice($path, -3);
-			$this->module = array_shift($path);
-		}
+		
+		if (!empty($path[2])) $this->module = array_shift($path);
+		
 		$this->controller = $path[0];
 		$this->method = isset($path[1])? $path[1] : '';
 				
