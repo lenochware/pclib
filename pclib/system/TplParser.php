@@ -262,7 +262,7 @@ class TplParser extends BaseObject
 
 				$document[$key+1] = $block;
 				if (isset($elements[$block]['begin'])) {
-					throw new Exception("Block name '%s' is already used.", array($block));
+					throw new \pclib\Exception("Block name '%s' is already used.", array($block));
 				}
 				$elements[$block]['id']    = $block;
 				$elements[$block]['type']  = 'block';
