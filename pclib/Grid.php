@@ -703,10 +703,15 @@ protected function print_BlockRow($block, $rowno = null)
  */
 private function cmpFunc($id)
 {
-	$dir = ($id == $this->sortArray[$id])? '-1:+1' : '+1:-1';
-	$cmd = "if (\$a['$id'] == \$b['$id']) return 0;\n";
-	$cmd .= "return (\$a['$id'] < \$b['$id']) ? $dir;";
-	return create_function('$a,$b', $cmd);
+	$dir = ($id == $this->sortArray[$id])? 1 : -1;
+
+	$func = function($a, $b) use ($id, $dir)
+	{
+		if ($a[$id] == $b[$id]) return 0;
+		return ($a[$id] < $b[$id]) ? -1*$dir : $dir;
+	};
+
+	return $func;
 }
 
 } // end class
