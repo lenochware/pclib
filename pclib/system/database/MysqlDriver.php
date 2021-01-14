@@ -29,7 +29,8 @@ public $extension = 'mysql';
 function connect($ds)
 {
 	$ok = false;
-	$res = @mysql_connect($ds['host'], $ds['user'], $ds['passw'], $this->forceReconnect);
+	$port = $ds['port']? ':'.$ds['port'] : '';
+	$res = @mysql_connect($ds['host'].$port, $ds['user'], $ds['passw'], $this->forceReconnect);
 	if ($res) $ok = mysql_select_db($ds['dbname'], $res);
 	if (!$ok) {
 		$this->error = $this->lastError();

@@ -99,12 +99,14 @@ protected function parseDsn($dsn)
 	$dsarray = array(
 	 'driver' => $dsa['scheme'],
 	 'host'   => $dsa['host'],
+	 'port'   => array_get($dsa, 'port'),
 	 'path'   => substr($dsa['path'],1),
 	 'dbname' => $path[0],
 	 'user'   => $dsa['user'],
 	 'passw'  => array_get($dsa, 'pass'),
-	 'codepage' => $path[1]? $path[1] : null
+	 'codepage' => isset($path[1])? $path[1] : null
 	);
+
 	//new way of adding options e.g. ?charset=utf8
 	if (!empty($dsa['query'])) parse_str($dsa['query'], $dsarray['options']);
 
@@ -158,7 +160,7 @@ function connect($dataSource)
 	$this->drv->verboseErrors = in_array('develop', $this->config['pclib.errors']);
 	$this->drv->forceReconnect = $this->forceReconnect;
 	$this->drv->connect($dsarray);
-	if ($dsarray['options']['charset']) $this->drv->codePage($dsarray['options']['charset']);
+	if (isset($dsarray['options']['charset'])) $this->drv->codePage($dsarray['options']['charset']);
 }
 
 /**

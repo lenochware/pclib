@@ -27,7 +27,8 @@ public $extension = 'pdo_mysql';
 
 function connect($ds)
 {
-	return $this->pdoConnect('mysql:dbname='.$ds['dbname'].';host='.$ds['host'], $ds['user'], $ds['passw']);
+	$port = $ds['port']? ';port='.$ds['port'] : '';
+	return $this->pdoConnect('mysql:dbname='.$ds['dbname'].';host='.$ds['host'].$port, $ds['user'], $ds['passw']);
 }
 
 function query($sql)
