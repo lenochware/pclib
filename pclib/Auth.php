@@ -175,6 +175,7 @@ protected function getSessionUser()
 
 	if ($data['sessionHash'] != $this->sessionHash($data)) {
 		$this->log('AUTH_ERROR', 'Authentication failed - invalid session.', $data['ID']);
+		$this->logout();
 		throw new AuthException("Authentication failed. Access denied.");
 	}
 
