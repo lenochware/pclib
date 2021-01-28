@@ -1,3 +1,6 @@
+<?elements
+string elements noescape
+?>
 <:?elements
 class tpl
 {elements}

@@ -849,7 +849,7 @@ function getPopup($id, $attr, $url)
 
 protected function replaceParams($s)
 {
-	if (strpos($s,'{')) $s = preg_replace_callback (
+	if (strpos($s,'{') !== false) $s = preg_replace_callback (
 		"/{([a-z0-9_.]+)}/i", array($this, 'callback_getvalue'), $s
 	);
 	return $s;
