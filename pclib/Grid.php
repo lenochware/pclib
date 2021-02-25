@@ -597,7 +597,7 @@ function getExportCsv($options = [])
 
 	$elms = [];
 	foreach($this->elements as $id => $elem) {
-		if ($elem['noprint'] or $elem['skip'] or in_array($elem['type'], $ignore_list)) continue;
+		if (!empty($elem['noprint']) or !empty($elem['skip']) or in_array($elem['type'], $ignore_list)) continue;
 		unset($elem['title'], $elem['size']);
 		$elms[$id] = $elem;
 		$last_id = $id;
@@ -619,7 +619,7 @@ function getExportCsv($options = [])
 			}
 			if ($id != $last_id) print $options['csv-separ'];
 		}
-		if($values[$i+1]) print $options['csv-row-separ'];
+		if(!empty($values[$i+1])) print $options['csv-row-separ'];
 	}
 
 	$this->elements = $elements;
