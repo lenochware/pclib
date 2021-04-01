@@ -528,7 +528,7 @@ function newController($name, $module = '')
 
 	$path = $this->path("$moduleDir{controllers}/$className.php");
 	
-	if (!file_exists($path)) throw new Exception("File '$path' not found.");
+	if (!file_exists($path)) return null;
 
 	require_once($path);
 	$fullClassName = $namespace.$className;
