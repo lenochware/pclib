@@ -48,6 +48,23 @@ function isValid()
 }
 
 /**
+ * Create new instance of $className and copy user data into.
+ * @return object AuthUserClass
+ */
+function asObject($className)
+{
+	$user = new $className;
+	if (!($user instanceof AuthUser)) {
+		throw new Exception ("'$className' must be child of AuthUser");
+	}
+
+	$user->values = $this->values;
+	$user->auth = $this->auth;
+
+	return $user;
+}
+
+/**
  * Check if user has permission $name.
  * @param string $name Permission
  * @param int $objectId Resource object id
