@@ -489,7 +489,7 @@ function getSession($name, $ns = null)
 function setSession($name, $value, $ns = null)
 {
 	if (!$ns) $ns = $this->name;
-	if (!isset($_SESSION[$ns])) return;
+	//if (!isset($_SESSION[$ns])) return;
 	if (strpos($name, '.')) {
 		list($n1,$n2) = explode('.', $name);
 		$_SESSION[$ns][$n1][$n2] = $value;
