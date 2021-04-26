@@ -118,6 +118,15 @@ function getLog($rowCount, array $filter = null)
 }
 
 /**
+ * Return size of the log in MB.
+ * @return int $size
+ */
+function getSize()
+{
+	return $this->getStorage()->getSize();
+}
+
+/**
  * Remove old records in log. It will keep $keepdays in the log.
  * @param int $keepDays Number of days to keep in the log
  * @param bool $allLogs This logger only / all loggers

@@ -122,4 +122,22 @@ function getLog($rowCount, array $filter = null)
 	return $events;
 }
 
+protected function getTableSize($tableName)
+{
+	$dbName = $this->db->dbName();
+	$size = $this->db->field(
+		"select round(((data_length + index_length) / 1024 / 1024), 2) 
+		FROM information_schema.TABLES 
+		WHERE table_schema = '{0}'
+		AND table_name = '{1}'", $dbName, $tableName
+	);
+
+	return $size;
+}
+
+function getSize()
+{
+	return $this->getTableSize('LOGGER') + $this->getTableSize('LOGGER_MESSAGES');
+}
+
 }
