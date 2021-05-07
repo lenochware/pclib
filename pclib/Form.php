@@ -1434,7 +1434,10 @@ private function getValidationString()
 		switch($rule) {
 			case 'number': if($options != 'strict') continue 2; break;
 			case 'date': $options = preg_replace("/[^dmyhms]/i","", $options); break;
-			case 'file': $options = strtr($options, array('.' => '\.', '*' => '.*', '?' => '.')); break;
+			case 'file': 
+				$options = strtr($options, array('.' => '\.', '*' => '.*', '?' => '.')); 
+				if (!empty($elem['size_mb'])) $options = $elem['size_mb'] .';'.$options;
+			break;
 		}
 
 		$lb = strip_tags(strtr($elem['lb'],'"|',"'/")) ?: $id;

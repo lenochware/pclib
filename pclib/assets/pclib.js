@@ -36,7 +36,8 @@ strings: {
 	'form-err-passw'  : ' Nevalidní heslo!',
 	'form-err-file'   : ' Chybný typ souboru!',
 	'form-err-req'    : ' Pole je povinné!',
-	'form-err-pattern' : ' Chybně zadaná hodnota!'
+	'form-err-pattern' : ' Chybně zadaná hodnota!',
+	'form-err-maxfilesize' : ' Překročena maximální povolená velikost souboru!'
 },
 
 /** @private */
@@ -55,6 +56,7 @@ getFormElements: function(form) {
 		};
 
 		elem.value = this.getValue(elem.id);
+		elem.object = document.getElementById(elem.id);
 
 		elements.push(elem);
 	}
@@ -130,11 +132,20 @@ validateForm: function(form) {
 			case 'file':
 				var result = false;
 				var patterns = elem.options.split(';');
-				for (var j in patterns) {
+				for (var j in patterns)
+				{
+					if (!isNaN(parseFloat(patterns[j]))) { /* isNumeric */
+						if (!this._validateFileSize(elem.object, patterns[j])) {
+							elem.message = 'form-err-maxfilesize';
+							break;
+						}
+						continue;
+					}
+
 					if (elem.value.match('^' + patterns[j] + '$')) {result = true; break;}
 				}
 				if (!result) {
-					elem.message = 'form-err-file';
+					if (!elem.message) elem.message = 'form-err-file';
 					isValid = false;
 				}
 				break;
@@ -149,6 +160,15 @@ validateForm: function(form) {
 	}
 
 	return {isValid: isValid, elements: elements};
+},
+
+_validateFileSize: function(input, size_mb)
+{
+	for (var j in input.files) {
+		if (input.files[j].size > size_mb * 1024 * 1024) return false;
+	}
+
+	return true;
 },
 
 /**
