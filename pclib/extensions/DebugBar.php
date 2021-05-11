@@ -17,7 +17,7 @@ protected $queryTime;
 protected $startTime;
 protected $queryTimeSum;
 
-protected $positionDefault = 'position:absolute;top:10px;right:10px;';
+protected $positionDefault = 'position:fixed;bottom:10px;right:10px;';
 
 protected $updating = false;
 public $registered = false;

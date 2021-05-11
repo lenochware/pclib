@@ -7,28 +7,29 @@
   cursor:pointer;
   border-radius: 2px;
   opacity: 0.8;
-  z-index: 2000;
+  z-index: 2100;
 }
 
 #pc-overlay {
   display:none;
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0vh;
+  left: 0vw;
+  width: 100vw;
+  height: 100vh;
   background: #000;
   opacity: 0.1;
   filter: alpha(opacity=50);
+  z-index: 1500;
 }
 
 .pc-debugbar-window {
   display: none;
-  position:absolute;
-  top: 100px;
-  left: 100px;
-  width: 80%;
-  height: 80%;
+  position:fixed;
+  top: 65vh;
+  left: 0px;
+  right:0px;
+  height: 35vh;
   overflow: scroll;
   background-color: white;
   border:1px solid blue;
