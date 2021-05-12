@@ -33,7 +33,7 @@
   overflow: scroll;
   background-color: white;
   border:1px solid blue;
-  padding: 8px;
+  padding: 0px 10px;
   font-family: monospace;
   font-size: 12px;
   z-index: 2000;
@@ -43,10 +43,25 @@
   padding:2px;
 }
 
+.pc-debugbar-menu {
+  position:fixed;
+  background-color: white; 
+  width: 80%;
+  padding: 10px 0px;
+}
 </style>
+<script>
+  function pc_debugbar_resize(top, height)
+  {
+    var elem = document.getElementById('pcwin0');
+    elem.style.top = top;
+    elem.style.height = height;
+  }
+</script>
+
 <div id="pc-overlay" onclick="pclib.hideModal()"></div>
 <div id="pc-debugbar" onclick="pclib.showModal('pcwin0','?r=pclib/debuglog')">
-<a href="#" onclick="document.getElementById('pc-debugbar').style.display='none';event.cancelBubble = true;">×</a>
-pclib {VERSION}|{TIME} ms|{MEMORY} MB <a href="#" onclick="pclib.showModal('pcwin1','?r=pclib/debuginfo');event.cancelBubble = true;">info</a></div>
+  <a href="#" onclick="document.getElementById('pc-debugbar').style.display='none';event.cancelBubble = true;">×</a>
+  pclib {VERSION}|{TIME} ms|{MEMORY} MB
+</div>
 <div id="pcwin0" class="pc-debugbar-window"></div>
-<div id="pcwin1" class="pc-debugbar-window"></div>

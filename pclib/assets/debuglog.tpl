@@ -4,13 +4,12 @@ string DT date "%H:%M:%S" lb "TIME"
 string LOGGERNAME
 string ACTIONNAME
 bind COLOR field "ACTIONNAME" list "url,green,error,red,*,black"
-string MESSAGE
+string MESSAGE noescape
 pager pager pglen "1000"
 ?>
 <table>
 {block items}
 <tr>
-<td valign="top" style="color:gray">{DT}</td>
 <td style="color:{COLOR}">{MESSAGE}</td>
 </tr>
 {/block}

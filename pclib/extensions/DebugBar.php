@@ -188,6 +188,8 @@ protected function logUrl()
 
 protected function printLogWindow()
 {
+	print file_get_contents(PCLIB_DIR.'assets/debugmenu.tpl');
+	print '<h4>Query Log</h4>';
 	$grid = new PCGrid(PCLIB_DIR.'assets/debuglog.tpl');
 	$data = $this->logger->getLog(100, array('LOGGERNAME' => $this->logger->name));
 	$grid->setArray($data);
@@ -198,10 +200,10 @@ protected function printLogWindow()
 protected function printInfoWindow()
 {
 	$dbg = $this->app->debugger;
-	print "<a href=\"?r=pclib/debuglog/clear\">Clear debuglog</a><br>";
-	print '<h1>_SESSION</h1>';
+	print file_get_contents(PCLIB_DIR.'assets/debugmenu.tpl');
+	print '<h4>_SESSION</h4>';
 	print $dbg->getDump(array($_SESSION));
-	print '<h1>_COOKIE</h1>';
+	print '<h4>_COOKIE</h4>';
 	print $dbg->getDump(array($_COOKIE));
 	die();
 }
