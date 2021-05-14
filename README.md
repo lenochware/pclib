@@ -1,22 +1,19 @@
 # What is PClib?
 
-Lightweight PHP framework for php 5.4+.
-For development of small to middle size web applications.
+Lightweight PHP framework without boilerplate of big frameworks.
 
 ### Features
 
-* Templates
-* Db: Database layer (mysql, pgsql or sql-lite)
+* MVC (Controllers, templates and models)
+* Db: Database layer (mysql, pgsql and sql-lite adapters included)
 * Form: Rendering, validation and storing into database
 * Grid (datagrid): Pagination, sorting columns, summarization rows, filter
 * Auth: Authentication and authorization: users, roles and permissions
 * Translator: multilanguage support
-* Debugger: improved error messages, variable dumps and debug-bar
-* Logger, Tree view and more
-
-
-### Requirements
-- PHP 5.4
+* Debugger: improved error messages, dump() function, debug-bar...
+* ORM
+* PAdmin: Site administrator tool
+* Logger, Tree view and more...
 
 ### Installation
 1. [Download **pclib**](http://pclib.brambor.net/?r=download)
