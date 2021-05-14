@@ -297,20 +297,7 @@ public function configure()
  */
 function redirect($route, $code = null)
 {
-
-	if ($code and function_exists('http_response_code')) {
-		http_response_code($code);
-	}
-
-	if (is_array($route)) {
-		$url = $route['url'];
-	}
-	else {
-		$url = $this->router->createUrl($route);
-	}
-
-	header("Location: $url");
-	exit();
+	$this->router->redirect($route, $code);
 }
 
 /**
