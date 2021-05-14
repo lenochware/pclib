@@ -206,7 +206,11 @@ class Action
 
 		foreach($ra as $section) {
 			if ($section == '__GET__') { $params += $_GET; continue; }
-			@list($name,$value) = explode(':', $section);
+
+			$exploded = explode(':', $section);
+			$name = $exploded[0];
+			$value = array_get($exploded, 1);
+						
 			if (isset($value)) $params[$name] = $value;
 			else $path[] = $section;
 		}

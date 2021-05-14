@@ -796,7 +796,9 @@ protected function print_BlockRow($block, $rowno = null)
 
 		if ($strip == TplParser::TPL_ELEM) {
 			 $strip = $this->document[++$i];
-			 @list($id,$sub) = explode('.', $strip);
+			 $exploded = explode('.', $strip);
+			 $id = $exploded[0];
+			 $sub = array_get($exploded, 1);
 
 			 if ($this->elements[$id]['noprint']) { $this->print_Empty($id, $sub); continue; }
 
@@ -825,7 +827,11 @@ protected function print_BlockRow($block, $rowno = null)
 function getPopup($id, $attr, $url)
 {
 		if ($attr == '1') $attr = '800x600';
-		@list($size,$attr) = explode(' ', $attr);
+
+		$exploded = explode(' ', $attr);
+		$size = $exploded[0];
+		$attr = array_get($exploded, 1);
+
 		switch ($attr) {
 		case 'full': $poppar='toolbar=1,location=1,menubar=1,scrollbars=1,resizable=1';
 		break;
@@ -1062,7 +1068,10 @@ private function callback_getvalue_db($param)
 
 private function callback_getvalue($param)
 {
-	@list($id,$sub) = explode('.', $param[1]);
+	$exploded = explode('.', $param[1]);
+	$id = $exploded[0];
+	$sub = array_get($exploded, 1);
+
 	if ($id == 'GET') {
 		if ($sub) return array_get($_GET, $sub);
 		else return '__GET__';

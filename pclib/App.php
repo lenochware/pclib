@@ -459,11 +459,14 @@ function getSession($name, $ns = null)
 	if (!$ns) $ns = $this->name;
 	if (!isset($_SESSION[$ns])) return null;
 
+	//because of retarded "key does not exists warning"
 	if (strpos($name, '.')) {
 		list($n1,$n2) = explode('.', $name);
-		return @$_SESSION[$ns][$n1][$n2];
+		if (!isset($_SESSION[$ns][$n1])) return null;
+		return array_get($_SESSION[$ns][$n1], $n2);
 	}
-	return @$_SESSION[$ns][$name];
+
+	return array_get($_SESSION[$ns], $name);
 }
 
 /**

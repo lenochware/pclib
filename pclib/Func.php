@@ -324,6 +324,10 @@ function startsWith($s, $substr)
 
 function array_get($a, $key, $default = null)
 {
+	if (is_array($key)) {
+		return isset($a[$key[0]])? (isset($a[$key[0]][$key[1]])? $a[$key[0]][$key[1]] : $default) : $default;
+	}
+
 	return isset($a[$key])? $a[$key] : $default;
 }
 

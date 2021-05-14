@@ -661,8 +661,8 @@ private function sumFieldEquals(array $sum)
 {
 	$rowno = $this->elements['items']['rowno'];
 	if ($this->sumArray['items']['pos'] > $sum['pos']) $rowno--;
-	$v1 = @$this->values['items'][$rowno][$sum['field']];
-	$v2 = @$this->values['items'][$rowno+1][$sum['field']];
+	$v1 = array_get($this->values['items'], [$rowno, $sum['field']]);
+	$v2 = array_get($this->values['items'], [$rowno+1, $sum['field']]);
 	if ($rowno == $this->pager->getValue('pglen')-1) $v2 = $this->sumArray['items']['last'][$sum['field']];
 	return ($v1 == $v2);
 }
