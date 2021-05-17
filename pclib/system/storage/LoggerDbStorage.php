@@ -109,12 +109,13 @@ function getLog($rowCount, array $filter = null)
 		left join $this->LABELS_TAB LL4 on LL4.ID=L.CATEGORY
 		left join $this->MESSAGES_TAB LM on LM.LOG_ID=L.ID
 		 where 1=1
+		~ AND L.LOGGER = '{LOGGER}'
 		~ AND L.CATEGORY='{CATEGORY}'
 		~ AND U.USERNAME like '{USERNAME}%'
 		~ AND LL2.LABEL like '{ACTIONNAME}%'
-		~ AND LL1.LABEL = '{LOGGERNAME}'
 		order by L.ID desc", $filter
 	);
+
 	foreach($events as $i => $tmp) {
 		$events[$i]['IP'] = long2ip($events[$i]['IP']);
 	}
