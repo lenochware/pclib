@@ -64,7 +64,7 @@ protected function getUserIp(pclib\AuthUser $user)
 {
 	$ip = ip2long($this->app->request->getClientIp());
 	if ($ip != $user->values['IP']) {
-		$this->log('AUTH_NOTICE', 'Access from different ip-address.', $user->values['ID']);
+		$this->log('auth', 'Access from different ip-address.', $user->values['ID']);
 	}
 	return $ip;
 }
@@ -144,10 +144,10 @@ function login($userName, $password)
 	else {
 		$this->setError($result);
 		if ($user) {
-			$this->log('AUTH_NOTICE', $result, null, $user->values['ID']);
+			$this->log('auth', $result, null, $user->values['ID']);
 		}
 		else {
-			$this->log('AUTH_NOTICE', $result, "Failed login of user '$userName'");
+			$this->log('auth', $result, "Failed login of user '$userName'");
 		}
 	}
 
@@ -174,7 +174,7 @@ protected function getSessionUser()
 	if (!$data) return null;
 
 	if ($data['sessionHash'] != $this->sessionHash($data)) {
-		$this->log('AUTH_ERROR', 'Authentication failed - invalid session.', $data['ID']);
+		$this->log('Error', 'Authentication failed - invalid session.', $data['ID']);
 		$this->logout();
 		throw new AuthException("Authentication failed. Access denied.");
 	}
@@ -225,7 +225,7 @@ function testRight($name, $objectId = 0)
 
 	$message = "Required permission '$name'. Access denied.";
 
-	$this->log('AUTH_ERROR', 'Unauthorized access!', null, $message);
+	$this->log('auth', 'Unauthorized access!', null, $message);
 	throw new AuthException($message);
 }
 
