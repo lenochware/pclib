@@ -170,7 +170,13 @@ function log($category, $message_id, $message = null, $item_id = null)
  * @param string $serviceName
  * @return IService $service
  */
-protected function createDefaultService($serviceName) {
+protected function createDefaultService($serviceName)
+{
+
+	if ($serviceName == 'events') {
+		return new pclib\EventManager;
+	}
+
 	$canBeDefault = array('logger', 'debugger', 'request', 'router');
 	if (in_array($serviceName, $canBeDefault)) {
 		$className = '\\pclib\\'.ucfirst($serviceName);
