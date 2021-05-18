@@ -21,17 +21,11 @@ use pclib\Exception;
  * Features:
  * - Access to undeclared members throws exception
  * - Events and object closures
- * - Object configuration
+ * - Object defaults
  */ 
 class BaseObject
 {
 	/*protected*/public static $defaults = array();
-
-	/** Occurs when new instance of the class is created. */
-	public $onNewInstance;
-
-	/** Occurs when called method does not exist. */
-	public $onMissingMethod;
 
 	/** var function() Return service object when requested with service(). */
 	public $serviceLocator;
@@ -58,12 +52,7 @@ class BaseObject
 		list($name, $value) = $args;
 
 		if (isset($value)) {
-			if (self::isEvent($name)) {
-				$classDef[$name][] = $value;
-			}
-			else {
-				$classDef[$name] = $value;
-			}
+			$classDef[$name] = $value;
 		}
 		else {
 			return $classDef[$name];
@@ -73,12 +62,6 @@ class BaseObject
 	function __construct()
 	{
 		$this->loadDefaults(get_called_class());
-		$this->onNewInstance();
-	}
-
-	public static function isEvent($name)
-	{
-		return preg_match('/^on[A-Z]/', $name);
 	}
 
 	/**
@@ -102,63 +85,28 @@ class BaseObject
  	function setProperties(array $defaults)
 	{
 		$closure = function($o, $defaults) {
-			foreach ($defaults as $key => $value) {
-				if (BaseObject::isEvent($key)) {
-					foreach ($value as $event) {
-						$o->addEvent($key, $event);
-					}
-				}
-				else {
-					$o->$key = $value;
-				}
+			foreach ($defaults as $key => $value) {	
+				$o->$key = $value;
 			}
 		};
 
 		$closure($this, $defaults);
 	}
 
-	/**
-	 * Run all event handlers in $object->$name property. 
-	 * @param string $name Event name e.g. 'onSave'.
-	 * @param array $args Event arguments.
-	 */
-	protected function fireEvent($name, array $args = array())
+	function on($name, $fn)
 	{
-		if (!$this->$name) return false;
-
-		if (!is_array($this->$name)) {
-			$class = get_class($this);
-			throw new Exception("Invalid $class->$name value - must be array.");
-		};
-
-		$event = new \stdClass;
-		$event->sender = $this;
-		$event->name = $name;
-		$event->data = $args;
-		$event->propagate = true;
-
-		foreach ($this->$name as $func) {
-			$result = call_user_func($func, $event);
-			if (isset($result)) $event->result = $result;
-			if (!$event->propagate) break;
-		}
-		return $event;
+		$em = $this->serviceLocator('events');
+		$em->on($name, $fn, $this);
 	}
 
-	/**
-	 * Add event handler to $object->$name property. 
-	 * @param string $name Event name e.g. 'onSave'.
-	 * @param callable $callback Event handler. (callable type hint is not supported in php 5.3)
-	 */
-	function addEvent($name, /*callable*/ $callback)
+	function trigger($name, $data = [])
 	{
-		if (!is_array($this->$name)) $this->$name = array();
-		array_push($this->$name, $callback);
+		$em = $this->serviceLocator('events');
+		$em->trigger($name, $data, $this);
 	}
 
 	/**
 	 * Try acquire $service and load it into property $this->$service.
-	 * Service is acquired by calling $onLoadService event.
 	 * @param string $service Service name
 	 * @param mixed $default Default value when service is not found
 	 * @return object Service object
@@ -189,21 +137,13 @@ class BaseObject
 
 	public function __call($name, $args)
 	{
-		if (self::isEvent($name)) {
-			return $this->fireEvent($name, $args);
-		}
-
 		// instanceof Closure
 		if (isset($this->$name) and is_callable($this->$name)) {
 			return call_user_func_array($this->$name, $args);
 		}
 
-		$ev = $this->fireEvent('onMissingMethod', array($name, $args));
-
-		if (!$ev or $ev->propagate) {
-			$class = get_class($this);
-			throw new MemberAccessException("Call to undefined method $class->$name()."); 
-		}
+		$class = get_class($this);
+		throw new MemberAccessException("Call to undefined method $class->$name()."); 
 	}
 
 	public function __get($name)
