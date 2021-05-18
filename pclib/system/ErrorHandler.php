@@ -31,9 +31,6 @@ class ErrorHandler extends BaseObject
 
 	public $MESSAGE_PATTERN = "<b>{severity} {code}: {exceptionClass}</b> {message}";
 
-	/** Occurs before Exception handling. */ 
-	public $onException;
-
 	/** var Logger */
 	public $logger; 
 
@@ -67,7 +64,7 @@ class ErrorHandler extends BaseObject
 	{
 		// disable error capturing to avoid recursive errors
 		restore_exception_handler();
-		$this->onException($e);
+		$this->trigger('php-exception', ['Exception' => $e]);
 		if (in_array('log', $this->options)) $this->logError($e);
 		if (!in_array('display', $this->options)) return;
 
@@ -150,7 +147,7 @@ class ErrorHandler extends BaseObject
 			'line' => $e->getLine(),
 			'trace' => $e->getTraceAsString(),
 			'htmlTrace' => $this->getHtmlTrace($e),
-			'route' => $_REQUEST['r'],
+			'route' => array_get($_REQUEST, 'r'),
 			'timestamp' => date('Y-m-d H:i:s'),
 		);
 		return $values;

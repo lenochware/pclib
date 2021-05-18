@@ -53,21 +53,6 @@ public $indexFile = 'index.php';
 /** var ErrorHandler */
 public $errorHandler;
 
-/** Occurs when App.error() method is called. */ 
-public $onError;
-
-/** Occurs before loading and running Controller. */ 
-public $onBeforeRun;
-
-/** Occurs after Controller has been executed. */ 
-public $onAfterRun;
-
-/** Occurs before application output. */ 
-public $onBeforeOut;
-
-/** Occurs after application output. */ 
-public $onAfterOut;
-
 public $plugins;
 
 /**
@@ -81,7 +66,8 @@ function __construct($name)
 	$this->name = $name;
 	$pclib->app = $this;
 
-	system\BaseObject::defaults('serviceLocator', array($this, 'getService'));
+	system\BaseObject::defaults('serviceLocator', [$this, 'getService']);
+	$this->serviceLocator = [$this, 'getService'];
 
 	$this->errorHandler = new system\ErrorHandler;
 	$this->errorHandler->register();
@@ -426,7 +412,7 @@ function error($message, $cssClass = null)
 	$message = vsprintf($this->t($message), $args);
 	if (!$cssClass) $cssClass = 'error';
 
-	$event = $this->onError($message);
+	$event = $this->trigger('app.error', ['message' => $message]);
 	if ($event and !$event->propagate) return;
 
 	$this->setContent('<div class="'.$cssClass.'">'.$message.'</div>');
@@ -552,7 +538,7 @@ function run($rs = null)
 	
 	$action = $this->router->action;
 
-	$event = $this->onBeforeRun();
+	$event = $this->trigger('app.before-run');
 	if ($event and !$event->propagate) return;
 
 	$ct = $this->newController($action->controller, $action->module);
@@ -560,7 +546,7 @@ function run($rs = null)
 
 	$html = $ct->run($action);
 
-	$event = $this->onAfterRun();
+	$event = $this->trigger('app.after-run');
 	if ($event and $event->propagate) return;
 
 	$this->setContent($html);
@@ -574,12 +560,12 @@ function run($rs = null)
  **/
 function out()
 {
-	$event = $this->onBeforeOut();
+	$event = $this->trigger('app.before-out');
 	if ($event and !$event->propagate) return;
 
 	if (!$this->layout) throw new NoValueException('Cannot show output: app->layout does not exists.');
 	$this->layout->out();
-	$this->onAfterOut();
+	$this->trigger('app.after-out');
 }
 
 }

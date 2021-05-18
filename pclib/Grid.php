@@ -66,12 +66,6 @@ protected $page;
 
 private $hash;
 
-/** Occurs before output of the row. */
-public $onBeforeRow;
-
-/** Occurs after output of the row. */
-public $onAfterRow;
-
 /**
  * Initialization - must be called after load()
  */
@@ -670,7 +664,7 @@ private function sumFieldEquals(array $sum)
 protected function print_BlockRow($block, $rowno = null)
 {
 	if ($block == 'items' and isset($rowno)) {
-		$this->onBeforeRow($this->values[$block][$rowno], $rowno);
+		$this->trigger('grid.before-row', ['row' => $this->values[$block][$rowno], 'index' => $rowno]);
 	}
 
 	if ($this->sumArray and $block == 'items') {
@@ -694,7 +688,7 @@ protected function print_BlockRow($block, $rowno = null)
 	}
 
 	if ($block == 'items' and isset($rowno)) {
-		$this->onAfterRow($this->values[$block][$rowno], $rowno);
+		$this->trigger('grid.after-row', ['row' => $this->values[$block][$rowno], 'index' => $rowno]);
 	}
 }
 
