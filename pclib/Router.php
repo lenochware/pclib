@@ -63,7 +63,7 @@ function getAction()
 		$action->method = $_REQUEST['pcl_form_submit'];
 	}
 
-	$this->onGetAction($action);
+	//$this->onGetAction($action);
 	return $action;
 }
 
@@ -108,7 +108,7 @@ function redirect($route, $code = null)
 		$url = $this->createUrl($route);
 	}
 
-	$this->onRedirect($url);
+	//$this->onRedirect($url);
 
 	header("Location: $url");
 	exit();
@@ -124,7 +124,7 @@ function createUrl($s)
 	$action = is_string($s)? new Action($s) : $s;
 	//TODO: test instanceof Action
 
-	$this->onCreateUrl($action);
+	//$this->onCreateUrl($action);
 
 	if (!$action->controller) return $this->baseUrl;
 

@@ -31,18 +31,6 @@ use pclib\system\TplParser;
 class Tpl extends system\BaseObject
 {
 
-/** Occurs on template initialization. */
-public $onInit;
-
-/** Occurs after template is loaded and parsed. */
-public $onLoad;
-
-/** Occurs before output. */
-public $onBeforeOut;
-
-/** Occurs after output. */
-public $onAfterOut;
-
 /** Name of the template. */
 public $name;
 
@@ -144,7 +132,7 @@ protected function _init()
 function init()
 {
 	$this->_init();
-	$this->onInit();
+	//$this->onInit();
 }
 
 private function getAccessor($name) {
@@ -182,7 +170,7 @@ function load($path)
 	if (!file_exists($path)) throw new FileNotFoundException("File '$path' not found.");
 	$tpl_string = file_get_contents($path);
 	$this->loadString($tpl_string);
-	$this->onLoad($path);
+	//$this->onLoad($path);
 }
 
 /**
@@ -212,9 +200,9 @@ protected function _out($block = null)
  */
 function out($block = null)
 {
-	$this->onBeforeOut();
+	//$this->onBeforeOut();
 	$this->_out($block);
-	$this->onAfterOut();
+	//$this->onAfterOut();
 }
 
 /**
