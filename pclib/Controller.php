@@ -29,9 +29,6 @@ public $name;
 /** Name of the called action without postfix. */
 public $action;
 
-/** Occurs when Controller is initialized. */
-public $onInit;
-
 function __construct(App $app)
 {
 	parent::__construct();
@@ -47,7 +44,7 @@ function __construct(App $app)
  **/
 function init()
 {
-	$this->onInit();
+	$this->trigger('controller.init');
 }
 
 /*

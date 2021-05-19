@@ -36,12 +36,6 @@ class FileStorage extends system\BaseObject implements IService
 	/** Unused - always "/Y/n/" in this version. */
 	public $dirNameFormat = ''; 
 
-	/** Occurs before file is saved. */
-	public $onBeforeSave;
-
-	/** Occurs after file is saved. */
-	public $onAfterSave;
-
 	/** Files matching patterns cannot be uploaded. */
 	public $uploadBlackList = array('*.php','*.php?','*.phtml','*.exe','.htaccess');
 
@@ -80,7 +74,7 @@ protected function getDbColumns($data)
  */
 function saveFile($entity, $file)
 {
-	$this->onBeforeSave($entity, $file);
+	$this->trigger('file.before-save', ['entity' => $entity, 'file' => $file]);
 
 	if (!(int)$entity[0] or !$entity[1]) {
 		throw new NoValueException('Cannot save file - invalid entity.');
@@ -120,19 +114,17 @@ function saveFile($entity, $file)
 	'DT' => date("Y-m-d H:i:s"),
 	);
 
-	$id = $this->db->insert($this->TABLE, $this->getDbColumns($file));
+	$file['ID'] = $this->db->insert($this->TABLE, $this->getDbColumns($file));
 
-	//$id = $this->db->insert($this->TABLE, $newfile);
-
-	$this->onAfterSave($entity, $file, $id);
-	return $id;
+	$this->trigger('file.after-save', ['entity' => $entity, 'file' => $file]);
+	
+	
+	return $file['ID'];
 }
 
 /** Copy file $file['SRC_PATH'] into file-storage. */
 function copyFile($entity, $file)
 {
-	//$this->onBeforeSave($entity, $file);
-
 	if (!(int)$entity[0] or !$entity[1]) {
 		throw new Exception('Cannot save file - invalid entity.');
 	}
@@ -167,7 +159,6 @@ function copyFile($entity, $file)
 
 	$id = $this->db->insert($this->TABLE, $this->getDbColumns($file));
 
-	//$this->onAfterSave($entity, $file, $id);
 	return $id;
 }
 

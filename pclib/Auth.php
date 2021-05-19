@@ -41,12 +41,6 @@ public $verifyRemote = true;
 /** var AuthUser User which is logged in. */
 public $loggedUser;
 
-/** Occurs after login. */
-public $onAfterLogin;
-
-/** Occurs before logout. */
-public $onBeforeLogout;
-
 /**
  * Take \b $user and log him in. See also #$loggedUser.
  * @param AuthUser $user
@@ -139,7 +133,7 @@ function login($userName, $password)
 		$user->values['IP'] = $this->getUserIp($user);
 		$user->values['LAST_LOGIN'] = date('Y-m-d H:i:s');
 		$this->getStorage()->setUser($user);
-		$this->onAfterLogin($user);
+		$this->trigger('auth.login', ['user' => $user]);
 	}
 	else {
 		$this->setError($result);
@@ -159,7 +153,7 @@ function login($userName, $password)
  */
 function logout()
 {
-	$this->onBeforeLogout($this->loggedUser);
+	$this->trigger('auth.logout', ['user' => $this->loggedUser]);
 	$this->loggedUser = null;
 	$this->setSessionUser(null);
 }

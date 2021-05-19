@@ -170,7 +170,7 @@ function load($path)
 	if (!file_exists($path)) throw new FileNotFoundException("File '$path' not found.");
 	$tpl_string = file_get_contents($path);
 	$this->loadString($tpl_string);
-	//$this->onLoad($path);
+	$this->trigger('tpl.after-load', ['path' => $path]);
 }
 
 /**
@@ -200,9 +200,9 @@ protected function _out($block = null)
  */
 function out($block = null)
 {
-	//$this->onBeforeOut();
+	$this->trigger('tpl.before-out');
 	$this->_out($block);
-	//$this->onAfterOut();
+	$this->trigger('tpl.after-out');
 }
 
 /**
