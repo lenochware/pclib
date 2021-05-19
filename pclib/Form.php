@@ -134,7 +134,7 @@ protected function getValidator()
 		$valid->skipUndefined = true;
 		$valid->skipUndefinedRule = true;
 		$valid->dateTimeFormat = $this->config['pclib.locale']['date'];
-		$valid->onValidateElement[] = array($this, 'validateElementCallback');
+		$valid->on('validate', [$this, 'validateElementCallback']);
 		$this->validator = $valid;
 	}
 
@@ -174,9 +174,9 @@ function validate()
 }
 
 //skip non-editable fields
-protected function validateElementCallback($event)
+public function validateElementCallback($event)
 {
-	$elem = $event->data[1];
+	$elem = $event->element;
 	$id = array_get($elem, 'id');
 
 	if (!$id or !$this->isEditable($id)) {
@@ -190,7 +190,7 @@ protected function validateElementCallback($event)
 
 		$errorMsg = call_user_func($elem['onvalidate'], $this, $id, null, $value);
 		if ($errorMsg) {
-			$event->sender->setError($elem['id'], $errorMsg, array($id, $value, $rule, $param));
+			$event->target->setError($elem['id'], $errorMsg, array($id, $value, $rule, $param));
 
 			$event->propagate = false;
 			$event->result = false;

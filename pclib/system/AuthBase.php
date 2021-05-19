@@ -41,9 +41,6 @@ public $passwordCost = 10;
 /** Throws exceptions instead of just collecting errors in ->errors */
 public $throwsExceptions = false;
 
-/** Occurs on auth error. */
-public $onError;
-
 /**
  * Constructor - load config parameters.
  */
@@ -114,7 +111,6 @@ function setError($message)
 	}
 	else {
 		$this->errors[] = $message;
-		$this->onError($message);
 	}
 }
 

@@ -55,9 +55,6 @@ class ValidatorBase extends BaseObject
 	/** var Translator */
 	public $translator;
 
-	/** Occurs before element validation. */
-	public $onValidateElement;
-
 	function __construct()
 	{
 		parent::__construct();
@@ -193,7 +190,7 @@ class ValidatorBase extends BaseObject
 	 */
 	function validateElement($value, array $elem)
 	{
-		$event = $this->onValidateElement($value, $elem);
+		$event = $this->trigger('validate', ['value' => $value, 'element' => $elem]);
 		if ($event) {
 			if (!$event->propagate) return $event->result;
 		}
@@ -210,7 +207,7 @@ class ValidatorBase extends BaseObject
 
 		//blank fields handling: required: invalid, not-required: valid.
 		if ($this->isBlank($value)) {
-			if ($elem['required']) {
+			if (!empty($elem['required'])) {
 				$this->setError($elem['id'], 'required');
 				return false;
 			}
