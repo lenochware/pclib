@@ -538,7 +538,7 @@ function run($rs = null)
 	
 	$action = $this->router->action;
 
-	$event = $this->trigger('app.before-run');
+	$event = $this->trigger('app.before-run', ['action' => $action]);
 	if ($event and !$event->propagate) return;
 
 	$ct = $this->newController($action->controller, $action->module);
@@ -546,7 +546,7 @@ function run($rs = null)
 
 	$html = $ct->run($action);
 
-	$event = $this->trigger('app.after-run');
+	$event = $this->trigger('app.after-run', ['action' => $action]);
 	if ($event and $event->propagate) return;
 
 	$this->setContent($html);

@@ -102,7 +102,7 @@ class BaseObject
 	function trigger($name, $data = [])
 	{
 		$em = $this->serviceLocator('events');
-		$em->trigger($name, $data, $this);
+		return $em->trigger($name, $data, $this);
 	}
 
 	/**
