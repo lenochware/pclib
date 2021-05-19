@@ -27,17 +27,8 @@ use pclib;
  */
 class Db extends system\BaseObject implements IService
 {
-/* Log-level: 1:Errors; 2:Each query @deprecated */
-public $logging = 1;
-
 /** If enabled, no query is executed. */
 public $disabled = false;
-
-/* Message buffer. Set logging=2, then var_dump($db->messages)
- * will write all executed sql (up to 100 queries).
- * @deprecated
- */
-public $messages = array();
 
 /** SQL of last executed query. */
 public $lastQuery;
@@ -219,14 +210,8 @@ function query($_sql, $param = null)
 	if (!$this->disabled) {
 		$res = $this->drv->query($sql);
 	}
-	
-	if ($this->logging > 1 and !$this->drv->error) {
-		$this->messages[] = "(n) Proceed $sql";
-	}
-	if ($this->logging and $this->drv->error)
-		$this->messages[] = "(e) ".$this->drv->error;
-	else
-		$this->lastQuery = $sql;
+		
+	$this->lastQuery = $this->drv->error? $this->drv->error : $sql;
 
   $this->trigger('db.after-query', ['sql' => $sql, 'query' => $res]);
 	return $res;
