@@ -98,7 +98,7 @@ class EventManager /*extends system\BaseObject*/ implements IService
 
 		if (!$listeners) return false;
 
-		$event = new Event($name, $data);
+		$event = new Event($name, $data, $target);
 
 		foreach ($listeners as $listener)
 		{
@@ -137,14 +137,11 @@ public $result;
  */
 public $data;
 
-function __construct($name, $data)
+function __construct($name, $data, $target)
 {
 	$this->name = $name;
 	$this->data = $data;
-
-	if (isset($this->data['target'])) {
-		$this->target = $this->data['target'];
-	}
+	$this->target = $target;
 }
 
 function stopPropagation()
