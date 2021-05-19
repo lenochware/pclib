@@ -228,7 +228,7 @@ function query($_sql, $param = null)
 	else
 		$this->lastQuery = $sql;
 
-  $this->trigger('db.after-query', ['sql' => $sql, 'result' => $res]);
+  $this->trigger('db.after-query', ['sql' => $sql, 'query' => $res]);
 	return $res;
 }
 

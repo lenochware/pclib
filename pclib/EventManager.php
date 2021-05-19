@@ -152,6 +152,11 @@ function stopPropagation()
 	$this->propagate = false;
 }
 
+public function __get($name)
+{
+	return $this->data[$name];
+}
+
 } //class Event
 
 ?>
