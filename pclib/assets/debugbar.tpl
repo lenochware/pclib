@@ -60,7 +60,7 @@
 </script>
 
 <div id="pc-overlay" onclick="pclib.hideModal()"></div>
-<div id="pc-debugbar" onclick="pclib.showModal('pcwin0','?r=pclib/debuglog')">
+<div id="pc-debugbar" onclick="pclib.showModal('pcwin0','?r=pclib_debugbar/show')">
   <a href="#" onclick="document.getElementById('pc-debugbar').style.display='none';event.cancelBubble = true;">×</a>
   pclib {VERSION}|{TIME} ms|{MEMORY} MB
 </div>

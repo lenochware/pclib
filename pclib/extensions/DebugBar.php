@@ -47,9 +47,8 @@ public static function getInstance()
 
 function addEvents($events)
 {
-	foreach ($events as $name => $closure) {
-		list($className, $eventName) = explode('.', $name);
-		BaseObject::$defaults[$className][$eventName][] = $closure;
+	foreach ($events as $name => $fn) {
+		$this->app->events->on($name, $fn);
 	}
 }
 
@@ -59,29 +58,32 @@ public static function register()
 
 	if ($that->registered) return;
 
-	$events = array(
-		'pclib\App.onBeforeOut' => array($that, 'hook'),
-		'pclib\App.onAfterOut' => array($that, 'hook'),
-		'pclib\App.onBeforeRun' => array($that, 'hook'),
-		'pclib\App.onError' => array($that, 'hook'),
-		'pclib\Db.onBeforeQuery' => array($that, 'hook'),
-		'pclib\Db.onAfterQuery' => array($that, 'hook'),
-		'pclib\Router.onRedirect' => array($that, 'hook'),
-		//'Func.onLogDump' => array($that, 'onLogDump'),
-	);
+	$events = [
+		'app.before-out' => [$that, 'onBeforeOut'],
+		'app.after-out'  => [$that, 'onAfterOut'],
+		'app.before-run' => [$that, 'onBeforeRun'],
+		'app.error' => [$that, 'onError'],
+		'db.before-query' => [$that, 'onBeforeQuery'],
+		'db.after-query'  => [$that, 'onAfterQuery'],
+		'router.redirect' => [$that, 'onRedirect'],
+		//'Func.onLogDump' => [$that, 'onLogDump'],
+	];
 
 	$that->addEvents($events);
-	
-	$that->app->loadDefaults();
-	$that->app->router->loadDefaults();
-	
-	if ($that->app->db) {
-		$that->app->db->loadDefaults();
-	}
-	
+		
 	$that->startTime = microtime(true);
 	$that->queryTimeSum = 0;
 	$that->registered = true;
+}
+
+protected function log($category, $message)
+{
+	if ($this->updating) return;
+	if ($this->app->controller == 'pclib_debugbar') return;
+
+	$this->updating = true;
+	$this->logger->log('DEBUG', $category, $message);
+	$this->updating = false;
 }
 
 function html()
@@ -95,22 +97,6 @@ function html()
 	return $t->html();
 }
 
-function hook($event)
-{
-	if(strpos($event->data[0], 'debuglog')) dump($this->updating,$event->data);
-
-	if ($this->updating) return;
-
-	if (rand(1,100) == 1) {
-		$this->logger->deleteLog(1);
-	}
-
-	$this->updating = true;
-	$name = $event->name;
-	$this->$name($event);
-	$this->updating = false;
-}
-
 function onBeforeOut($event)
 {
 	$this->app->layout->values['CONTENT'] .= $this->html();
@@ -121,24 +107,21 @@ function onAfterOut($event)
 {
 	$message = "Time: ". $this->getTime($this->startTime).' ms, db: '.$this->queryTimeSum.' ms';
 	$message = "<b>$message</b>";
-	$this->logger->log('DEBUG', 'time', $message);
+	$this->log('time', $message);
 }
 
 
 function onBeforeRun($event)
 {
-	if ($this->app->routestr == 'pclib/debuglog') {
-		$this->printLogWindow();
-		$event->propagate = false;
+	if ($event->action->controller != 'pclib_debugbar') return;
+
+	switch ($event->action->method) {
+		case 'show': $this->printLogWindow(); break;
+		case 'clear': $this->logger->deleteLog(0); break;
+		case 'variables': $this->printInfoWindow(); break;
 	}
-	if ($this->app->routestr == 'pclib/debuglog/clear') {
-		$this->logger->deleteLog(0);
-		$event->propagate = false;
-	}
-	elseif($this->app->routestr == 'pclib/debuginfo') {
-		$this->printInfoWindow();
-		$event->propagate = false;
-	}
+
+	$event->propagate = false;
 }
 
 function onBeforeQuery($event)
@@ -150,41 +133,37 @@ function onAfterQuery($event)
 {
 	$msec = $this->getTime($this->queryTime);
 	$this->queryTimeSum += $msec;
-	$this->logger->log('DEBUG', 'query',
-		preg_replace("/(\s*[\r\n]+\s*)/m", "\\1<br>", htmlspecialchars($event->data[0])) // \n => <br>
+	$this->log('query',
+		preg_replace("/(\s*[\r\n]+\s*)/m", "\\1<br>", htmlspecialchars($event->sql)) // \n => <br>
 		." <span style=\"color:blue\">($msec ms)</span>"
 	);
 }
 
 function onError($event)
 {
-	$this->logger->log('DEBUG', 'error', $event->data[0]);
+	$this->log('error', $event->message);
 }
 
-function onLogDump($event)
-{
-	$dbg = $this->app->debugger;
+// function onLogDump($event)
+// {
+// 	$dbg = $this->app->debugger;
 
-	$dbg->useHtml = false;
-	$path = htmlspecialchars($dbg->tracePath(2));
-	$dbg->useHtml = true;
+// 	$dbg->useHtml = false;
+// 	$path = htmlspecialchars($dbg->tracePath(2));
+// 	$dbg->useHtml = true;
 
-	$this->logger->log('DEBUG', 'DUMP',
-		"<span title=\"$path\">".$dbg->getDump($event->data).'</span>'
-	);
-}
+// 	$this->log('DUMP',
+// 		"<span title=\"$path\">".$dbg->getDump($event->data).'</span>'
+// 	);
+// }
 
 function onRedirect($event)
 {
-	$this->logger->log('DEBUG', 'redirect', '<b>Redirect to ' . $event->data[0] . '</b>');
+	$this->log('redirect', '<b>Redirect to ' . $event->url . '</b>');
 }
 
 protected function logUrl()
 {
-	if (strpos($this->app->routestr, 'pclib/debug') === 0) return;
-
-	$this->updating = true;
-
 	$request = $this->app->request;
 	$message = date("H:m:s ").'<b>'
 	.($request->isAjax()? 'AJAX ': '')
@@ -196,8 +175,7 @@ protected function logUrl()
 		$message = $this->app->debugger->getDump(array($_POST)) . '<br>' . $message;
 	}
 
-	$this->logger->log('DEBUG', 'url', $message . '<hr>');
-	$this->updating = false;
+	$this->log('url', $message . '<hr>');
 }
 
 protected function printLogWindow()
