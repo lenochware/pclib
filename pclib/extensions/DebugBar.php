@@ -55,7 +55,6 @@ public static function register()
 		'db.before-query' => [$that, 'onBeforeQuery'],
 		'db.after-query'  => [$that, 'onAfterQuery'],
 		'router.redirect' => [$that, 'onRedirect'],
-		//'Func.onLogDump' => [$that, 'onLogDump'],
 	];
 
 	$that->addEvents($events);
@@ -74,7 +73,6 @@ protected function getLogger()
 	return $logger;
 }
 
-
 protected function addEvents($events)
 {
 	foreach ($events as $name => $fn) {
@@ -88,6 +86,11 @@ protected function log($category, $message)
 	if ($this->isDebugBarRequest()) return;
 
 	$this->updating = true;
+
+	if (rand(1,100) == 1) {
+		$this->logger->deleteLog(1);
+	}
+		
 	$this->logger->log('DEBUG', $category, $message);
 	$this->updating = false;
 }
@@ -149,19 +152,6 @@ function onError($event)
 {
 	$this->log('error', $event->message);
 }
-
-// function onLogDump($event)
-// {
-// 	$dbg = $this->app->debugger;
-
-// 	$dbg->useHtml = false;
-// 	$path = htmlspecialchars($dbg->tracePath(2));
-// 	$dbg->useHtml = true;
-
-// 	$this->log('DUMP',
-// 		"<span title=\"$path\">".$dbg->getDump($event->data).'</span>'
-// 	);
-// }
 
 function onRedirect($event)
 {
@@ -226,7 +216,4 @@ public function dump($vars)
 	$this->log('dump', $message);
 }
 
-
 }
-
-?>
