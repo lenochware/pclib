@@ -28,11 +28,7 @@ private function __construct()
 {
 	global $pclib;
 	$this->app = $pclib->app;
-
-	//Use logger with independent db connection to avoid conflicts.
-	$this->logger = new PCLogger('debuglog');
-	$this->logger->storage = new \pclib\system\storage\LoggerDbStorage($this->logger);
-	$this->logger->storage->db = clone $this->app->db;
+	$this->logger = $this->getLogger();
 
 	$this->logUrl();	
 }
@@ -43,13 +39,6 @@ public static function getInstance()
       self::$instance = new self;
   }
   return self::$instance;
-}
-
-function addEvents($events)
-{
-	foreach ($events as $name => $fn) {
-		$this->app->events->on($name, $fn);
-	}
 }
 
 public static function register()
@@ -76,10 +65,27 @@ public static function register()
 	$that->registered = true;
 }
 
+protected function getLogger()
+{
+	//Use logger with independent db connection to avoid conflicts.
+	$logger = new PCLogger('debuglog');
+	$logger->storage = new \pclib\system\storage\LoggerDbStorage($logger);
+	$logger->storage->db = clone $this->app->db;	
+	return $logger;
+}
+
+
+protected function addEvents($events)
+{
+	foreach ($events as $name => $fn) {
+		$this->app->events->on($name, $fn);
+	}
+}
+
 protected function log($category, $message)
 {
 	if ($this->updating) return;
-	if ($this->app->controller == 'pclib_debugbar') return;
+	if ($this->isDebugBarRequest()) return;
 
 	$this->updating = true;
 	$this->logger->log('DEBUG', $category, $message);
@@ -113,7 +119,7 @@ function onAfterOut($event)
 
 function onBeforeRun($event)
 {
-	if ($event->action->controller != 'pclib_debugbar') return;
+	if (!$this->isDebugBarRequest()) return;
 
 	switch ($event->action->method) {
 		case 'show': $this->printLogWindow(); break;
@@ -172,7 +178,7 @@ protected function logUrl()
 	.$request->url;
 
 	if ($request->method == 'POST') {
-		$message = $this->app->debugger->getDump(array($_POST)) . '<br>' . $message;
+		$message = $this->getDump($_POST) . '<br>' . $message;
 	}
 
 	$this->log('url', $message . '<hr>');
@@ -181,7 +187,7 @@ protected function logUrl()
 protected function printLogWindow()
 {
 	print file_get_contents(PCLIB_DIR.'assets/debugmenu.tpl');
-	print '<h4>Query Log</h4>';
+	print '<h4>Debug Log</h4>';
 	$grid = new PCGrid(PCLIB_DIR.'assets/debuglog.tpl');
 	$data = $this->logger->getLog(100, array('LOGGERNAME' => $this->logger->name));
 	$grid->setArray($data);
@@ -191,18 +197,27 @@ protected function printLogWindow()
 
 protected function printInfoWindow()
 {
-	$dbg = $this->app->debugger;
 	print file_get_contents(PCLIB_DIR.'assets/debugmenu.tpl');
 	print '<h4>_SESSION</h4>';
-	print $dbg->getDump(array($_SESSION));
+	print $this->getDump($_SESSION);
 	print '<h4>_COOKIE</h4>';
-	print $dbg->getDump(array($_COOKIE));
+	print $this->getDump($_COOKIE);
 	die();
 }
 
 protected function getTime($startTime)
 {
 	return round((microtime(true) - $startTime) * 1000, 1);
+}
+
+protected function isDebugBarRequest()
+{
+	return ($this->app->controller == 'pclib_debugbar');
+}
+
+protected function getDump()
+{
+	return $this->app->debugger->getDump(func_get_args());
 }
 
 }
