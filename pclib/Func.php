@@ -56,6 +56,16 @@ function dump()
 }
 
 /**
+ * Dump variable(s) for debugging to the debug log.
+ * Usage: ddump($a,$b,...);
+ **/
+function ddump()
+{
+	$dd = pclib\Extensions\DebugBar::getInstance();
+	$dd->dump(func_get_args());
+}
+
+/**
  * Dump variable(s) for debugging to the javascript console.
  * Usage: jdump($a,$b,...);
  **/
@@ -74,29 +84,6 @@ function jdump()
 	else
 		print "<script>$js</script>";
 }
-
-/**
- * Dump variable(s) for debugging to the text file / database log.
- * Usage: logdump($a,$b,...);
- **/
-function logdump()
-{
-	global $pclib;
-	$app = $pclib->app;
-	$args = func_get_args();
-	
-	$debug = $app->debugger;
-	$sav = $debug->useHtml;
-	$debug->useHtml = false;
-	$s = $debug->getDump($args);
-	$debug->useHtml = $sav;
-
-	$dir = $app->config['pclib.directories']['logs'];
-	$logfile = $dir.'logdump.log';
-	$s = "\n--- ".date("Y-m-d H:i:s")." ---\n".$s;
-	file_put_contents($logfile, $s, FILE_APPEND);
-}
-
 
 /** 
  * Return string "ID='$id'".

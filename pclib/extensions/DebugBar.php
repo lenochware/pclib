@@ -220,6 +220,13 @@ protected function getDump()
 	return $this->app->debugger->getDump(func_get_args());
 }
 
+public function dump($vars)
+{
+	$message = $this->app->debugger->getDump($vars);
+	$this->log('dump', $message);
+}
+
+
 }
 
 ?>
