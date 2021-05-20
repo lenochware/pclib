@@ -144,7 +144,9 @@ protected function _out($block = null)
 		$this->elements['noitems']['noprint'] = !$empty;
 	}
 
+	$this->trigger('grid.before-out');
 	parent::_out($block);
+	$this->trigger('grid.after-out');
 	$this->saveSession();
 }
 

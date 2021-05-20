@@ -147,9 +147,11 @@ protected function getValidator()
  */
 protected function _out($block = null)
 {
+	$this->trigger('form.before-out');
 	print $this->head();
 	parent::_out($block);
 	print $this->foot();
+	$this->trigger('form.after-out');
 }
 
 /**
