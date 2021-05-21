@@ -150,7 +150,7 @@ function onAfterQuery($event)
 
 function onError($event)
 {
-	$this->log('error', $event->message);
+	$this->log('error', "<span style=\"color:red\">".$event->message."</span>");
 }
 
 function onRedirect($event)

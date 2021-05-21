@@ -59,9 +59,9 @@
   }
 </script>
 
-<div id="pc-overlay" onclick="pclib.hideModal()"></div>
-<div id="pc-debugbar" onclick="pclib.showModal('pcwin0','?r=pclib_debugbar/show')">
-  <a href="#" onclick="document.getElementById('pc-debugbar').style.display='none';event.cancelBubble = true;">×</a>
+<div id="pc-overlay" onclick="pclib.hideModal();event.stopPropagation()"></div>
+<div id="pc-debugbar" onclick="pclib.showModal('pcwin0','?r=pclib_debugbar/show');event.stopPropagation()">
+  <a href="#" onclick="document.getElementById('pc-debugbar').style.display='none';event.stopPropagation()">×</a>
   pclib {VERSION}|{TIME} ms|{MEMORY} MB
 </div>
 <div id="pcwin0" class="pc-debugbar-window"></div>
