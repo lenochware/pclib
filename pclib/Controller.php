@@ -107,6 +107,34 @@ public function run($action)
 }
 
 /**
+ * Call route $rs and return result of the controller's action.
+ * @param string $rs Route path i.e. 'comment/edit/id:1'
+ * @return string $output
+ */
+function action($rs)
+{
+  $action = new pclib\Action($rs);
+  $ct = $this->app->newController($action->controller);
+
+  if (!$ct) throw new Exception('Build of '.$action->controller.' failed.');
+
+  return $ct->run($action);
+}
+
+/**
+ * Create template $path, populated with $data.
+ * @param string $path Path to template
+ * @param array $data Template values
+ * @return Tpl $template
+ */
+public function template($path, $data = [])
+{
+  $templ = new pclib\Tpl($path);
+  $templ->values = $data;
+  return $templ;
+}
+
+/**
  * Redirect to $route.
  **/
 function redirect($route)
