@@ -992,8 +992,9 @@ function getItems($id)
 	elseif ($elem['lookup']) $items = $this->getLkpLookup($elem['lookup']);
 	elseif ($elem['datasource']) $items = $this->getDataSource($elem['datasource']);
 
-	if ($this->translator) {
-		$items = $this->translator->translateArray($items);
+	$tr = $this->app->getService('translator');
+	if ($tr) {
+		$items = $tr->translateArray($items);
 	}
 
 	$this->elements[$id]['items'] = $items;
