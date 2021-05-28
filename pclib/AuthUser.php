@@ -136,6 +136,16 @@ function passwordVerify($password)
 	else return $this->service('auth')->passwordHashVerify($password, $cred[1]);
 }
 
+/**
+ * Change user password.
+ * @param string $password
+ */
+function changePassword($password)
+{
+	$am = new pclib\extensions\AuthManager;
+	$am->setPassw($this->values['USERNAME'], $password);
+}
+
 }
 
 ?>
