@@ -796,7 +796,7 @@ function print_Select($id, $sub, $value)
 	$emptylb = $elem['emptylb'] ?: ' - Choose - ';
 
 	$options = array();
-	$html = $elem['noemptylb']? '':'<option value="">'.$this->t($emptylb).'</option>';
+	$html = $elem['noemptylb']? '':'<option value="">'.$this->app->text($emptylb).'</option>';
 
 	if ($elem['multiple'] and $value and !is_array($value))
 	{
@@ -1085,7 +1085,7 @@ function getVisibleElements()
 				$value = implode(', ', $labels);
 			}
 			else {
-				$value = $this->t($value[0]? 'yes' : 'no');
+				$value = $this->app->text($value[0]? 'yes' : 'no');
 			}
 		}
 

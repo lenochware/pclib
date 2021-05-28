@@ -476,7 +476,7 @@ protected function executeCmd($cmd)
 /**Set message to $this->messages. */
 protected function message($message, $params)
 {
-	$this->messages[] = vsprintf($this->t($message), $params);
+	$this->messages[] = $this->app->text($message, $params);
 }
 
 }

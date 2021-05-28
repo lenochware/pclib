@@ -52,9 +52,6 @@ protected $app;
 /** var Db */
 public $db;
 
-/** var Translator */
-public $translator;
-
 /** var Router */
 public $router;
 
@@ -715,7 +712,7 @@ function print_Action($id, $sub, $value)
 	$action = new Action($rs);
 	$ct = $this->app->newController($action->controller, $action->module);
 	if (!$ct) {
-		printf($this->t('Page not found: "%s"'), $action->controller.' '.$action->module);
+		print $this->app->text('Page not found: "%s"', $action->controller.' '.$action->module);
 	}
 	else print $ct->run($action);
 }
@@ -1080,7 +1077,7 @@ protected function fireEventElem()
 	if (!$func) return false;
 	if (!is_callable($func)) {
 		trigger_error(
-			vsprintf($this->t("Function %s of event %s not found."), array($func, $name)),
+			$this->app->text("Function %s of event %s not found.", $func, $name),
 			E_USER_WARNING
 		);
 		return false;
@@ -1088,11 +1085,6 @@ protected function fireEventElem()
 	$ret = call_user_func_array($func, $args);
 	if ($ret === null) $ret = true; //no return - stop propagation
 	return $ret;
-}
-
-protected function t($s)
-{
-	return $this->service('translator', false)? $this->translator->translate($s) : $s;
 }
 
 } //class Tpl

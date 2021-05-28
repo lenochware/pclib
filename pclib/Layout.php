@@ -134,7 +134,7 @@ public function addMessage($message, $cssClass = null, $params = array())
 	if (!$this->messagesTag) throw new NoValueException('Missing "messages" tag in template.');
 	if (!$cssClass) $cssClass = 'message';
 	$flash = $this->app->getSession('pclib.flash');
-	$flash[$cssClass][] = $this->app->t($message, $params);
+	$flash[$cssClass][] = $this->app->text($message, $params);
 	$this->app->setSession('pclib.flash', $flash);
 }
 

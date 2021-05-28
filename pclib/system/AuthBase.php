@@ -23,9 +23,6 @@ class AuthBase extends BaseObject
 /** var App */
 protected $app;
 
-/** var Translator */
-public $translator;
-
 /** Array of error messages (if any) */
 public $errors = array();
 
@@ -104,7 +101,7 @@ protected function log($category, $messageId, $message = null, $itemId = null)
 function setError($message)
 {
 	$args = array_slice(func_get_args(), 1) ;
-	$message = vsprintf($this->t($message), $args);
+	$message = $this->app->text($message, $args);
 
 	if ($this->throwsExceptions) {
 		throw new AuthException($message);
@@ -112,10 +109,6 @@ function setError($message)
 	else {
 		$this->errors[] = $message;
 	}
-}
-
-protected function t($s) {
-	return $this->service('translator', false)? $this->translator->translate($s) : $s;
 }
 
 }

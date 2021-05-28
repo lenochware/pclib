@@ -359,11 +359,11 @@ function path($path)
 /**
  * Translate string $s.
  * Uses Translator service if present, otherwise return unmodified $s.
- * Example: $app->t('File %%s not found.', $fileName);
+ * Example: $app->text('File %%s not found.', $fileName);
  * @param string $s String to be translated.
  * @param mixed $args Variable number of arguments.
  */
-function t($s)
+function text($s)
 {
 	$translator = array_get($this->services, 'translator');
 	if ($translator) $s = $translator->translate($s);
@@ -409,7 +409,7 @@ function warning($message, $cssClass = null)
 function error($message, $cssClass = null)
 {
 	$args = array_slice(func_get_args(), 2);
-	$message = vsprintf($this->t($message), $args);
+	$message = $this->text($message, $args);
 	if (!$cssClass) $cssClass = 'error';
 
 	$event = $this->trigger('app.error', ['message' => $message]);
@@ -431,7 +431,7 @@ function httpError($code, $message, $cssClass = null)
 	}
 
 	$args = array_slice(func_get_args(), 3);
-	$message = vsprintf($this->t($message), $args);
+	$message = $this->text($message, $args);
 	$this->error($message, $cssClass);
 }
 

@@ -26,7 +26,7 @@ protected function authPrompt()
 {
 	header("WWW-Authenticate: Basic realm=\"$this->realm\"");
 	header('HTTP/1.1 401 Unauthorized');
-	die($this->t('This page requires authentication.'));
+	die($this->app->text('This page requires authentication.'));
 }
 
 protected function verifyCredentials(array $credentials)
@@ -83,7 +83,7 @@ function loginHttp()
 
 function logout()
 {
-	die($this->t('Please close your internet browser for logout.'));
+	die($this->app->text('Please close your internet browser for logout.'));
 }
 
 }
