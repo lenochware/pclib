@@ -75,9 +75,6 @@ function findActionName($action)
 	if (method_exists($this, $action.$this->ACTION_POSTFIX)) {
 		return $action;
 	}
-	elseif (method_exists($this, 'default'.$this->ACTION_POSTFIX)) {
-		return 'default';		
-	}
 
 	return false;
 }
@@ -92,18 +89,20 @@ public function run($action)
 	$this->action = $this->findActionName($action->method);
 	$this->init();
 
-	if (!$this->action) {
-		$this->app->httpError(404, 'Page not found: "%s"', null, $action->path);
+	if ($this->action) {
+		$action_method = $this->action.$this->ACTION_POSTFIX;
+		$args = $this->getArgs($action_method, $action->params);
+
+		return call_user_func_array([$this, $action_method], $args);
 	}
-
-	$action_method = $this->action.$this->ACTION_POSTFIX;
-	$args = $this->getArgs($action_method, $action->params);
-
-	if ($this->action == 'default') {
-		$this->action = $action;
+	else {
+		return $this->defaultAction($action);
 	}
+}
 
-	return call_user_func_array(array($this, $action_method), $args);
+public function defaultAction($action)
+{
+	$this->app->httpError(404, 'Page not found: "%s"', null, $action->path);
 }
 
 /**
