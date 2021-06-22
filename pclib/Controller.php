@@ -163,5 +163,30 @@ function selection($from = null)
 	return $sel;
 }
 
+/**
+ * Check if user has permission $perm. If not, redirect to sign-in or throw error.
+ * If $perm is empty, any logged user is allowed.
+ **/
+function authorize($perm = '')
+{
+	$auth = $this->app->getService('auth');
+
+	if (!$auth) {
+		$this->app->error('Permission denied.');
+	}
+
+	if (!$perm and $auth->isLogged()) return;
+
+	if (!$auth->isLogged()) {
+		$this->app->message('Please sign in.');
+		$this->app->setSession('backurl', $this->app->request->getUrl());
+		$this->redirect('user/signin');
+	}
+
+	if (!$auth->hasRight($perm)) {
+		$this->app->error('Permission denied.');
+	}
+}
+
 
 }
