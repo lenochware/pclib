@@ -138,12 +138,6 @@ protected function _out($block = null)
 {
 	$this->values['items'] = $this->getValues();
 
-	if ($this->config['pclib.compatibility']['tpl_syntax'] and !$this->elements['items']['else']) {
-		$empty = !$this->values['items'];
-		$this->elements['items']['noprint'] = $empty;
-		$this->elements['noitems']['noprint'] = !$empty;
-	}
-
 	$this->trigger('grid.before-out');
 	parent::_out($block);
 	$this->trigger('grid.after-out');

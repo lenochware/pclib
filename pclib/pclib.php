@@ -15,7 +15,7 @@
 /**
  * PClib version string
  */
-define('PCLIB_VERSION', '2.5.0');
+define('PCLIB_VERSION', '2.6.0');
 
 /* Find out where library reside. MUST BE an absolute path. */
 if (!defined('PCLIB_DIR')) {
@@ -45,19 +45,6 @@ class Pclib
 	/** var Autoloader */
 	public $autoloader;
 
-	public $legacyAliases = array(
-		'App' => '\pclib\App',
-		'Db' => '\pclib\Db',
-		'Tpl' => '\pclib\Tpl',
-		'Grid' => '\pclib\Grid',
-		'Form' => '\pclib\Form',
-		'Auth' => '\pclib\Auth',
-		'Tree' => '\pclib\Tree',
-		'Logger' => '\pclib\Logger',
-		'Translator' => '\pclib\Translator',
-		'App_Controller' => '\pclib\Controller',		
-	);
-
 	/** PClib intialization - it's called just once before using %pclib. */
 	function init()
 	{
@@ -77,8 +64,6 @@ class Pclib
 			'PCSelection' => '\pclib\orm\Selection',
 			'PCFileStorage' => '\pclib\FileStorage',
 		);
-
-		$this->legacyAliases += array_change_key_case($this->legacyAliases, CASE_LOWER);
 
 		$this->version = PCLIB_VERSION;
 		$autoload = new \pclib\system\Autoloader;

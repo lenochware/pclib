@@ -96,7 +96,6 @@ function __construct($path = '', $sessName = '')
 	$this->config = $this->app->config;
 	$this->escapeHtmlFunction = array($this, 'escapeHtml');
 	$this->parser = new TplParser;
-	$this->parser->legacyBlockSyntax = $this->config['pclib.compatibility']['tpl_syntax'];
 
 	$this->sessName = $sessName;
 	$this->loadSession();
@@ -1071,11 +1070,8 @@ protected function fireEventElem()
 	$name = $args[0]; $args[0] = $this;
 	$id = $args[1];
 	$func = $this->elements[$id][$name];
-	if (!$func and $this->config['pclib.compatibility']['tpl_syntax']) {
-		$func = $this->elements[$id][substr($name,2)];
-		if ($func) $func = 'callback_'.$func;
-	}
 	if (!$func) return false;
+
 	if (!is_callable($func)) {
 		trigger_error(
 			$this->app->text("Function %s of event %s not found.", $func, $name),

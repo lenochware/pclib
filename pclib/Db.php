@@ -707,10 +707,6 @@ function setParams($sql, $params)
 	
 	$pat = $this->SQL_PARAM_PATTERN;
 	if (strpos($sql, '{')) $has_params = true;
-	if ($this->config['pclib.compatibility']['sql_syntax'] and strpos($sql, '[')) {
-		$has_params = true;
-		$pat = "/\[([#\?\!]?)([a-z0-9_]+)\]/i";
-	}
 	if (!$has_params) return $sql;
 	
 	preg_match_all($pat, $sql, $found);

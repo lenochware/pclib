@@ -48,8 +48,6 @@ public $environment;
 /** Enabling debugMode will display debug-toolbar. */
 public $debugMode = false;
 
-public $indexFile = 'index.php';
-
 /** var ErrorHandler */
 public $errorHandler;
 
@@ -274,9 +272,6 @@ public function configure()
 	}
 	foreach ($this->config['pclib.directories'] as $k => $dir) {
 		$this->config['pclib.directories'][$k] = paramstr($dir, $this->paths);
-	}
-	if ($this->config['pclib.compatibility']['legacy_classnames']) {
-		$pclib->autoloader->addAliases($pclib->legacyAliases);
 	}
 }
 

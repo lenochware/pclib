@@ -33,9 +33,6 @@ function __construct(App $app)
 {
 	parent::__construct();
 	$this->app = $app;
-	if ($this->app->config['pclib.compatibility']['legacy_classnames']) {
-		$this->ACTION_POSTFIX = '_Action';
-	}
 }
 
 /**
