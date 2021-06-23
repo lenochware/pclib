@@ -76,7 +76,27 @@ function jdump()
 	$args = func_get_args();
 	
 	foreach($args as $var) {
-		$js .= 'console.log('.json_encode($var).');';
+		
+		if (is_object($var)) {
+			$var = ["__class__" => "[object ".get_class($var)."]"] + (array)$var;
+		}
+
+		if (is_array($var)) {
+			$output = [];
+			foreach ($var as $key => $value) {
+				if (is_object($value)) $value = "[object ".get_class($value)."]";
+				if (is_array($value)) $value = "[array(".count($value).")]";
+				$key = str_replace("\0", ' ', $key);
+				$output[$key] = $value;
+			}
+
+			$output = ["__class__" => "[PHPArray(".count($var).")]"] + (array)$output;
+		}
+		else {
+			$output = $var;
+		}
+
+		$js .= 'console.log('.json_encode($output).');';
 	}
 	
 	if ($pclib->app->layout)
