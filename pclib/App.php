@@ -273,13 +273,22 @@ public function configure()
 	foreach ($this->config['pclib.directories'] as $k => $dir) {
 		$this->config['pclib.directories'][$k] = paramstr($dir, $this->paths);
 	}
+
+	$c = $this->config['pclib.app'];
+
+	if (!empty($c['db'])) $this->db = new pclib\Db($c['db']);
+	if (!empty($c['auth'])) $this->auth = new pclib\Auth();
+	if (!empty($c['logger'])) $this->logger = new pclib\Logger();
+	if (!empty($c['language'])) $this->setLanguage($c['language']);
+	if (!empty($c['debugbar'])) $this->debugMode = true;
+	if (!empty($c['layout'])) $this->setLayout($c['layout']);
 }
 
 /**
  * Perform redirect to $route.
  * Example: $app->redirect("products/edit/id:$id");
  * @param string|array $route
- * @param htttp code (e.g. 301 Moved Permanently)
+ * @param http code (e.g. 301 Moved Permanently)
  * See also @ref pcl-route
  */
 function redirect($route, $code = null)
@@ -384,17 +393,6 @@ function message($message, $cssClass = null)
 {
 	$args = array_slice(func_get_args(), 2);
 	$this->layout->addMessage($message, $cssClass, $args);
-}
-
-/**
- * Display warning message.
- * @deprecated Use app->message($message, 'warning');
- * @see message()
- **/
-function warning($message, $cssClass = null)
-{
-	$args = array_slice(func_get_args(), 2);
-	$this->layout->addMessage($message, $cssClass? $cssClass : 'warning', $args);
 }
 
 /**
@@ -530,8 +528,16 @@ function run($rs = null)
 	if ($rs) {
 		$this->router->action = new Action($rs);
 	}
+
+	if (!$this->router->action->controller) {
+		$default = array_get($this->config['pclib.app'], 'default-route');
+		if ($default) {
+			$this->router->action = new Action($default);
+		}
+	}
 	
 	$action = $this->router->action;
+	
 
 	$event = $this->trigger('app.before-run', ['action' => $action]);
 	if ($event and !$event->propagate) return;
