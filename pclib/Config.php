@@ -22,7 +22,6 @@ $config = [
 		'logs' => 'temp/log/',
 		'assets' => '{pclib}/assets/',
 		'localization' => '{webroot}{pclib}/localization/',
-		'app-templates' => 'tpl/app/',
 	],
 
 	'pclib.loader' => [

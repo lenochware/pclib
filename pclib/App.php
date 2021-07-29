@@ -543,7 +543,10 @@ function run($rs = null)
 	if ($event and !$event->propagate) return;
 
 	$ct = $this->newController($action->controller, $action->module);
-	if (!$ct) $this->httpError(404, 'Page not found: "%s"', null, $action->controller);
+	if (!$ct) {
+		$ct = $this->newController('base');
+		if (!$ct) $this->httpError(404, 'Page not found: "%s"', null, $action->controller);
+	}
 
 	$html = $ct->run($action);
 
