@@ -459,6 +459,14 @@ function print_Element($id, $sub, $value)
 {
 	$elem = $this->elements[$id];
 
+	if (
+		($elem['escape'] 
+			or ($this->config['pclib.security']['tpl-escape'] and !$elem["noescape"])
+		) and is_string($value)
+	) {
+		$value = $this->escapeHtmlFunction($value);
+	}
+
   if ($sub == 'lb') {
     print $elem['lb']? $elem['lb'] : $id;
     return;
@@ -467,14 +475,6 @@ function print_Element($id, $sub, $value)
     print $value;
     return;
   }
-
-	if (
-		($elem['escape'] 
-			or ($this->config['pclib.security']['tpl-escape'] and !$elem["noescape"])
-		) and is_string($value)
-	) {
-		$value = $this->escapeHtmlFunction($value);
-	}
 
 	switch ($elem["type"]) {
 		case "number":

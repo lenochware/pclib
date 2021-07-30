@@ -76,6 +76,8 @@ function getNavig($options = array())
 		$alt = '';
 		if (!$title) continue;
 
+		$title = utf8_htmlspecialchars($title);
+
 		if (utf8_strlen($title) > 30) {
 			$alt = 'title="'.$title.'"';
 			$title = utf8_substr($title, 0, 30). '...';

@@ -382,7 +382,7 @@ function print_Element($id, $sub, $value)
 	}
 
 	if ($sub == 'value') {
-		print $value;
+		parent::print_Element($id, $sub, $value);
 		return;
 	}
 
@@ -1213,7 +1213,7 @@ protected function ieFix($id, $name, $value)
 		'type' => 'hidden',
 		'id' => $id.'_hid',
 		'name' => $name,
-		'value' => $value,
+		'value' => $this->escape($value),
 	);
 	return $this->htmlTag('input', $tag);
 }

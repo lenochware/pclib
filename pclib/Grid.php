@@ -303,7 +303,7 @@ function print_Element($id, $sub, $value)
 		return;
 	}
 	elseif ($sub == 'value') {
-		print $value;
+		parent::print_Element($id, $sub, $value);
 		return;
 	}
 
