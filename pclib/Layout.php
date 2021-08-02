@@ -83,10 +83,12 @@ function getNavig($options = array())
 			$title = utf8_substr($title, 0, 30). '...';
 		}
 
+		$class = ($i == $maxlevel)? "pc-nav-$i pc-nav-active" : "pc-nav-$i";
+
 		if ($i == $maxlevel and !$options['lastlink'])
-			$navig[] = "<span $alt>$title</span>";
+			$navig[] = "<span $alt class=\"$class\">$title</span>";
 		else
-			$navig[] = "<a href=\"$url\" $alt>$title</a>";
+			$navig[] = "<a href=\"$url\" $alt class=\"$class\">$title</a>";
 
 	}
 
