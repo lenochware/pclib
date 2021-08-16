@@ -85,12 +85,12 @@ CREATE INDEX I_AUTH_USER_ROLE_ROLE_ID ON AUTH_USER_ROLE (ROLE_ID);
 
 CREATE TABLE AUTH_USERS (
   ID integer primary key,
-  USERNAME varchar(30),
-  FULLNAME varchar(100),
-  EMAIL varchar(100),
+  USERNAME varchar(255),
+  FULLNAME varchar(255),
+  EMAIL varchar(255),
   PASSW varchar(255),
   DPASSW varchar(50),
-  ANNOT varchar(100),
+  ANNOT varchar(255),
   LAST_LOGIN datetime,
   LOGINFAIL integer DEFAULT 0,
   ACTIVE integer DEFAULT 1,

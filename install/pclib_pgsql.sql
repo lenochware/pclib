@@ -90,12 +90,12 @@ CREATE INDEX i_auth_user_role_role_id ON auth_user_role USING btree (role_id);
 
 CREATE TABLE auth_users (
   id serial NOT NULL,
-  username character varying(30) DEFAULT NULL,
-  fullname character varying(100) DEFAULT NULL,
-  email character varying(100) DEFAULT NULL,
+  username character varying(255) DEFAULT NULL,
+  fullname character varying(255) DEFAULT NULL,
+  email character varying(255) DEFAULT NULL,
   passw character varying(255) DEFAULT NULL,
   dpassw character varying(50) DEFAULT NULL,
-  annot character varying(100) DEFAULT NULL,
+  annot character varying(255) DEFAULT NULL,
   last_login timestamp without time zone,
   loginfail smallint DEFAULT 0,
   active smallint DEFAULT 1,
