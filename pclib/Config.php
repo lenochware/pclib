@@ -24,10 +24,6 @@ $config = [
 		'localization' => '{webroot}{pclib}/localization/',
 	],
 
-	'pclib.loader' => [
-		'controller' => ['dir' => 'controllers', 'namespace' => '', 'postfix' => 'Controller'],
-	],
-
 	'pclib.security' => ['tpl-escape' => false, 'csrf' => false, 'form-prevent-mass' => false],
 	'pclib.auth' => ['algo' => 'md5', 'secret' => 'write any random string!', 'realm' => ''],
 
