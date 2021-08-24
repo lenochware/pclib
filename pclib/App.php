@@ -267,9 +267,6 @@ public function configure()
 	global $pclib;
 	$this->errorHandler->options = $this->config['pclib.errors'];
 
-	if ($this->config['pclib.logger']['log']) {
-		$this->logger->categories = $this->config['pclib.logger']['log'];
-	}
 	foreach ($this->config['pclib.directories'] as $k => $dir) {
 		$this->config['pclib.directories'][$k] = paramstr($dir, $this->paths);
 	}
@@ -279,7 +276,7 @@ public function configure()
 	if (!empty($c['db'])) $this->db = new pclib\Db($c['db']);
 	if (!empty($c['auth'])) $this->auth = new pclib\Auth();
 	if (!empty($c['logger'])) $this->logger = new pclib\Logger();
-	if (!empty($c['upload-dir'])) $this->fileStorage = new pclib\FileStorage($c['upload-dir']);
+	if (!empty($c['file-storage'])) $this->fileStorage = new pclib\FileStorage($this->config['pclib.directories']['uploaded']);
 	if (!empty($c['language'])) $this->setLanguage($c['language']);
 	if (!empty($c['debugbar'])) $this->debugMode = true;
 	if (!empty($c['friendly-url'])) $this->router->friendlyUrl = true;

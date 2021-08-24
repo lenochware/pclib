@@ -16,12 +16,11 @@
 $config = [
 	'pclib.errors' => ['display', 'develop', /*,'log','template'=>'error.tpl' */],
 	'pclib.locale' => ['date' => '%d. %m. %Y', 'datetime' => '%d.%m.%Y %H:%M%:%S'],
-	'pclib.logger' => ['log' => ['ALL']],
 
 	'pclib.directories' => [
-		'logs' => 'temp/log/',
 		'assets' => '{pclib}/assets/',
 		'localization' => '{webroot}{pclib}/localization/',
+		'uploaded' => '{basedir}/uploaded',
 	],
 
 	'pclib.security' => ['tpl-escape' => false, 'csrf' => false, 'form-prevent-mass' => false],
