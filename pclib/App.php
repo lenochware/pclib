@@ -302,10 +302,8 @@ function redirect($route, $code = null)
  * Initialize application Translator and enable translation to the $language.
  * You can access current language as $app->language.
  * @param string $language Language code such as 'en' or 'source'.
- * @param bool $useDefault Preload default texts?
- * @param bool $useFile Try load texts from php file?
  */
-function setLanguage($language, $useDefault = true, $useFile = true)
+function setLanguage($language)
 {
 	$trans = new Translator($this->name);
 	$trans->language = $language;
@@ -313,13 +311,12 @@ function setLanguage($language, $useDefault = true, $useFile = true)
 	if ($language == 'source') {
 		$trans->autoUpdate = true;
 	}
-	elseif($useFile) {
+	else {
 		$transFile = $this->config['pclib.directories']['localization'].$language.'.php';
 		if (file_exists($transFile)) $trans->useFile($transFile);
-		else throw new FileNotFoundException("Translator file '$transFile' not found.");
 	}
 
-	if ($useDefault) {
+	if (!empty($this->services['db'])) {
 		try {
 			$trans->usePage('default');
 		} catch (Exception $e) {
