@@ -300,24 +300,6 @@ function selectPair($dsstr)
 	return $rows;
 }
 
-//for compatibility
-function select_All()
-{
-	return call_user_func_array(array($this, 'selectAll'), func_get_args());
-}
-
-//for compatibility
-function select_One()
-{
-	return call_user_func_array(array($this, 'selectOne'), func_get_args());
-}
-
-//for compatibility
-function select_Pair()
-{
-	return call_user_func_array(array($this, 'selectPair'), func_get_args());	
-}
-
 /**
  * Perform INSERT query, return inserted ID.
  * See \ref db-params.
@@ -668,17 +650,6 @@ function getLookup($lkpName)
 	
 	$items = $this->selectPair($sql);
 
-/*
-	if ($this->mls) {
-		$langid = $lkpname;
-		$mls_items = $this->mls->getpage('L_'.$langid);
-		foreach((array)$mls_items as $iid => $label) $items[$iid] = $label;
-
-		if ($this->mls->autoupdate)
-			$this->mls->set_page_db($this->mls->defaultlang, 'L_'.$langid, $items);
-	}
-*/
-
 	return $items;
 }
 
@@ -772,7 +743,8 @@ protected function getWhereSql($cond, $args)
 {
 	if (is_numeric($cond)) throw new \InvalidArgumentException;
 	if (is_array($cond)) {
-		foreach($cond as $k => $v){
+		$s = '';
+		foreach($cond as $k => $v) {
 			$s .= " AND ".$this->escape($k,'ident')."='".$this->escape($v)."'";
 		}
 		$where = substr($s, 5);
