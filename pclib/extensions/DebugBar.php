@@ -212,8 +212,15 @@ protected function getDump()
 
 public function dump($vars)
 {
-	$message = $this->app->debugger->getDump($vars);
+	$dbg = $this->app->debugger;
+
+	$sav = $dbg->useHtml;
+	$dbg->useHtml = false;
+
+	$message = $dbg->getDump($vars);
 	$this->log('dump', $message);
+	
+	$dbg->useHtml = $sav;	
 }
 
 }
