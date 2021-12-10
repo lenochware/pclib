@@ -282,7 +282,7 @@ function getEntity($id)
  */
 function deleteAll($filter)
 {
-	$toDelete = $this->db->select_one($this->TABLE.':ID', $filter);
+	$toDelete = $this->db->selectOne($this->TABLE.':ID', $filter);
 	foreach($toDelete as $id) $this->delete($id);
 }
 
@@ -338,7 +338,7 @@ function isImage($file) {
  */
 function findAll($filter)
 {
-	$files = $this->db->select_all($this->TABLE, $filter);
+	$files = $this->db->selectAll($this->TABLE, $filter);
 	return $files;
 }
 
@@ -358,7 +358,7 @@ function findOne($filter)
  */
 function getAll($entity)
 {
-	$files = $this->db->select_all(
+	$files = $this->db->selectAll(
 		"select * from $this->TABLE where ENTITY_ID='{0}' AND ENTITY_TYPE='{1}' order by FILE_ID", 
 		$entity
 	);

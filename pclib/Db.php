@@ -264,7 +264,7 @@ function selectAll($dsstr)
 /**
  * Perform SELECT query, return first column of result as indexed array.
  * @copydoc shortcut-select
- * @return array $column. Ex: select_one('PERSONS:NAME')
+ * @return array $column. Ex: selectOne('PERSONS:NAME')
  * will return array('John', 'Jack', ...)
 **/
 function selectOne($dsstr)
@@ -281,7 +281,7 @@ function selectOne($dsstr)
  * Perform SELECT query, return first and second column
  * as associative array (lookup query).
  * @copydoc shortcut-select
- * @return array $lookup. Ex: select_pair('PERSONS:NAME,MONEY')
+ * @return array $lookup. Ex: selectPair('PERSONS:NAME,MONEY')
  *  will return array('John' => 12000, 'Jack' => 200, ...)
 **/
 function selectPair($dsstr)
