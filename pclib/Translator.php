@@ -147,9 +147,19 @@ function createLanguage($lang)
 	return $this->getStorage()->createLanguage($lang);
 }
 
+function hasLanguage($lang)
+{
+	return $this->getStorage()->hasLanguage($lang);
+}
+
 function deleteLanguage($lang)
 {
 	$this->getStorage()->deleteLanguage($lang);
+}
+
+function getId()
+{
+	return $this->getStorage()->getLabelId($this->name, 1);
 }
 
 }
