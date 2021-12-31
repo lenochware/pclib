@@ -84,6 +84,10 @@ class Tree extends system\BaseObject
     $this->length = 0;
   }
 
+  /**
+   * Import %Tree from text string.
+   * @param string $s Source string. See https://pclib.brambor.net/demo/?r=source/tree.txt
+   */
   function importText($s)
   {
     $this->reset();
@@ -98,6 +102,10 @@ class Tree extends system\BaseObject
     }
   }
   
+    /**
+   * Export current %Tree to text string.
+   * @return string $s %Tree as text.
+   */
   function exportText()
   {
     $s = "PATH|ROUTE\n";
@@ -114,6 +122,10 @@ class Tree extends system\BaseObject
     return $s;
   }
 
+  /**
+   * Import %Tree from array of $nodes.
+   * @param array $nodes [['ID'=>'','LABEL'=>'','LEVEL'=>'',...],...]
+   */
   function fromArray($nodes)
   {
     $this->reset();
@@ -122,6 +134,10 @@ class Tree extends system\BaseObject
     }
   }
 
+  /**
+   * Export %Tree as array of $nodes.
+   * @return array $nodes 
+   */
   function toArray()
   {
     return $this->nodes;
@@ -139,12 +155,22 @@ class Tree extends system\BaseObject
     return $node;
   }
 
+  /**
+   * Get %Tree node.
+   * @param int $nodeId
+   * @return array $node
+   */
   function get($nodeId)
   {
     $key = $this->index[$nodeId];
     return $this->nodes[$key] ?: null;
   }
 
+  /**
+   * Set %Tree node values.
+   * @param int $nodeId
+   * @param array $data Data of node to be set.
+   */
   function set($nodeId, $data)
   {
     if (!isset($this->index[$nodeId])) throw new Exception("Node not found.");
@@ -152,15 +178,23 @@ class Tree extends system\BaseObject
     $this->nodes[$key] = $data + $this->nodes[$key];
   }
 
+  /**
+   * Find %Tree node by node parameter.
+   * @param string $key Node key
+   * @param string $value Value of node key
+   * @return array $node
+   */
   function find($key, $value)
   {
     foreach ($this->nodes as $node) {
-      if ($node[$key] == $value) return $node['ID'];
+      if ($node[$key] == $value) return $node;
     }
   }
 
   /**
-   * Load %tree from the query. Expected fields: ID, LABEL, PARENT_ID
+   * Load %tree from database query. Expected fields: ID, LABEL, PARENT_ID.
+   * @param string $sql Database query
+   * @param int $topId
    */
   function fromQuery($sql, $topId = 0)
   {
@@ -194,6 +228,10 @@ class Tree extends system\BaseObject
     }
   }
 
+  /**
+   * Load %tree from table tree_lookups.
+   * @param int $treeId 
+   */
   function load($treeId, $topId = 0, $maxLevel = 0)
   {
     $this->service('db');
@@ -216,6 +254,10 @@ class Tree extends system\BaseObject
     $this->fromArray($nodes);
   }
 
+  /**
+   * Save current %tree to table tree_lookups.
+   * @param int $treeId 
+   */
   function save($treeId)
   {
     $this->service('db');
@@ -239,9 +281,6 @@ class Tree extends system\BaseObject
       $this->db->insert($table, $data);
     }
   }
-
-
-  /* View */
 
   /**
    * Expand path(s) in current %tree.
@@ -288,6 +327,9 @@ class Tree extends system\BaseObject
     }
   }
 
+  /**
+   * Return html output of the current tree.
+  **/
   public function html()
   {
     $t = new PCTpl($this->options['template']);
@@ -359,9 +401,7 @@ class Tree extends system\BaseObject
       list($begin, $end) = explode('__items__',  $t->html('folder'));
       return ($strip == 'folderBegin')? $begin : $end;
     }
-
   }
-
 
 }
 
