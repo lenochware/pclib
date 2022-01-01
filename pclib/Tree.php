@@ -30,7 +30,6 @@ class Tree extends system\BaseObject
 
   protected $nodes;
   protected $length;
-  protected $options;
   protected $index;
 
   protected $router;
@@ -47,13 +46,13 @@ class Tree extends system\BaseObject
    * Create %Tree instance.
    * @param string $path Filename of template file. By default it uses default-tree.tpl.
    */
-  function __construct($options = [])
+  function __construct($path = '')
   {
     parent::__construct();
 
-    $defaults = ['table' => 'TREE_LOOKUPS', 'template' => PCLIB_DIR.'assets/default-tree.tpl'];
+    if (!$path)  $path = PCLIB_DIR.'assets/default-tree.tpl';
 
-    $this->options = $options + $defaults;
+    $this->tpl = new PCTpl($path);
     $this->reset();
   }
 
@@ -236,13 +235,11 @@ class Tree extends system\BaseObject
   {
     $this->service('db');
 
-    $table = $this->options['table'];
-
     $flt = '';
 
     if ($topId) {
-      $first = $this->db->select($table, pri($topId));     
-      $last = $this->db->select($table, "TREE_ID='$treeId' AND ID>'{ID}' AND LEVEL<='{LEVEL}' ORDER BY ID", $first);
+      $first = $this->db->select($this->table, pri($topId));     
+      $last = $this->db->select($this->table, "TREE_ID='$treeId' AND ID>'{ID}' AND LEVEL<='{LEVEL}' ORDER BY ID", $first);
       $flt .= $last? sprintf("AND ID BETWEEN %d AND %d", $first['ID'], $last['ID'] - 1) : "AND ID>".$first['ID'];
     }
 
@@ -250,7 +247,7 @@ class Tree extends system\BaseObject
       $flt .= ' AND LEVEL<='.$maxLevel;
     }
 
-    $nodes = $this->db->selectAll($table, "TREE_ID={#0} AND ACTIVE=1 $flt ORDER BY ID", $treeId);
+    $nodes = $this->db->selectAll($this->table, "TREE_ID={#0} AND ACTIVE=1 $flt ORDER BY ID", $treeId);
     $this->fromArray($nodes);
   }
 
@@ -262,9 +259,7 @@ class Tree extends system\BaseObject
   {
     $this->service('db');
 
-    $table = $this->options['table'];
-
-    $this->db->delete($table, "TREE_ID={#0}", $treeId);
+    $this->db->delete($this->table, "TREE_ID={#0}", $treeId);
 
     foreach ($this->nodes as $node)
     {
@@ -278,7 +273,7 @@ class Tree extends system\BaseObject
         'ACTIVE' => $node['ACTIVE'],
       ];
 
-      $this->db->insert($table, $data);
+      $this->db->insert($this->table, $data);
     }
   }
 
@@ -332,7 +327,8 @@ class Tree extends system\BaseObject
   **/
   public function html()
   {
-    $t = new PCTpl($this->options['template']);
+    $this->tpl->values['items'] = '__items__';
+    $rootHtml = $this->tpl->html('root');
 
     $i = 0;
     $html = '';
@@ -358,20 +354,20 @@ class Tree extends system\BaseObject
       }
 
       if (!empty($node['FOLDER'])) {
-        $html .= $this->getHtmlTplStrip($t, 'folderBegin', $node);
+        $html .= $this->getHtmlTplStrip($this->tpl, 'folderBegin', $node);
       }
       else {
-        $html .= $this->getHtmlTplStrip($t, 'item', $node);
+        $html .= $this->getHtmlTplStrip($this->tpl, 'item', $node);
       }
 
       if ($next['LEVEL'] < $node['LEVEL']) {
         $n = $node['LEVEL'] - $next['LEVEL'];
-        $closeHtml = $this->getHtmlTplStrip($t, 'folderEnd', $node);
+        $closeHtml = $this->getHtmlTplStrip($this->tpl, 'folderEnd', $node);
         $html .= str_repeat($closeHtml, $n);
       }
     }
 
-    return $html;
+    return str_replace('__items__', $html, $rootHtml);
   }
 
   function __toString()

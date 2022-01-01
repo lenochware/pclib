@@ -2,10 +2,11 @@
 string ID
 string LABEL
 string OPEN
+string CSS_CLASS default "pctree"
 string items
 ?>
-{block item}
-	<li id="i{ID}">{LABEL}</li>
+{block root}
+	<ul class="{CSS_CLASS}">{items}</ul>
 {/block}
 
 {block folder}
@@ -13,4 +14,8 @@ string items
 	<span>{LABEL}</span>
 	<ul>{items}</ul>
 </li>
+{/block}
+
+{block item}
+	<li id="i{ID}">{LABEL}</li>
 {/block}
