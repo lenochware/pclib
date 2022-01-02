@@ -56,6 +56,9 @@ class Tree extends system\BaseObject
     $this->reset();
   }
 
+  /**
+   * Called everytime when adding node to the tree.
+   */
   protected function addNode($data)
   {
     if (!isset($data['LEVEL']) or !isset($data['LABEL'])) {
@@ -66,6 +69,7 @@ class Tree extends system\BaseObject
     if ($this->length) {
       $last = &$this->nodes[$this->length - 1];
       $last['FOLDER'] = $last['LEVEL'] < $data['LEVEL'] ? 'folder' : '';
+      if ($last['FOLDER']) $last['OPEN'] = 'closed';
     }
 
     if (empty($data['ID'])) $data['ID'] = $this->length;

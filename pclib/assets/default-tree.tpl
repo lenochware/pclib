@@ -1,7 +1,9 @@
 <?elements
 string ID
 string LABEL
+string LEVEL
 string OPEN
+string URL
 string CSS_CLASS default "pctree"
 string items
 ?>
@@ -17,5 +19,10 @@ string items
 {/block}
 
 {block item}
+{if URL}
+	<li id="i{ID}"><a href="{URL}">{LABEL}</a></li>
+{/if}
+{if not URL}
 	<li id="i{ID}">{LABEL}</li>
+{/if}
 {/block}
