@@ -4,11 +4,12 @@ string LABEL
 string LEVEL
 string OPEN
 string URL
-string CSS_CLASS default "pctree"
+string CSS_CLASS default "tree"
+string TREE_ID
 string items
 ?>
 {block root}
-	<ul class="{CSS_CLASS}">{items}</ul>
+	<ul id="tree{TREE_ID}" class="{CSS_CLASS}">{items}</ul>
 {/block}
 
 {block folder}

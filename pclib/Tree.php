@@ -40,7 +40,7 @@ class Tree extends system\BaseObject
   /** var Tpl %Tree template. */
   public $tpl;
 
-  public $filter;
+  public $values;
 
   /**
    * Create %Tree instance.
@@ -253,6 +253,7 @@ class Tree extends system\BaseObject
 
     $nodes = $this->db->selectAll($this->table, "TREE_ID={#0} AND ACTIVE=1 $flt ORDER BY ID", $treeId);
     $this->fromArray($nodes);
+    $this->values['TREE_ID'] = $treeId;
   }
 
   /**
@@ -331,6 +332,7 @@ class Tree extends system\BaseObject
   **/
   public function html()
   {
+    $this->tpl->values = $this->values;
     $this->tpl->values['items'] = '__items__';
     $rootHtml = $this->tpl->html('root');
 
@@ -338,10 +340,6 @@ class Tree extends system\BaseObject
     $html = '';
     while($node = array_get($this->nodes, $i++))
     {
-      if (is_callable($this->filter)) {
-        $node = call_user_func($this->filter, $this, $node);
-      }
-
       if (!$node['ACTIVE']) {
         $i = $this->nextSibling($i - 1);
         continue;
