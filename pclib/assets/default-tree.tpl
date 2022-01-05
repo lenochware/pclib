@@ -14,7 +14,10 @@ string items
 
 {block folder}
 <li id="i{ID}" class="folder {OPEN}">
-	<span>{LABEL}</span>
+	<span>
+		{if URL}<a href="{URL}">{LABEL}</a>{/if}
+		{if not URL}{LABEL}{/if}
+	</span>
 	<ul>{items}</ul>
 </li>
 {/block}
