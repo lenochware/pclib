@@ -952,6 +952,19 @@ function upload($tableName, $id, $old = array())
 }
 
 /**
+ * Return content of uploaded file.
+ * @param string $id Input id
+ * @return string $file|false
+ */
+function getFile($id)
+{
+	$aFile = $_FILES[$id];
+	if (!$aFile['size'] or $aFile['error']) return false;
+	if ($this->fileInBlackList($this->values[$id])) return false;
+	return file_get_contents($aFile['tmp_name']);
+}
+
+/**
  * Insert %form values into db-table $tab and save uploaded files into specified directory.
  * Columns of the table must have same names like keys in #$values array.
  * Convert numbers, dates and checkboxes to database format automatically.
