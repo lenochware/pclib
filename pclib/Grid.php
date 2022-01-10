@@ -604,9 +604,21 @@ function getExportCsv($options = [])
 
 	foreach ($values as $i => $row) {
 		foreach($elms as $id => $elem) {
+			$quotes = false;
+			if (strpos($row[$id], '"') !== false or strpos($row[$id], ';') !== false) {
+				$quotes = true;
+			}
+			
+			if ($quotes) {
+				print '"';
+				$row[$i] = str_replace('"', '""', $row[$i]);
+			}
+
 			if (!$this->fireEventElem('onprint',$id,'',$row[$id])) {
 			$this->print_Element($id, '', $row[$id]);
 			}
+
+			if ($quotes) print '"';
 			if ($id != $last_id) print $options['csv-separ'];
 		}
 		if(!empty($values[$i+1])) print $options['csv-row-separ'];
@@ -627,10 +639,23 @@ function getExportCsv($options = [])
 function exportCsv($fileName, $options = array())
 {
 	ob_clean();
-	header('Content-type: text/csv');
+	header('Content-type: text/csv;charset=UTF-8');
 	header('Content-Disposition: attachment; filename="'.$fileName.'"');
 	print $this->getExportCsv($options);
 	die();
+}
+
+/**
+ * Show download dialog for csv-file with content of the grid.
+ * @see getExportCsv()
+ */
+function exportExcel($fileName)
+{
+	header("Content-Type: application/vnd.ms-excel;charset=UTF-8");
+	header('Content-Disposition: attachment; filename="'.$fileName.'"');  
+  echo pack("CCC",0xef,0xbb,0xbf);
+  print $this->getExportCsv();
+  die();
 }
 
 /** get proper base url for %grid sort and pager & other links */
