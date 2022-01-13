@@ -341,6 +341,28 @@ function insertAll($tab, array $data)
 }
 
 /**
+ * Update or insert when key does not exists.
+ * @param string $tab Table name
+ * @param array $data assoc-array of 'FIELDNAME' => 'FIELDVALUE' pairs.
+ * @param array $key Found record for update with $key fields
+ * @return int $inserted_id|false
+**/
+function insertUpdate($tab, array $data, array $key = ['ID'])
+{
+	$filter = array_intersect_key($data, array_flip($key));
+
+	$found = $this->select($tab, $filter);
+
+	if ($found) {
+		$this->update($tab, $data, $filter);
+		return false;
+	}
+	else {
+		return $this->insert($tab, $data);
+	}
+}
+
+/**
  * Run database dump file $fileName.
  * @return int Number of executed queries.
 **/
