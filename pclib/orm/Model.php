@@ -164,7 +164,7 @@ protected function getValidator()
  */
 function getColumns()
 {
-	$cols = self::$columnsCache[$this->tableName];
+	$cols = array_get(self::$columnsCache, $this->tableName);
 	if (!$cols) {
 		$cols = $this->db->columns($this->tableName);
 		self::$columnsCache[$this->tableName] = $cols;
@@ -304,12 +304,13 @@ function hasColumn($name)
 
 protected function getElement($name)
 {
-	return $this->getTemplate()->elements[$name];
+	return array_get($this->getTemplate()->elements, $name);
 }
 
 protected function isCalculated($name)
 {
-	return $this->getTemplate()->elements['model']['calculated'][$name];
+	$calculated = $this->getTemplate()->elements['model']['calculated'];
+	return isset($calculated[$name]);
 }
 
 /**
@@ -321,7 +322,7 @@ protected function isCalculated($name)
 public function __get($name)
 {
 	$el = $this->getElement($name);
-	if ($el['type'] == 'relation') {
+	if ($el and $el['type'] == 'relation') {
 		return $this->related($name);
 	}
 
@@ -611,7 +612,7 @@ function setValue($name, $value)
 		throw new MemberAccessException("Cannot write to an undeclared property $class->$name.");    
 	}
 
-	if ($this->values[$name] === $value) return;
+	if (array_get($this->values, $name) === $value) return;
 	if ( !$this->testRight(array('write', $name)) ) return false;
 
 	$this->values[$name] = $value;

@@ -116,6 +116,10 @@ protected function newModel($data)
  */
 public function __call($name, $args)
 {
+	if (empty($this->query['from'])) {
+		return parent::__call($name, $args);
+	}
+
 	$modelClass = Model::className($this->query['from']);
 	$methodName = 'select'.ucfirst($name);
 	if (method_exists($modelClass, $methodName)) {
@@ -415,12 +419,12 @@ function getSql()
 	if (!$select or !$from) return '';
 	
 	$sql = 'SELECT '.implode(',', $select).' FROM '.$from;
-	if ($where)  $sql .= ' WHERE '.implode(' AND ', array_unique($where));
-	if ($whereJoin)  $sql .= ($where? ' AND ':' WHERE ').implode(' AND ', array_unique($whereJoin));
-	if ($group)  $sql .= ' GROUP BY '.$group;
-	if ($having) $sql .= ' HAVING '.implode(' AND ', array_unique($having));
-	if ($order)  $sql .= ' ORDER BY '.implode(',', $order);
-	if ($limit)  $sql .= ' LIMIT '.$limit[0].' OFFSET '.$limit[1];
+	if (isset($where))  $sql .= ' WHERE '.implode(' AND ', array_unique($where));
+	if (isset($whereJoin))  $sql .= ($where? ' AND ':' WHERE ').implode(' AND ', array_unique($whereJoin));
+	if (isset($group))  $sql .= ' GROUP BY '.$group;
+	if (isset($having)) $sql .= ' HAVING '.implode(' AND ', array_unique($having));
+	if (isset($order))  $sql .= ' ORDER BY '.implode(',', $order);
+	if (isset($limit))  $sql .= ' LIMIT '.$limit[0].' OFFSET '.$limit[1];
 	return $sql;
 }
 
