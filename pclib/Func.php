@@ -198,7 +198,7 @@ function pcl_build_query($query_data)
 function mimetype($path)
 {
 	global $app;
-	$ext = extractpath($path,'%e');
+	$ext = strtolower(extractpath($path,'%e'));
 	if ($app and $app->config['pclib.mimetypes'][$ext])
 		$ret = $app->config['pclib.mimetypes'][$ext];
 	else
