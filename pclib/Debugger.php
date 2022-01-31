@@ -295,6 +295,7 @@ protected function traceArray($e = null)
 
 		if (!isset($call['line'])) $call['line'] = null;
 		if (!isset($call['file'])) $call['file'] = null;
+		if (!isset($call['args'])) $call['args'] = [];
 
 		if (isset($call['class'])) {
 			if ($call['class'] == get_class($this)) break;

@@ -706,21 +706,39 @@ function setParams($sql, $params)
 	if (!$found[0]) return $sql;
 	$from = $to = array();
 	$empty = false;
-	foreach($found[2] as $i => $key) {
+	foreach($found[2] as $i => $key)
+	{
 		$from[] = $found[0][$i];
-		if (strlen(array_get($params, $key)) == 0) {
-			$empty = true;
-			if ($found[1][$i] == '#') $to[] = '__PCL_EMPTY0__';
-			else $to[] = '__PCL_EMPTYS__';
+		$value = array_get($params, $key);
+
+		if (is_array($value)) {
+			if ($value === []) {
+				$empty = true;
+				if ($found[1][$i] == '#') $to[] = '__PCL_EMPTY0__';
+				else $to[] = '__PCL_EMPTYS__';
+			}
+			if ($found[1][$i] == '#')
+				$to[] = implode(',', array_map('intval', $params[$key]));
+			elseif($found[1][$i] == '?')
+				$to[] = '';			
+			else
+				$to[] = implode("','", array_map([$this, 'escape'], $params[$key]));
 		}
-		elseif ($found[1][$i] == '#')
-			$to[] = (int)$params[$key];
-		elseif($found[1][$i] == '?')
-			$to[] = '';
-		elseif($found[1][$i] == '!')
-			$to[] = $params[$key];
-		else
-			$to[] = $this->escape($params[$key]);
+		else {
+			if (strlen($value) == 0) {
+				$empty = true;
+				if ($found[1][$i] == '#') $to[] = '__PCL_EMPTY0__';
+				else $to[] = '__PCL_EMPTYS__';
+			}
+			elseif ($found[1][$i] == '#')
+				$to[] = (int)$value;
+			elseif($found[1][$i] == '?')
+				$to[] = '';
+			elseif($found[1][$i] == '!')
+				$to[] = $value;
+			else
+				$to[] = $this->escape($value);
+		}
 	}
 	
 	$sql = str_replace($from, $to, $sql);
