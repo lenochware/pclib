@@ -242,6 +242,20 @@ function randomstr($size, $characters = '0123456789abcdefghijklmnopqrstuvwxyzABC
 	return $s;
 }
 
+/**
+ * Configure session cookie for safe usage and call session_start().
+**/
+function safe_session_start()
+{
+  //ini_set('session.use_only_cookies', 1);
+  ini_set('session.cookie_httponly', 1);
+  ini_set('session.cookie_secure', 1);
+  ini_set('session.use_strict_mode', 1);
+  ini_set('session.cookie_samesite', 'lax');
+
+  session_start();
+}
+
 /* fnmatch does not exists on windows systems */
 if(!function_exists('fnmatch')) {
 		function fnmatch($pattern, $string) {
