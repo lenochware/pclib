@@ -144,7 +144,7 @@ function setLayout($path)
  */
 function log($category, $message_id, $message = null, $item_id = null)
 {
-	$logger = $this->services['logger'];
+	$logger = array_get($this->services,'logger');
 	if (!$logger) return;
 	return $logger->log($category, $message_id, $message, $item_id);
 }
