@@ -211,8 +211,8 @@ function loadSession()
 	if (!$this->sessName) return;
 	$s = $this->app->getSession($this->sessName);
 
-	$this->values  = array_get($s, 'values');
-	$this->invalid = array_get($s, 'invalid');
+	$this->values  = array_get($s, 'values') ?: [];
+	$this->invalid = array_get($s, 'invalid') ?: [];
 }
 
 /**
@@ -1342,7 +1342,7 @@ protected function head()
 	else
 		$tag['method'] = 'post';
 
-	if ($this->header['csrf']) $hidden['csrf_token'] = $this->getCsrfToken();
+	if (!empty($this->header['csrf'])) $hidden['csrf_token'] = $this->getCsrfToken();
 	$hidden['submitted'] = $this->name;
 	if ($action) $tag['action'] = $this->header['action'] = $action;
 
