@@ -174,6 +174,11 @@ class Action
 		}
 	}
 
+	function setPath($path)
+	{
+		$this->path = preg_replace("/[^a-z0-9_:,;@ \-\.\/]/i","", $path);
+	}
+
 	/**
 	 * Convert route to string.
 	 * @return string $route
@@ -212,10 +217,10 @@ class Action
 			else $path[] = $section;
 		}
 
-		$this->path = implode('/', $path);
-		$this->params = $params;
+		$this->setPath(implode('/', $path));
+		$path = explode('/', $this->path);
 
-		if (!empty($path[2])) $this->module = array_shift($path);
+		$this->params = $params;
 
 		$this->controller = $path[0];
 		$this->method = array_get($path, 1);
@@ -227,10 +232,10 @@ class Action
 	 */
 	function fromArray($get)
 	{
-		$this->path = array_get($get, 'r', '');
+		$this->setPath(array_get($get, 'r', ''));
 		$path = explode('/', $this->path);
 		
-		if (!empty($path[2])) $this->module = array_shift($path);
+		//if (!empty($path[2])) $this->module = array_shift($path);
 		
 		$this->controller = $path[0];
 		$this->method = isset($path[1])? $path[1] : '';

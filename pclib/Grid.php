@@ -528,7 +528,7 @@ protected function getQuery()
 		if ($lpos = stripos($sql, ' order by ')) $sql = substr($sql, 0, $lpos);
 		$orderby = '';
 		foreach($this->sortArray as $id => $sval) {
-			if (!$this->elements[$id]) {
+			if (empty($this->elements[$id])) {
 				unset($this->sortArray[$id]);
 				continue;
 			}
