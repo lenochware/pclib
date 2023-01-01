@@ -335,7 +335,7 @@ function utf8_ascii($s)
 
 function utf8_htmlspecialchars($s)
 {
-	return htmlspecialchars($s, ENT_COMPAT, 'UTF-8');
+	return htmlspecialchars($s ?: '', ENT_COMPAT, 'UTF-8');
 }
 
 function startsWith($s, $substr)

@@ -900,7 +900,7 @@ function htmlTag($name, $attr = array(), $content = null, $startTagOnly = false)
 	foreach($attr as $k => $v) {
 		if (is_array($v)) $v = implode(' ', $v);
 		if (is_numeric($k)) $html .= $this->useXhtml? " $v=\"$v\"" : " $v";
-		elseif(strlen($v)) $html .= " $k=\"$v\"";
+		elseif(strlen($v ?: '')) $html .= " $k=\"$v\"";
 	}
 
 	if ($startTagOnly) {
@@ -928,6 +928,9 @@ protected function formatDate($dtstr, $fmt = '')
 	if (!$fmt or $fmt == '1') $fmt = $this->config['pclib.locale']['date'];
 	if (!$dtstr or substr($dtstr,0,10) == '0000-00-00') return '';
 	list($y,$m,$d,$h,$i,$s) = sscanf($dtstr, "%d-%d-%d %d:%d:%d");
+	
+	$y+=0;$m+=0;$d+=0;$h+=0;$i+=0;$s+=0;	
+
 	if (checkdate ($m, $d, $y)) {
 		if ($y < 1970) { //fix problem with unix epoch
 			$trans = array("%Y" => $y, "%y" => substr($y,-2));

@@ -85,7 +85,7 @@ protected function _init()
     	$this->header['ajax'] = true;
     }
 
-		if (strpos(array_get($elem, 'size'), '/')) {
+		if (strpos(array_get($elem, 'size', ''), '/')) {
 			list($sz,$ml) = explode('/',$elem['size']);
 			$this->elements[$id]['size'] = $sz;
 			$this->elements[$id]['maxlength'] = $ml;

@@ -725,7 +725,7 @@ function setParams($sql, $params)
 				$to[] = implode("','", array_map([$this, 'escape'], $params[$key]));
 		}
 		else {
-			if (strlen($value) == 0) {
+			if (strlen($value ?: '') == 0) {
 				$empty = true;
 				if ($found[1][$i] == '#') $to[] = '__PCL_EMPTY0__';
 				else $to[] = '__PCL_EMPTYS__';
