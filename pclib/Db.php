@@ -36,6 +36,9 @@ public $lastQuery;
 /** Create new connection even if connection with same params exists */
 public $forceReconnect = true;
 
+/** Log queries slower than 1s - 0: do not log anything */
+public $slowQueryLog = 1.0;
+
 public $LOOKUP_TAB = 'LOOKUPS';
 
 /** var AbstractDriver Database driver */
@@ -207,6 +210,8 @@ function query($_sql, $param = null)
 	$event = $this->trigger('db.before-query', ['sql' => $sql]);
 	if ($event and !$event->propagate) return;
 
+	$tm = microtime(true);
+
 	if (!$this->disabled) {
 		$res = $this->drv->query($sql);
 	}
@@ -214,6 +219,14 @@ function query($_sql, $param = null)
 	$this->lastQuery = $this->drv->error? $this->drv->error : $sql;
 
   $this->trigger('db.after-query', ['sql' => $sql, 'query' => $res]);
+
+  $tmEnd = microtime(true);
+  if ($this->slowQueryLog and $tmEnd - $tm > $this->slowQueryLog) {
+  	if (!strpos($this->lastQuery, 'LOGGER')) { //avoid recursion
+  		$this->app->log('db', 'slow-query', $this->lastQuery . sprintf(" (%01.2fs)", $tmEnd - $tm));
+  	}	
+  }
+
 	return $res;
 }
 
