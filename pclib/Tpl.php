@@ -920,8 +920,8 @@ function escapeHtml($s)
 }
 
 /**
- * DATABASE DATE => HUMAN DATE (in strftime() format)
- * @see strftime()
+ * DATABASE DATE => HUMAN DATE (in date() format)
+ * @see date()
  */
 protected function formatDate($dtstr, $fmt = '')
 {
@@ -933,15 +933,15 @@ protected function formatDate($dtstr, $fmt = '')
 
 	if (checkdate ($m, $d, $y)) {
 		if ($y < 1970) { //fix problem with unix epoch
-			$trans = array("%Y" => $y, "%y" => substr($y,-2));
+			$trans = array("Y" => $y, "y" => substr($y,-2));
 			$fmt = strtr($fmt, $trans);
 			$y = "1980";
 		}
-		return strftime($fmt, mktime ($h, $i, $s, $m, $d, $y));
+		return date($fmt, mktime ($h, $i, $s, $m, $d, $y));
 	}
 	elseif (substr($dtstr,0,5) == 'today') {
 		$tm = strtotime($dtstr);
-		return strftime($fmt, $tm);
+		return date($fmt, $tm);
 	}
 	else return $dtstr;
 }

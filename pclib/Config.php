@@ -15,7 +15,7 @@
 /** pclib default configuration */
 $config = [
 	'pclib.errors' => ['display', 'develop', /*,'log','template'=>'error.tpl' */],
-	'pclib.locale' => ['date' => '%d. %m. %Y', 'datetime' => '%d.%m.%Y %H:%M%:%S'],
+	'pclib.locale' => ['date' => 'd. m. Y', 'datetime' => 'd.m.Y H:i:s'],
 
 	'pclib.directories' => [
 		'assets' => '{pclib}/assets/',

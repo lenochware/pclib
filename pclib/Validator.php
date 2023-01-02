@@ -24,7 +24,7 @@ class Validator extends system\ValidatorBase
 	const PATTERN_IDENTIFIER = '/^[a-z_][a-z0-9_]+$/i';
 	const PATTERN_TIME24 = '/^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/';
 
-	public $dateTimeFormat = '%d.%m.%Y %H:%M%:%S';
+	public $dateTimeFormat = 'd.m.Y H:i:s';
 
 	function __construct()
 	{
@@ -116,12 +116,12 @@ class Validator extends system\ValidatorBase
 
 protected function parseDate($datestr, $format)
 {
-	$fmtspec = array('d','m','Y','H','M','S');
+	$fmtspec = array('d','m','Y','H','i','s');
 	$d = preg_split("/[^0-9]+/", $datestr, null, PREG_SPLIT_NO_EMPTY);
 	$f = array_flip(preg_split("/[^a-z]+/i", $format, null, PREG_SPLIT_NO_EMPTY));
 	$datearray = array();
 	foreach($fmtspec as $i) {
-		$datearray[] = isset($f[$i])? $d[$f[$i]] : strftime("%$i");
+		$datearray[] = isset($f[$i])? $d[$f[$i]] : date($i);
 	}
 	return $datearray;
 }

@@ -149,7 +149,7 @@ class ValidatorBase extends BaseObject
 
 	/**
 	 * Validate $value using $rule.
-	 * Example: validateRule('1.1.2016', 'date', '%d.%m.%Y')
+	 * Example: validateRule('1.1.2016', 'date', 'd.m.Y')
 	 * @param mixed $value
 	 * @param string $rule
 	 * @param mixed $param Rule parameters
