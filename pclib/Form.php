@@ -256,7 +256,12 @@ function create($tableName)
  **/
 protected function getHttpData()
 {
-	$data = $this->header['get']? $_GET['data'] : $_POST['data'];
+	if ($this->header['get']) {
+		$data = array_get($_GET, 'data', []);
+	}
+	else {
+		$data = array_get($_POST, 'data', []);
+	}
 
 	$preventMass = $this->config['pclib.security']['form-prevent-mass'];
 	if ($preventMass) {
@@ -272,6 +277,7 @@ protected function getHttpData()
 
 		$val = array_get($data, $id);
 		if ($elem['type'] == 'check' and !$val and !$elem['noprint']) $data[$id] = array();
+		if ($elem['type'] == 'radio' and !$val and !$elem['noprint']) $data[$id] = '';
 		elseif ($elem['type'] == 'select' and $elem['multiple'] and !$val and !$elem['noprint']) $data[$id] = array();
 		elseif($elem['type'] == 'input' and is_string($val)) $data[$id] = trim($val);
 	}
@@ -1268,7 +1274,7 @@ protected function toSqlDate($dtstr, $fmtstr = '')
 
 	$dt = preg_split("/[^0-9]+/", $dtstr);
 	if (!$fmtstr or $fmtstr == '1') $fmtstr = $this->config['pclib.locale']['datetime'];
-	preg_match_all("/%(.)/", $fmtstr, $fmt, PREG_PATTERN_ORDER);
+	preg_match_all("/(.)/", $fmtstr, $fmt, PREG_PATTERN_ORDER);
 	$fmt = $fmt[1];
 
 	$oDT = new \stdClass;

@@ -117,8 +117,8 @@ class Validator extends system\ValidatorBase
 protected function parseDate($datestr, $format)
 {
 	$fmtspec = array('d','m','Y','H','i','s');
-	$d = preg_split("/[^0-9]+/", $datestr, null, PREG_SPLIT_NO_EMPTY);
-	$f = array_flip(preg_split("/[^a-z]+/i", $format, null, PREG_SPLIT_NO_EMPTY));
+	$d = preg_split("/[^0-9]+/", $datestr, -1, PREG_SPLIT_NO_EMPTY);
+	$f = array_flip(preg_split("/[^a-z]+/i", $format, -1, PREG_SPLIT_NO_EMPTY));
 	$datearray = array();
 	foreach($fmtspec as $i) {
 		$datearray[] = isset($f[$i])? $d[$f[$i]] : date($i);

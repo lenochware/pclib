@@ -287,6 +287,8 @@ function utf8_strpos($haystack , $needle ,$offset = 0)
 
 function utf8_strlen($s)
 {
+	$s = (string)$s;
+	
 	return extension_loaded('mbstring')? mb_strlen($s, 'UTF-8') : strlen($s);
 }
 
