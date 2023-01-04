@@ -189,6 +189,9 @@ protected function setSessionUser(pclib\AuthUser $user = null)
 		$data = $user->values;
 		$data['sessionHash'] = $this->sessionHash($data);
 	}
+	else {
+		$data = null;
+	}
 	
 	$this->app->setSession('pclib.user', $data, $this->realm);
 }
