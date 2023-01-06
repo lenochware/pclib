@@ -66,6 +66,9 @@ function delete($keepDays, $allLogs = false)
 	"DT<'{0}'
 	~ AND LOGGER='{1}'", $date, $logger);
 	$this->db->delete($this->MESSAGES_TAB, "DT<'{0}'", $date);
+
+	$this->db->query("OPTIMIZE TABLE $this->LOGGER_TAB");
+	$this->db->query("OPTIMIZE TABLE $this->MESSAGES_TAB");
 }
 
 

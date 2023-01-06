@@ -50,6 +50,7 @@ function __construct()
 }
 
 /** Iterator.rewind() implementation. */
+#[\ReturnTypeWillChange]
 function rewind()
 {
 	$this->execute();
@@ -57,18 +58,21 @@ function rewind()
 }
 
 /** Iterator.current() implementation. */
+#[\ReturnTypeWillChange]
 function current()
 {
 	return $this->valid()? $this->newModel($this->data) : null;
 }
 
 /** Iterator.key() implementation. */
+#[\ReturnTypeWillChange]
 function key()
 {
 	return $this->position;
 }
 
 /** Iterator.next() implementation. */
+#[\ReturnTypeWillChange]
 function next()
 {
 	$data = $this->db->fetch($this->result);
@@ -82,6 +86,7 @@ function next()
 }
 
 /** Iterator.valid() implementation. */
+#[\ReturnTypeWillChange]
 function valid()
 {
 	return ($this->result !== null);

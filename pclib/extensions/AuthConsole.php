@@ -85,7 +85,7 @@ function execute($line)
 	if ($pos = utf8_strpos($line, ';')) $line = utf8_substr($line, 0, $pos);
 
 	$keywords = "user|role|right|active|passw|dpassw";
-	$patt = '/([+-\? ])\s*('.$keywords.')\s(\s*([\w\/\*]+))?(\s*\"([^\"]+)\")?/i';
+	$patt = '/([+-\? ])\s*('.$keywords.')\s(\s*([\w\/\*\.]+))?(\s*\"([^\"]+)\")?/i';
 	//utf8_preg_match_all()?
 	$terms_n = preg_match_all($patt, ' '.$line.' ', $terms, PREG_SET_ORDER);
 	if (!$terms_n) {
@@ -177,7 +177,7 @@ protected function query(array $terms)
 	$op    = trim($master[1]);
 	$ty   = $master[2];
 	$name  = strtr($master[4],'*','%');
-	$annot = $master[6];
+	$annot = array_get($master, 6);
 	
 	$pgsql = (get_class($this->db->drv) == 'pgsql')? $this->db->drv : null;
 
@@ -326,7 +326,7 @@ protected function executeCmd($cmd)
 	$op    = trim($cmd[1]);
 	$opt   = $cmd[1].$cmd[2];
 	$name  = $cmd[4];
-	$annot = $cmd[6];
+	$annot = array_get($cmd, 6);
 
 	if (!$op) return true;
 

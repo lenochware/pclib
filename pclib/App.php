@@ -368,8 +368,10 @@ function text($s)
 	$translator = array_get($this->services, 'translator');
 	if ($translator) $s = $translator->translate($s);
 	$args = array_slice(func_get_args(), 1);
-	if ($args) {
-		if (is_array($args[0])) $args = $args[0];
+	
+	if (!empty($args) and is_array($args[0])) $args = $args[0];
+
+	if ($args and strpos($s, '%') !== false) {
 		$s = vsprintf ($s, $args);
 	}
 	return $s;

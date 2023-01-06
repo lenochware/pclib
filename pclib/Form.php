@@ -85,7 +85,7 @@ protected function _init()
     	$this->header['ajax'] = true;
     }
 
-		if (strpos(array_get($elem, 'size'), '/')) {
+		if (strpos(array_get($elem, 'size', ''), '/')) {
 			list($sz,$ml) = explode('/',$elem['size']);
 			$this->elements[$id]['size'] = $sz;
 			$this->elements[$id]['maxlength'] = $ml;
@@ -211,8 +211,8 @@ function loadSession()
 	if (!$this->sessName) return;
 	$s = $this->app->getSession($this->sessName);
 
-	$this->values  = array_get($s, 'values');
-	$this->invalid = array_get($s, 'invalid');
+	$this->values  = array_get($s, 'values') ?: [];
+	$this->invalid = array_get($s, 'invalid') ?: [];
 }
 
 /**
@@ -256,7 +256,12 @@ function create($tableName)
  **/
 protected function getHttpData()
 {
-	$data = $this->header['get']? $_GET['data'] : $_POST['data'];
+	if ($this->header['get']) {
+		$data = array_get($_GET, 'data', []);
+	}
+	else {
+		$data = array_get($_POST, 'data', []);
+	}
 
 	$preventMass = $this->config['pclib.security']['form-prevent-mass'];
 	if ($preventMass) {
@@ -272,6 +277,7 @@ protected function getHttpData()
 
 		$val = array_get($data, $id);
 		if ($elem['type'] == 'check' and !$val and !$elem['noprint']) $data[$id] = array();
+		if ($elem['type'] == 'radio' and !$val and !$elem['noprint']) $data[$id] = '';
 		elseif ($elem['type'] == 'select' and $elem['multiple'] and !$val and !$elem['noprint']) $data[$id] = array();
 		elseif($elem['type'] == 'input' and is_string($val)) $data[$id] = trim($val);
 	}
@@ -1268,7 +1274,7 @@ protected function toSqlDate($dtstr, $fmtstr = '')
 
 	$dt = preg_split("/[^0-9]+/", $dtstr);
 	if (!$fmtstr or $fmtstr == '1') $fmtstr = $this->config['pclib.locale']['datetime'];
-	preg_match_all("/%(.)/", $fmtstr, $fmt, PREG_PATTERN_ORDER);
+	preg_match_all("/(.)/", $fmtstr, $fmt, PREG_PATTERN_ORDER);
 	$fmt = $fmt[1];
 
 	$oDT = new \stdClass;
@@ -1342,7 +1348,7 @@ protected function head()
 	else
 		$tag['method'] = 'post';
 
-	if ($this->header['csrf']) $hidden['csrf_token'] = $this->getCsrfToken();
+	if (!empty($this->header['csrf'])) $hidden['csrf_token'] = $this->getCsrfToken();
 	$hidden['submitted'] = $this->name;
 	if ($action) $tag['action'] = $this->header['action'] = $action;
 

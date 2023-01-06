@@ -287,6 +287,8 @@ function utf8_strpos($haystack , $needle ,$offset = 0)
 
 function utf8_strlen($s)
 {
+	$s = (string)$s;
+	
 	return extension_loaded('mbstring')? mb_strlen($s, 'UTF-8') : strlen($s);
 }
 
@@ -335,7 +337,7 @@ function utf8_ascii($s)
 
 function utf8_htmlspecialchars($s)
 {
-	return htmlspecialchars($s, ENT_COMPAT, 'UTF-8');
+	return htmlspecialchars($s ?: '', ENT_COMPAT, 'UTF-8');
 }
 
 function startsWith($s, $substr)
