@@ -571,18 +571,25 @@ function create($tableName)
 
 /**
  * Return content of the grid as csv-text.
- * @param array $options [csv-separ: ';', csv-row-separ: "\r\n"]
+ * @param array $options [csv-separ: ';', csv-row-separ: "\n"]
  * @return string csv-text
  */
-function getExportCsv($options = [])
+function getExportCsv($options = [], $page = null)
 {
-	$this->pager->setPageLen($this->length);
+	if ($page) {
+		$this->pager->setPage($page);
+	}
+	else {
+		$page = 1;
+		$this->pager->setPageLen($this->length);
+	}
+
 	$elements = $this->elements;
 	$values = $this->getValues();
 	$this->values['items'] = $values;
 
-	$options += ['csv-separ' => ';', 'csv-row-separ' => "\r\n"];
-	
+	$options += ['csv-separ' => ';', 'csv-row-separ' => "\n", 'csv-enclosure' => '"'];
+	 
 	$ignore_list = array('class','block','pager','sort');
 
 	$elms = [];
@@ -596,22 +603,27 @@ function getExportCsv($options = [])
 
 	ob_start();
 
-	foreach($elms as $id => $elem) {
-		print $elem['lb'] ?: $elem['id'];
-		if ($id != $last_id) print $options['csv-separ'];
+	if ($page == 1) {
+		foreach($elms as $id => $elem) {
+			print $elem['lb'] ?: $elem['id'];
+			if ($id != $last_id) print $options['csv-separ'];
+		}
 	}
+
 	print $options['csv-row-separ'];
 
 	foreach ($values as $i => $row) {
 		foreach($elms as $id => $elem) {
 			$quotes = false;
-			if (strpos($row[$id], '"') !== false or strpos($row[$id], ';') !== false) {
+			if (strpos($row[$id], $options['csv-enclosure']) !== false 
+				or strpos($row[$id], $options['csv-separ']) !== false 
+				or strpos($row[$id], $options['csv-row-separ']) !== false) {
 				$quotes = true;
 			}
 			
 			if ($quotes) {
 				print '"';
-				$row[$i] = str_replace('"', '""', $row[$i]);
+				$row[$id] = str_replace('"', '""', $row[$id]);
 			}
 
 			if (!$this->fireEventElem('onprint',$id,'',$row[$id])) {
@@ -641,7 +653,14 @@ function exportCsv($fileName, $options = array())
 	ob_clean();
 	header('Content-type: text/csv;charset=UTF-8');
 	header('Content-Disposition: attachment; filename="'.$fileName.'"');
-	print $this->getExportCsv($options);
+
+  $this->pager->setPageLen(min(1000, $this->length));
+  $pgCount = ceil($this->length / 1000);
+
+  for ($page = 1; $page <= $pgCount; $page++) {
+     print $this->getExportCsv($options, $page);
+  }
+
 	die();
 }
 
@@ -654,7 +673,14 @@ function exportExcel($fileName)
 	header("Content-Type: application/vnd.ms-excel;charset=UTF-8");
 	header('Content-Disposition: attachment; filename="'.$fileName.'"');  
   echo pack("CCC",0xef,0xbb,0xbf);
-  print $this->getExportCsv();
+
+  $this->pager->setPageLen(min(1000, $this->length));
+  $pgCount = ceil($this->length / 1000);
+
+  for ($page = 1; $page <= $pgCount; $page++) {
+     print $this->getExportCsv([], $page);
+  }
+
   die();
 }
 
