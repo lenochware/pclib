@@ -614,6 +614,9 @@ function getExportCsv($options = [], $page = null)
 
 	foreach ($values as $i => $row) {
 		foreach($elms as $id => $elem) {
+
+			if (!isset($row[$id])) $row[$id] = '';
+
 			$quotes = false;
 			if (strpos($row[$id], $options['csv-enclosure']) !== false 
 				or strpos($row[$id], $options['csv-separ']) !== false 

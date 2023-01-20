@@ -1,6 +1,7 @@
 <?elements
 class templatefactory create "form"
 string elements noescape
+string name
 ?>
 <:?elements
 class form

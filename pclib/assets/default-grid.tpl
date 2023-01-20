@@ -1,6 +1,7 @@
 <?elements
 class templatefactory create "grid" sort
 string elements noescape
+string name
 ?>
 <:?elements
 class grid

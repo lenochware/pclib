@@ -617,7 +617,8 @@ function indexes($table)
 function tableName($dsstr)
 {
 	if (!strpos($dsstr, ' ')) {
-		list($table,$tmp) = explode(':', $dsstr);
+		$t = explode(':', $dsstr);
+		$table = $t[0];
 	}
 	else {
 		preg_match("/from\s+(\w+)/i", $dsstr, $found);
