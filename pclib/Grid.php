@@ -563,10 +563,17 @@ protected function getOrderByField($id)
 /**
  * Use default template for displaying database table content.
  */
-function create($tableName)
+function create($tableName, $templatePath = '')
 {
+	$this->service('db');
+	
 	$tableName = $this->db->tableName($tableName);
-	$this->createFromTable($tableName, PCLIB_DIR.'assets/default-grid.tpl');
+
+	if (!$templatePath) {
+		$templatePath = $this->defaultTemplatePath.'/default-grid.tpl';
+	}
+	
+	$this->createFromTable($tableName, $templatePath);	
 }
 
 /**

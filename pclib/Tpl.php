@@ -78,6 +78,8 @@ private $inBlock = array();
 /** Function for escaping html in template values. */
 public $escapeHtmlFunction;
 
+public $defaultTemplatePath =  PCLIB_DIR.'assets';
+
 /**
  * Load and parse template file.
  *
@@ -433,9 +435,13 @@ protected function createFromTable($tableName, $templatePath)
 /**
  * Use default template for displaying database table content.
  */
-function create($tableName)
+function create($tableName, $templatePath = '')
 {
-	$this->createFromTable($tableName, PCLIB_DIR.'assets/default-tpl.tpl');
+	if (!$templatePath) {
+		$templatePath = $this->defaultTemplatePath.'/default-tpl.tpl';
+	}
+	
+	$this->createFromTable($tableName, $templatePath);
 }
 
 /** Return computed value of element $id. */

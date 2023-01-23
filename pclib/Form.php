@@ -245,9 +245,13 @@ function isEditable($id, $testAttr = true)
 /**
  * Use default template for displaying database table content.
  */
-function create($tableName)
+function create($tableName, $templatePath = '')
 {
-	$this->createFromTable($tableName, PCLIB_DIR.'assets/default-form.tpl');
+	if (!$templatePath) {
+		$templatePath = $this->defaultTemplatePath.'/default-form.tpl';
+	}
+	
+	$this->createFromTable($tableName, $templatePath);		
 }
 
 /**
