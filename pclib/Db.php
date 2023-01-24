@@ -77,6 +77,9 @@ protected function parseDsn($dsn)
 		$pdo = true;
 		$dsn = substr($dsn, 4);
 	}
+	else {
+		$pdo = false;
+	}
 	
 	$dsa = parse_url($dsn);
 	if (!isset($dsa['scheme'])) return [];
@@ -121,13 +124,16 @@ function connect($dataSource)
 		throw new \InvalidArgumentException('Invalid connection parameters.');
 	}
 
+	$dsarray = [];
+
 	if(is_string($dataSource)) {
 		$dsarray = $this->parseDsn($dataSource);
 	}
 	elseif (is_array($dataSource) and array_key_exists ('driver', $dataSource)) {
 		$dsarray = $dataSource;
 	}
-	else throw new \InvalidArgumentException('Invalid connection parameters.');
+
+	if (!$dsarray) throw new \InvalidArgumentException('Invalid connection parameters.');
 	
 	$this->dataSource = $dataSource;	
 
