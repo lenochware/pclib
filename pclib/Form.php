@@ -1336,7 +1336,7 @@ protected function head()
 
 	if ($ha) $tag += $ha;
 
-	if (!$this->useXhtml) $tag['name'] = $this->name;
+	$tag['name'] = $this->name;
 
 	$action = $this->getUrl($this->header);
 
@@ -1367,7 +1367,7 @@ protected function head()
 
 	$hidden = (array)$hidden + $this->extraHidden; 
 	foreach ($hidden as $k => $v) {
-		$html .= "<input type=\"hidden\" name=\"$k\" value=\"$v\"".($this->useXhtml? ' />' : '>')."\n";
+		$html .= "<input type=\"hidden\" name=\"$k\" value=\"$v\">\n";
 	}
 
 	return $html;

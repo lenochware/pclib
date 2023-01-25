@@ -55,9 +55,6 @@ public $db;
 /** var Router */
 public $router;
 
-/** Generate XHTML code. */
-public $useXhtml = false;
-
 /** Link to array of configuration parameters. */
 protected $config = null;
 
@@ -619,7 +616,7 @@ function print_Link($id, $sub, $value)
 	}
 
 	if ($elem['img']) {
-		$lb = "<img src=\"{$elem['img']}\" class=\"link\" alt=\"{$elem['lb']}\" title=\"{$elem['lb']}\"".($this->useXhtml? ' />' : '>');
+		$lb = "<img src=\"{$elem['img']}\" class=\"link\" alt=\"{$elem['lb']}\" title=\"{$elem['lb']}\">";
 	}
 	else {
 		$lb = $elem['lb'];
@@ -905,7 +902,7 @@ function htmlTag($name, $attr = array(), $content = null, $startTagOnly = false)
 	}
 	foreach($attr as $k => $v) {
 		if (is_array($v)) $v = implode(' ', $v);
-		if (is_numeric($k)) $html .= $this->useXhtml? " $v=\"$v\"" : " $v";
+		if (is_numeric($k)) $html .= " $v";
 		elseif(strlen($v ?: '')) $html .= " $k=\"$v\"";
 	}
 
@@ -913,7 +910,7 @@ function htmlTag($name, $attr = array(), $content = null, $startTagOnly = false)
 		return $html.'>';
 	}
 	elseif (!isset($content)) {
-		return $html.($this->useXhtml? ' />' : '>');
+		return $html.'>';
 	}
 	else {
 		return $html .'>'.$content."</$name>";
@@ -961,7 +958,7 @@ protected function formatStr($s, $fmt)
 	$len = strlen($fmt);
 	for($i = 0; $i < $len; $i++) {
 		switch ($fmt[$i]) {
-		case "n": $s = nl2br($s, $this->useXhtml); break;
+		case "n": $s = nl2br($s, false); break;
 		case "h": $s = utf8_htmlspecialchars($s); break;
 		case "H": $s = strip_tags($s); break;
 		case "u": $s = utf8_strtoupper($s); break;

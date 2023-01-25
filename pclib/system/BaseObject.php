@@ -33,7 +33,7 @@ class BaseObject
 	/**
 	 * Set or retireve default parameters of the object. 
 	 * You can set any public attribute of the object.
-	 * Example: Form::defaults('useXhtml', true); or Form::defaults($options);
+	 * Example: Form::defaults('useButtonTag', true); or Form::defaults($options);
 	 * @param mixed Configuration parameter(s).
 	 */
 	public static function defaults()
