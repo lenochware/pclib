@@ -11,11 +11,5 @@ button update lb "Update" noprint
 button delete lb "Delete" noprint
 ?:>
 <table class="form">
-{block columns}<tr>
-  <td>{:{name}.lb:}</td>
-  <td>{:{name}:}</td>
-  <td>{:{name}.err:}</td>
-</tr>
-{/block}
-<tr><td colspan="3">{:insert:} {:update:} {:delete:}</td></tr>
+{:form.fields:}
 </table>

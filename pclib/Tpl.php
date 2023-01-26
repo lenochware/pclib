@@ -77,6 +77,8 @@ public $escapeHtmlFunction;
 
 public $defaultTemplatePath =  PCLIB_DIR.'assets';
 
+protected $fields = [];
+
 /**
  * Load and parse template file.
  *
@@ -660,20 +662,26 @@ function print_Env($id, $sub, $value)
 /**
  * Print all fields into template.
  * It uses simple table layout.
- * Type {tpl.fields} or {tpl.control} into template.
+ * Type {tpl.fields} into template.
  * @copydoc tag-handler
  */
 function print_Class($id, $sub, $value)
 {
 	if ($id != $this->className) return;
-	$this->eachPrintable(array($this, 'trPrintElement'), $sub);
+	$this->forElements([$this, 'trPrintElement'], $sub);
 }
 
-function eachPrintable($callback, $sub = '')
+protected function forElements($callback, $sub = '')
 {
 	$ignore_list = array('class','block','pager','sort','button');
 
-	foreach($this->elements as $id => $elem) {
+	$fields = $this->fields ?: array_keys($this->elements);
+
+	foreach($fields as $id)
+	{
+		if (!isset($this->elements[$id])) continue;
+		$elem = $this->elements[$id];
+	
 		if (in_array($elem['type'], $ignore_list) or $elem['noprint'] or $elem['skip']) {
 			continue;
 		}
@@ -876,6 +884,15 @@ function addTag($line)
 	else {
 		$this->elements[$elem['id']] = $elem;
 	}
+}
+
+/** 
+ * Show only this $fields in template (using tag {grid.fields} or {form.fields}).
+ * @param array $fields list of field (element) ids
+ */
+function setFields($fields)
+{
+	$this->fields = $fields;
 }
 
 

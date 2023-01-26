@@ -491,7 +491,7 @@ function print_Class($id, $sub, $value)
 	if ($id != $this->className) return;
 	$printFunc = ($this->header['default_print'] == 'div')? 'divPrintElement' : 'trPrintElement';
 
-	$this->eachPrintable(array($this, $printFunc), $sub);		
+	$this->forElements([$this, $printFunc], $sub);		
 
 	print ($printFunc == 'trPrintElement')? "<tr><td colspan=\"3\">" : '<div class="form-group buttons">';
 	foreach($this->elements as $id => $elem) {
