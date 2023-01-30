@@ -77,7 +77,11 @@ public $escapeHtmlFunction;
 
 public $defaultTemplatePath =  PCLIB_DIR.'assets';
 
+/** List of id's to be printed in {grid.fields} tag. */
 protected $fields = [];
+
+/** Additional element type handlers. */
+protected $types = [];
 
 /**
  * Load and parse template file.
@@ -120,7 +124,10 @@ protected function _init()
 	else $this->header = [];
 
 	if(isset($this->header['name'])) $this->name = $this->header['name'];
-	if (!$this->name) $this->name = $this->className;	
+	if (!$this->name) $this->name = $this->className;
+
+	$globals = $this->app->getService('globals');
+	if ($globals) $globals->addGlobals($this);
 }
 
 /**
@@ -480,6 +487,11 @@ function print_Element($id, $sub, $value)
     print $value;
     return;
   }
+
+	if (isset($this->types[$elem["type"]])) {
+		print call_user_func($this->types[$elem["type"]], $this, $id, $sub, $value);
+		return;
+	}
 
 	switch ($elem["type"]) {
 		case "number":
@@ -885,6 +897,12 @@ function addTag($line)
 		$this->elements[$elem['id']] = $elem;
 	}
 }
+
+function addType($name, $fn)
+{
+	$this->types[$name] = $fn;
+}
+
 
 /** 
  * Show only this $fields in template (using tag {grid.fields} or {form.fields}).
