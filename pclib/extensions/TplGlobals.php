@@ -12,18 +12,30 @@
 # License as published by the Free Software Foundation; either
 # version 2.1 of the License, or (at your option) any later version.
 
-namespace pclib\system;
+namespace pclib\extensions;
+use pclib\system\BaseObject;
+use pclib\IService;
 
 /**
  * Add variables or new element types visible in all templates.
  */
-class TplGlobals extends BaseObject implements \pclib\IService
+class TplGlobals extends BaseObject implements IService
 {
 	protected $values = [];
 
 	function set($id, $value)
 	{
 		$this->values[$id] = $value;
+	}
+
+	function setArray(array $values)
+	{
+		$this->values = $values;
+	}
+
+	function reset()
+	{
+		$this->values = [];
 	}
 
 	function get($id)
@@ -35,7 +47,6 @@ class TplGlobals extends BaseObject implements \pclib\IService
 	{
 		unset($this->values[$id]);
 	}
-
 
 	function fetch($id, $params = [])
 	{
@@ -62,11 +73,14 @@ class TplGlobals extends BaseObject implements \pclib\IService
 				continue;
 			};
 
-			$v = $this->fetch($id);
+			if (isset($t->elements[$id])) {
+				throw new \pclib\Exception("Name conflict: global '$id'");
+			}
+
 			$t->addTag("global $id skip");
 
-			$t->elements[$id]['onprint'] = function() use($t, $id) {
-				print $this->fetch($id, [$t, $id]);
+			$t->elements[$id]['onprint'] = function($o, $id, $sub, $value) {
+				print $this->fetch($id, [$o, $id, $sub, $value]);
 			};
 
 		}
@@ -74,7 +88,7 @@ class TplGlobals extends BaseObject implements \pclib\IService
 
 	protected function isType($id)
 	{
-		return (strpos($id, 'type-') === 0);
+		return (strpos($id, 'type:') === 0);
 	}
 }
 
