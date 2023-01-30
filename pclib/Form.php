@@ -59,7 +59,7 @@ protected $className = 'form';
 public $uploadBlackList = array('*.php','*.php?','*.phtml','*.exe','.htaccess');
 
 /** Generate buttons with html button tag or as input type=button. */
-public $useButtonTag = false;
+public $useButtonTag = true;
 
 protected $editables = array('input', 'check', 'radio', 'text', 'select', 'listinput');
 
