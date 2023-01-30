@@ -42,8 +42,6 @@ class ElementsDef extends BaseObject
 			'action' => null,
 			'route' => null,
 			'singlepage' => null,
-			'ajaxget' => null,
-			'ajax' => null,
 			'submitted' => null,
 			'noformtag' => null,
 			'table' => null,
@@ -70,7 +68,6 @@ class ElementsDef extends BaseObject
 			'columns' => null,
 			'noemptylb' => null,
 			'hint' => null,
-			'ajaxget' => null,
 			'hidden' => null,
 			'multiple' => null,
 		],
@@ -89,7 +86,6 @@ class ElementsDef extends BaseObject
 			'submit' => null,
 			'hint' => null,
 			'hash' => null,
-			'ajaxget' => null,
 		],
 
 		'input' => [
@@ -103,7 +99,6 @@ class ElementsDef extends BaseObject
 			'pattern' => null,
 			'range' => null,
 			'hint' => null,
-			'ajaxget' => null,
 			'hidden' => null,
 		],
 	];

@@ -23,7 +23,7 @@ use pclib;
  * - Validation of user input
  * - Store %form into database
  * - Can use generic layout with default template
- * - Html5, javascript validation, Ajax and more.
+ * - Html5 support
  *
  * See \ref form-tags for description of implemented tags. \n
  * In addition, you can use common template elements (see \ref tpl-tags)
@@ -49,8 +49,6 @@ public $invalid = array();
 protected $validator;
 
 protected $hidden;
-
-private $ajax_id;
 
 private $extraHidden = array();
 
@@ -81,10 +79,6 @@ protected function _init()
 			$this->header['fileupload'] = 1;
 		}
 
-    if (!empty($elem['ajaxget'])) {
-    	$this->header['ajax'] = true;
-    }
-
 		if (strpos(array_get($elem, 'size', ''), '/')) {
 			list($sz,$ml) = explode('/',$elem['size']);
 			$this->elements[$id]['size'] = $sz;
@@ -103,7 +97,6 @@ protected function _init()
 		'submitted' => null, 
 		'pcl_form_submit' => null, 
 		'csrf_token' => null, 
-		'ajax_id' => null
 	];
 
 	if ($request['submitted'] != $this->name) return;
@@ -113,12 +106,6 @@ protected function _init()
 	if ($this->header['csrf']
 		and $request['csrf_token'] != $this->getCsrfToken()
 	) throw new AuthException("CSRF authorization failed.");
-
-
-	if ($request['ajax_id']) {
-		$this->ajax_id = pcl_ident($request['ajax_id']);
-		$this->header['get'] = 1;
-	}
 
 	$this->values = $this->getHttpData();
 
@@ -330,22 +317,6 @@ protected function getTag($id, $ignoreHtmlAttr = false)
 
 	$tag['__attr'] = $elem['attr'];
 
-	if ($ajaxget = $elem['ajaxget']) {
-		$event = str_shift(':', $ajaxget);
-		if (!$event) $event = $this->isEditable($id)? 'onchange' : 'onclick';
-		$url = $this->header['action'];
-		$url .= (strpos($url, '?') ? '&' : '?')."pcl_form_submit=ajax&ajax_id=$id";
-
-		if ($ajaxget == '1' or $ajaxget == '*') {
-			foreach($this->elements as $aid => $tmp) {
-				if ($this->isEditable($aid, false) and $aid != $id)
-					$paramsarray[] = $aid;
-			}
-			$params = implode(',', $paramsarray);
-		}
-		else $params = $ajaxget;
-		$tag[$event] = "pclib.ajaxGet('$this->name','$id','$url','$params')";
-	}
 	return $tag;
 }
 
@@ -410,8 +381,6 @@ function print_Element($id, $sub, $value)
 		return;
 	}
 
-	if ($this->header['ajax'] and $id != 'GET') print "<span id=\"x_$id\">";
-
 	switch ($this->elements[$id]['type']) {
 		case 'input':
 			$this->print_Input($id,$sub,$value);
@@ -439,29 +408,6 @@ function print_Element($id, $sub, $value)
 			parent::print_Element($id,$sub,$value);
 			break;
 	}
-
-	if ($this->header['ajax'] and $id != 'GET') print "</span>";
-}
-
-
-function print_Block($block)
-{
-	if ($this->header['ajax']) {
-		print "<span id=\"x_$block\">";
-		parent::print_Block($block);
-		print "</span>";
-	}
-	else
-		parent::print_Block($block);
-}
-
-function print_Empty($id, $sub = null)
-{
-	if (!$this->header['ajax']) return;
-	if ($sub == 'lb')
-		print "<label for=\"$id\" id=\"xl_$id\"></label>";
-	else
-		print "<span id=\"x_$id\"></span>";
 }
 
 /**
@@ -546,7 +492,7 @@ function print_Label($id)
 	if (!empty($this->invalid[$id])) $class[] = 'err';
 	$attr = '';
 	if ($class) $attr = ' class="'.implode(' ',$class).'"';
-	if ($this->header['ajax']) $attr .= " id=\"xl_$id\"";
+
 	print "<label for=\"$id\"$attr>";
 	print $elem['lb']? $elem['lb'] : $id;
 	print "</label>";
@@ -1152,45 +1098,6 @@ function mailTo($to, $subj, $intro='', $hdr='')
 	}
 
 	mail($to, $subj, $msg, $hdr);
-}
-
-/**
- * Synchronize %form elements on the client with server, without reloading page.
- * @param string $elemList Colon separated list of elements to synchronize
- * @return string json-data
- */
-function ajaxSync($elemList = null)
-{
-	if (!isset($elemList)) {
-		$elemList = $this->elements[$this->ajax_id]['ajaxget'];
-		if (strpos($elemList, ':')) str_shift(':', $elemList);
-	}
-	if ($elemList != '1')
-		$elemarray = explode(',', $elemList);
-	else
-		$elemarray = array_keys($this->values);
-
-	$result = array();
-	$this->header['ajax'] = false;
-	foreach((array)$elemarray as $id) {
-		$h_id = $this->elements[$id]? "x_$id" : $id;
-		if ($this->getAttr($id, 'noprint')) {
-			$result[$h_id] = '';
-			$result['xl_'.$id] = '';
-			continue;
-		}
-		ob_start();
-		if ( $this->elements[$id]['type'] == 'block')
-			$this->print_Block($id);
-		else
-			$this->print_Element($id, null, $this->getValue($id));
-		$result[$h_id] = ob_get_contents();
-		/*if ($this->config['pclib.encoding'])
-			$result[$h_id] = utf8_string($result[$h_id]);*/
-		ob_end_clean();
-	}
-
-	return json_encode($result);
 }
 
 /**

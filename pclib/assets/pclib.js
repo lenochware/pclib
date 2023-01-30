@@ -26,7 +26,6 @@ onAjaxComplete: null,
 /** Occurs when form is validated. */
 onValidate: null,
 
-ajax_id: null,
 modalWin: null,
 
 strings: {
@@ -240,47 +239,6 @@ ajaxLoad: function (elem, url) {
 	};
 	this.xhr.open('GET', url, true);
 	this.xhr.send();
-},
-
-/**
- * Invoke ajax request - used by element's attribute ajaxget.
- *
- * @param {string} name template name
- * @param {string} id id of calling element
- * @param {string} url URL called by ajax. Should contain calling of function form->ajaxsync()
- * @param {string} params Comma separated list of elements' id for synchronization
- */
-ajaxGet: function (name, id, url, params) {
-	if (!this.xhr) this.xhr = new XMLHttpRequest();
-
-	params += ',' + id;
-	var paramsArray = params.split(',');
-	var data = '&submitted='+name;
-	for (var i in paramsArray) {
-		data += '&data[' + paramsArray[i] + ']=' + this.getValue(paramsArray[i]);
-	}
-
-	this.ajax_id = id;
-	var self = this;
-	this.xhr.onreadystatechange = function() { self.ajaxSync(); };
-	this.xhr.open('GET', url + data,true);
-	this.xhr.send();
-},
-
-/**
- * Callback function for ajaxGet() - load data from the server.
- * @private
- */
-ajaxSync: function() {
-	if (this.xhr.readyState!=4 || this.xhr.status!=200) return;
-	if (!this.xhr.responseText) return;
-	var responseArray = JSON.parse(this.xhr.responseText);
-	for (var id in responseArray) {
-		var elem = document.getElementById(id);
-		if (!elem) continue;
-		elem.innerHTML = responseArray[id];
-	}
-	if (this.onAjaxComplete) this.onAjaxComplete(this.ajax_id);
 },
 
 /**
