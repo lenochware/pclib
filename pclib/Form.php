@@ -103,7 +103,7 @@ protected function _init()
 
 	$this->submitted = $request['pcl_form_submit'] ?: true;
 
-	if ($this->header['csrf']
+	if (!empty($this->header['csrf'])
 		and $request['csrf_token'] != $this->getCsrfToken()
 	) throw new AuthException("CSRF authorization failed.");
 

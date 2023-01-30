@@ -23,7 +23,7 @@ $config = [
 		'uploaded' => '{basedir}/uploaded',
 	],
 
-	'pclib.security' => ['tpl-escape' => false, 'csrf' => false, 'form-prevent-mass' => false],
+	'pclib.security' => ['tpl-escape' => true, 'csrf' => false, 'form-prevent-mass' => false],
 	'pclib.auth' => ['algo' => 'md5', 'secret' => 'write any random string!', 'realm' => ''],
 
 	'pclib.app' => [
