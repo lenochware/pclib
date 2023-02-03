@@ -272,10 +272,10 @@ class Tree extends system\BaseObject
         'TREE_ID' => $treeId,
         'LABEL' => $node['LABEL'],
         'LEVEL' => $node['LEVEL'],
-        'ROUTE' => $node['ROUTE'] ?? '',
-        'URL'   => $node['URL'] ?? '',
-        'RKEY'  => $node['RKEY'] ?? '',
-        'ACTIVE' => $node['ACTIVE'] ?? '',
+        'ROUTE' => array_get($node, 'ROUTE'),
+        'URL'   => array_get($node, 'URL'),
+        'RKEY'  => array_get($node, 'RKEY'),
+        'ACTIVE' => array_get($node, 'ACTIVE'),
       ];
 
       $this->db->insert($this->table, $data);

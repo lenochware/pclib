@@ -584,7 +584,8 @@ function print_Bind($id, $sub, $value)
 
 	if ($elem['bitfield']) {
 		$i = 0;
-		$checked = array();
+		$value = (int)$value;
+		$checked = [];
 		while (true) {
 			$bit = pow(2,$i++);
 			if ($value & $bit) $checked[] = $items[$i];
