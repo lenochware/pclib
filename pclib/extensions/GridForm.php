@@ -116,6 +116,11 @@ protected function getValues()
 	return $rows;
 }
 
+function setAttr($id, $value, $block = null)
+{
+	$this->form->setAttr($id, $value, $block);
+}
+
 /**
  * This function is called for each template tag when it is printed.
  * \copydoc tag-handler

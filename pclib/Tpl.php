@@ -263,33 +263,21 @@ function disable()
 }
 
 /**
- * Set attributes for template elements.
- * $keystr can be 'element/attribute' or 'block/element/attribute'. If you
- * need set all elements in block, you can use wildcard: 'block/ * /attribute'.
- * Also you can select elements with some attr. value: 'attr=value/attribute'
+ * Set attribute globally for template elements.
  *
- * @param string $keystr Attribute specification (with wildcards)
- * @param string $value Value assigned to attribute.
+ * @param string $id Attribute id
+ * @param string $value Attribute value
+ * @param string $block Set attribute for specified block
  */
-function set($keystr, $value)
+function setAttr($id, $value, $block = null)
 {
-	$key = explode('/',$keystr);
-	if (count($key) == 3) $block = array_shift($key);
-	$id = $key[0];
-	$attr = $key[1];
-	$sattr = false;
-	if (strpos($id,'=')) list($sattr,$svalue) = explode('=', $id);
-
-	if (!$sattr and $id != '*') {
-		$this->elements[$id][$attr] = $value;
-		return;
+	if ($block) {
+		$this->elements[$block][$id] = $value;
+	}
+	else {
+		$this->header[$id] = $value;
 	}
 
-	foreach($this->elements as $id => $tmp) {
-		if ($block and !$this->isInBlock($id,$block)) continue;
-		if ($sattr and $this->elements[$id][$sattr] != $svalue) continue;
-		$this->elements[$id][$attr] = $value;
-	}
 }
 
 /* Check if element $id is in $block */
