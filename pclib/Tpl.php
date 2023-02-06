@@ -283,7 +283,7 @@ function setAttr($id, $value, $block = null)
 /* Check if element $id is in $block */
 protected function isInBlock($id, $block)
 {
-	while ($id = $this->elements[$id]['block']) {
+	while ($id = array_get($this->elements[$id], 'block')) {
 		if ($id == $block) return true;
 	}
 	return false;
@@ -311,16 +311,24 @@ protected function getAttr($id, $attr)
 
 function getBlock($block)
 {
-	$values = array();
+	$values = [];
+
 	foreach($this->elements as $id => $tmp) {
 		if (!$this->isInBlock($id, $block) or $tmp['type'] == 'block') continue;
+	
 		$bid = $id;
-		while ($bid = $this->elements[$bid]['block']) {
-			$value = $this->values[$bid][$id];
+		while ($bid = array_get($this->elements[$bid], 'block')) {
+
+			if (isset($this->values[$bid])) {
+				$value = array_get($this->values[$bid], $id);
+			}
+
 			if (isset($value)) break;
 		}
+
 		$values[$id] = isset($value)? $value : $this->values[$id];
 	}
+
 	return $values;
 }
 
