@@ -451,7 +451,7 @@ function create($tableName, $templatePath = '')
 }
 
 /** Return computed value of element $id. */
-function compute($id)
+protected function compute($id)
 {
 	$items = array_get($this->elements[$id], 'items');
 	if (!$items) {
@@ -832,7 +832,7 @@ protected function print_BlockRow($block, $rowno = null)
  * @param string $url url of page to open
  * @return string $js javascript window code
 **/
-function getPopup($id, $attr, $url)
+protected function getPopup($id, $attr, $url)
 {
 		if ($attr == '1') $attr = '800x600';
 
@@ -1020,7 +1020,7 @@ protected function toString($value) {
  * @param int $id identificator of element
  * @return array $items
  */
-function getItems($id)
+protected function getItems($id)
 {
 	$elem = $this->elements[$id];
 	if (!empty($elem['items'])) {
