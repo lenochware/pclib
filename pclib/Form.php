@@ -40,10 +40,12 @@ public $fileStorage;
 
 /**
  * Array of error messages filled by validate() function.
- * You can set it on your own too.
  * Error messages can be shown using {errors} or {fieldname.err} tag in template.
  */
-public $invalid = array();
+public $invalid = [];
+
+/** Should submit disabled input fields? */
+public $submitDisabled = true;
 
 /** var FormValidator Form validator. */
 protected $validator;
@@ -1137,6 +1139,7 @@ function addHidden($name, $value)
 //submit disabled elements too (add hidden field for disabled element)
 protected function ieFix($id, $name, $value)
 {
+	if (!$this->submitDisabled) return '';
 	if (!$this->getAttr($id, 'noedit') or $this->elements[$id]['hidden']) return '';
 
 	$tag = array(
