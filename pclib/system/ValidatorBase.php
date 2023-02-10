@@ -127,7 +127,7 @@ class ValidatorBase extends BaseObject
 	 */
 	function isBlank($value)
 	{
-		return is_array($value)? (count($value) == 0) : (strlen($value) == 0);
+		return is_array($value)? (count($value) == 0) : (strlen((string)$value) == 0);
 	}
 
 	/** 

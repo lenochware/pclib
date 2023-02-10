@@ -45,7 +45,7 @@ public $fileStorage;
 public $invalid = [];
 
 /** Should submit disabled input fields? */
-public $submitDisabled = true;
+public $submitDisabledInputs = true;
 
 /** var FormValidator Form validator. */
 protected $validator;
@@ -1139,7 +1139,7 @@ function addHidden($name, $value)
 //submit disabled elements too (add hidden field for disabled element)
 protected function ieFix($id, $name, $value)
 {
-	if (!$this->submitDisabled) return '';
+	if (!$this->submitDisabledInputs) return '';
 	if (!$this->getAttr($id, 'noedit') or $this->elements[$id]['hidden']) return '';
 
 	$tag = array(
