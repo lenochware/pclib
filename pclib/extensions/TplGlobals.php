@@ -65,13 +65,33 @@ class TplGlobals extends BaseObject implements IService
 
 	//add [global id] to template elements
 
-	function addGlobals($t)
+	function addGlobals($t, $params)
 	{
-		foreach ($this->values as $id => $value) {
-			if ($this->isType($id)) {
-				$t->addType(substr($id,5), $value);
+		$this->addGlobalsModule($t, '');
+
+		$use = array_get($params, 'use', '');
+		if (!$use) return;
+
+		$modules = explode(',', $use);
+
+		foreach ($modules as $module) {
+			$this->addGlobalsModule($t, $module);
+		}
+	}
+
+	protected function addGlobalsModule($t, $module = '')
+	{
+		foreach ($this->values as $id => $value)
+		{
+			$var = $this->parseId($id);
+			if ($var['module'] != $module) continue;
+
+			if ($var['type']) {
+				$t->addType($var['id'], $value);
 				continue;
 			};
+
+			$id = $var['id'];
 
 			if (isset($t->elements[$id])) {
 				throw new \pclib\Exception("Name conflict: global '$id'");
@@ -79,17 +99,31 @@ class TplGlobals extends BaseObject implements IService
 
 			$t->addTag("global $id skip");
 
-			$t->elements[$id]['onprint'] = function($o, $id, $sub, $value) {
-				print $this->fetch($id, [$o, $id, $sub, $value]);
-			};
+			$t->elements[$id]['onprint'] = function($o, $id, $sub, $value) use($module) {
 
+				print $this->fetch(($module? "$module.":'') . $id, [$o, $id, $sub, $value]);
+			};
 		}
 	}
 
-	protected function isType($id)
+	protected function parseId($id)
 	{
-		return (strpos($id, 'type:') === 0);
-	}
+		$type = false;
+
+		if (strpos($id, 'type:') === 0) {
+			$type = true;
+			$id = substr($id,5);
+		};
+
+		if (strpos($id, '.')) {
+			list($module, $id) = explode('.', $id, 2);
+		}
+		else {
+			$module = '';
+		}
+
+		return ['type' => $type, 'module' => $module, 'id' => $id];
+	}	
 }
 
 ?>

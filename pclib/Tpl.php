@@ -127,7 +127,7 @@ protected function _init()
 	if (!$this->name) $this->name = $this->className;
 
 	$globals = $this->app->getService('globals');
-	if ($globals) $globals->addGlobals($this);
+	if ($globals) $globals->addGlobals($this, $this->header);
 }
 
 /**
