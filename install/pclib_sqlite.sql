@@ -154,6 +154,19 @@ CREATE TABLE TREE_LOOKUPS (
 
 CREATE INDEX TREE_LOOKUPS_NR ON TREE_LOOKUPS (TREE_ID,NR);
 
+
+-- Table structure for table APP_PARAMS
+
+CREATE TABLE APP_PARAMS (
+  ID integer primary key,
+  PARAM_NAME VARCHAR(100) DEFAULT NULL,
+  PARAM_VALUE VARCHAR(255) DEFAULT NULL,
+  TITLE VARCHAR(255) DEFAULT NULL,
+  CREATED_AT datetime,
+  UPDATED_AT datetime,
+  AUTHOR_ID integer DEFAULT NULL
+);
+
 /*Table structure for table `FILESTORAGE` */
 
 CREATE TABLE FILESTORAGE (
@@ -171,3 +184,20 @@ CREATE TABLE FILESTORAGE (
 );
 
 CREATE INDEX I_FILESTORAGE_ENTITY (ENTITY_TYPE,ENTITY_ID);
+
+
+CREATE TABLE jobs (
+  id integer primary key,
+  name VARCHAR(50),
+  annotation ntext,
+  job_type VARCHAR(30),
+  job_command ntext,
+  first_run_at datetime,
+  period integer,
+  last_run_at datetime,
+  last_run_result ntext,
+  last_run_duration numeric,
+  active integer DEFAULT 1,
+  created_at datetime,
+  author_id integer
+);

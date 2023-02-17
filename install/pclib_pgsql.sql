@@ -163,6 +163,19 @@ CREATE TABLE tree_lookups (
   CONSTRAINT pk_tree_lookups_id PRIMARY KEY (id)
 );
 
+-- Table structure for table APP_PARAMS
+
+CREATE TABLE app_params (
+  id serial NOT NULL,
+  param_name character varying(100) DEFAULT NULL,
+  param_value character varying(255) DEFAULT NULL,
+  title character varying(255) DEFAULT NULL,
+  created_at timestamp without time zone,
+  updated_at timestamp without time zone,
+  author_id integer DEFAULT NULL,
+  CONSTRAINT pk_app_params_id PRIMARY KEY (id)
+);
+
 -- Table structure for table FILESTORAGE
 
 CREATE TABLE filestorage (
@@ -181,3 +194,20 @@ CREATE TABLE filestorage (
 );
 
 CREATE INDEX i_filestorage_entity ON filestorage USING btree (entity_type, entity_id);
+
+CREATE TABLE jobs (
+  id serial NOT NULL,
+  name character varying(50) DEFAULT NULL,
+  annotation text,
+  job_type character varying(30) DEFAULT NULL,
+  job_command text,
+  first_run_at timestamp without time zone,
+  period integer DEFAULT NULL,
+  last_run_at timestamp without time zone,
+  last_run_result text,
+  last_run_duration decimal(10,2) DEFAULT NULL,
+  active smallint DEFAULT 1,
+  created_at timestamp without time zone,
+  author_id integer DEFAULT NULL,
+  CONSTRAINT pk_jobs_id PRIMARY KEY (id)
+);
