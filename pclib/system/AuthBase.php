@@ -65,6 +65,8 @@ function passwordHash($password)
 			return md5($this->secret.$password);
 		case 'bcrypt': 
 			return password_hash($password , PASSWORD_BCRYPT, array('cost' => $this->passwordCost));
+		case 'bcrypt-md5': 
+			return password_hash(md5($this->secret.$password) , PASSWORD_BCRYPT, array('cost' => $this->passwordCost));
 		default:
 			throw new AuthException('Unknown password-hash algorihtm');
 	}	
@@ -83,6 +85,8 @@ function passwordHashVerify($password, $hash)
 			return (md5($this->secret.$password) == $hash);		
 		case 'bcrypt': 
 			return password_verify($password, $hash);
+		case 'bcrypt-md5': 
+			return password_verify(md5($this->secret.$password), $hash);
 		default:
 			throw new AuthException('Unknown password-hash algorihtm');
 	}
