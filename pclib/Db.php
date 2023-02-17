@@ -41,6 +41,8 @@ public $slowQueryLog = 1.0;
 
 public $LOOKUP_TAB = 'LOOKUPS';
 
+public $info = [];
+
 /** var AbstractDriver Database driver */
 public $drv;
 
@@ -155,6 +157,9 @@ function connect($dataSource)
 	$this->drv->forceReconnect = $this->forceReconnect;
 	$this->drv->connect($dsarray);
 	if (isset($dsarray['options']['charset'])) $this->drv->codePage($dsarray['options']['charset']);
+
+	unset($dsarray['passw']);
+	$this->info = $dsarray;
 }
 
 /**
@@ -163,6 +168,7 @@ function connect($dataSource)
 function close()
 {
 	$this->drv->close();
+	$this->info = [];
 }
 
 function __clone()
