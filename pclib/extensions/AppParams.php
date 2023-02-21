@@ -22,12 +22,31 @@ class AppParams implements pclib\IService {
 		$this->db = $this->app->db;
 	}
 
+	/**
+	 * Load parameters from database.
+	 */
 	function load()
 	{
-		$this->values += $this->db->selectPair("select PARAM_NAME,PARAM_VALUE from APP_PARAMS");
+		$data = $this->db->selectPair("select PARAM_NAME,PARAM_VALUE from APP_PARAMS");
+		$this->values = array_merge($this->values, $data); 
 		$this->isLoaded = true;
 	}
 
+	/**
+	 * Set and save parameter to database.
+	 */
+	function save($name, $value)
+	{
+		$this->set($name, $value);
+		$this->db->insertUpdate("APP_PARAMS", ['PARAM_NAME' => $name, 'PARAM_VALUE' => $value], ['PARAM_NAME']);
+	}
+
+	/**
+	 * Get parameter $name.
+	 * @param string $name Parameter name
+	 * @param string $default Default parameter value
+	 * @return parameter value | $default
+	 */
 	function get($name, $default = null)
 	{
 		if (!$this->isLoaded) $this->load();
@@ -35,6 +54,9 @@ class AppParams implements pclib\IService {
 		return $this->values[$name] ?? $default;
 	}
 
+	/**
+	 * Set parameter $name to value $value.
+	 */
 	function set($name, $value)
 	{
 		$this->values[$name] = $value;

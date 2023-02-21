@@ -30,7 +30,7 @@ or install it using composer:
 
 **Render form**
 ```php
-require 'pclib/pclib.php';
+require 'vendor/autoload.php'; // or 'pclib/pclib.php' without composer
 $app = new PCApp('test-app');
 
 $form = new PCForm('tpl/form-template.tpl');
@@ -39,9 +39,9 @@ print $form;
 
 **Connect to database and show datagrid with data**
 ```php
-require 'pclib/pclib.php';
+require 'vendor/autoload.php'; 
 $app = new PCApp('test-app');
-$app->db = new PCDb('mysql://root@localhost/test');
+$app->db = new PCDb('pdo_mysql://user:password@localhost/database-name');
 
 $grid = new PCGrid('tpl/grid-template.tpl');
 $grid->setQuery('SELECT * FROM products');

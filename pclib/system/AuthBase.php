@@ -29,7 +29,7 @@ public $errors = array();
 /** Secret string used for enpowerment of md5 hash */
 public $secret;
 
-/** Password algorhitm - can be 'md5' or 'bcrypt' */
+/** Password algorhitm - can be 'md5', 'bcrypt', 'bcrypt-md5' */
 public $passwordAlgo;
 
 /** Bcrypt cost. */
