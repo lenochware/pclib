@@ -188,6 +188,10 @@ function setArray(array $dataArray, $totalLength = 0)
 	$this->setLength($totalLength ?: count($this->dataArray));
 }
 
+/**
+ * Set Selection $sel which will be used as datasource for the grid.
+ * @param orm\Selection $sel
+ */
 function setSelection(orm\Selection $sel)
 {
 	$this->setQuery($sel->getSql());

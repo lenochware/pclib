@@ -309,6 +309,11 @@ protected function getAttr($id, $attr)
 	return null;
 }
 
+/**
+ * Return values of block $block.
+ * @param string $block Id of template block
+ * @return array $values
+**/
 function getBlock($block)
 {
 	$values = [];
@@ -879,8 +884,10 @@ protected function getUrl($elem)
 	return false;
 }
 
-// add element definition
-// $line has same format as line in section "elements" in common template
+/** 
+ * Add new element.
+ * @param string $line Element definition in template file syntax - e.g. "string Title noprint"
+ */
 function addTag($line)
 {
 	$elem = $this->parser->parseLine($line);
@@ -895,6 +902,11 @@ function addTag($line)
 	}
 }
 
+/** 
+ * Add new type of element handled by callback function $fn.
+ * @param string $name Name of new type
+ * @param callable $fn function($obj, $id, $sub, $value)
+ */
 function addType($name, $fn)
 {
 	$this->types[$name] = $fn;
@@ -925,7 +937,10 @@ private function insertAfter(array $a, array $elem, $after)
   );
 }
 
-function htmlTag($name, $attr = array(), $content = null, $startTagOnly = false)
+/** 
+ * Return html tag $name with attributes $attr: "<$name $attr>$content</$name>".
+ */
+function htmlTag($name, $attr = [], $content = null, $startTagOnly = false)
 {
 	$html = '<'.$name;
 	if(isset($attr['__attr'])) {

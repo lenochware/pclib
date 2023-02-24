@@ -38,7 +38,9 @@ class AppParams implements pclib\IService {
 	function save($name, $value)
 	{
 		$this->set($name, $value);
-		$this->db->insertUpdate("APP_PARAMS", ['PARAM_NAME' => $name, 'PARAM_VALUE' => $value], ['PARAM_NAME']);
+		$this->db->insertUpdate("APP_PARAMS", 
+			['PARAM_NAME' => $name, 'PARAM_VALUE' => $value, 'UPDATED_AT' => date("Y-m-d H:i:s")], ['PARAM_NAME']
+		);
 	}
 
 	/**

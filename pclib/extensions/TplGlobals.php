@@ -14,41 +14,65 @@
 
 namespace pclib\extensions;
 use pclib\system\BaseObject;
+use pclib\Tpl;
 use pclib\IService;
 
 /**
- * Add variables or new element types visible in all templates.
+ * Add variables or new element types globally for all templates.
+ * Use like app service: $app->globals = new TplGlobals;
+ * You can define type like this: set('type:my_string', $fn);
+ * You can use modules: set('images.upload_dir', '/images');
  */
 class TplGlobals extends BaseObject implements IService
 {
 	protected $values = [];
 
+/**
+ * Set global template variable $id.
+ * @param string $id
+ * @param mixed|callable $value /can be callable function($o, $id, $sub, $value)/
+ */
 	function set($id, $value)
 	{
 		$this->values[$id] = $value;
 	}
 
+/**
+ * Set array of global template variables.
+ */
 	function setArray(array $values)
 	{
 		$this->values = $values;
 	}
 
+/**
+ * Remove all global variables.
+ */
 	function reset()
 	{
 		$this->values = [];
 	}
 
+/**
+ * Get global template variable $id.
+ */
 	function get($id)
 	{
 		return $this->values[$id];
 	}
 
+/**
+ * Delete global template variable $id.
+ */
 	function delete($id)
 	{
 		unset($this->values[$id]);
 	}
 
-	function fetch($id, $params = [])
+/**
+ * Fetch global template variable $id (if it is callable, return result).
+ */
+	function fetch($id, array $params = [])
 	{
 		if (is_callable($this->values[$id])) {
 			return call_user_func_array($this->values[$id], $params);
@@ -63,9 +87,10 @@ class TplGlobals extends BaseObject implements IService
 		return isset($this->values[$id]);
 	}
 
-	//add [global id] to template elements
-
-	function addGlobals($t, $params)
+/**
+ * Add globals to template $t
+ */
+	function addGlobals(Tpl $t, array $params)
 	{
 		$this->addGlobalsModule($t, '');
 
@@ -79,7 +104,7 @@ class TplGlobals extends BaseObject implements IService
 		}
 	}
 
-	protected function addGlobalsModule($t, $module = '')
+	protected function addGlobalsModule(Tpl $t, $module = '')
 	{
 		foreach ($this->values as $id => $value)
 		{
