@@ -632,7 +632,10 @@ function print_Link($id, $sub, $value)
 	}
 
 	if ($elem['img']) {
-		$lb = "<img src=\"{$elem['img']}\" class=\"link\" alt=\"{$elem['lb']}\" title=\"{$elem['lb']}\">";
+		$lb = $this->htmlTag('img', ['src' => $elem['img'], 'title' => $elem['lb'], 'class' => 'link'], '');
+	}
+	elseif ($elem['glyph']) {
+		$lb = $this->htmlTag('span', ['class' => $elem['glyph'], 'title' => $elem['lb']], '');
 	}
 	else {
 		$lb = $elem['lb'];
