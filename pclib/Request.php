@@ -18,6 +18,7 @@ use pclib;
 /**
  * Provides unified access to HTTP request.
  * Can detect request method, url, user agent, request headers and such.
+ * For any getXxx() method, you can use shortcut ->xxx - e.g. print $app->request->url;
  */
 class Request extends system\BaseObject implements IService
 {
@@ -48,6 +49,12 @@ function isSSL()
 function getHost()
 {
 	return $_SERVER['HTTP_HOST'];
+}
+
+/** Return request port. */
+function getPort()
+{
+	return $_SERVER['SERVER_PORT'];
 }
 
 /** Return current url. */

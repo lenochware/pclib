@@ -14,12 +14,6 @@ use pclib;
 class Controller extends system\BaseObject
 {
 
-/**
- * Each action method name must have following postfix.
- * Only action methods are callable by sending request from user browser.
- */
-public $ACTION_POSTFIX = 'Action';
-
 /** var App Link to application */
 protected $app;
 
@@ -28,6 +22,15 @@ public $name;
 
 /** Name of the called action without postfix. */
 public $action;
+
+/** authorize() fallback when user is not logged in. */
+public $authorizeRedirect = 'user/signin';
+
+/**
+ * Each action method name must have following postfix.
+ * Only action methods are callable by sending request from user browser.
+ */
+protected $ACTION_POSTFIX = 'Action';
 
 function __construct(App $app)
 {
@@ -180,7 +183,7 @@ function authorize($perm = '')
 	if (!$auth->isLogged()) {
 		$this->app->message('Please sign in.');
 		$this->app->setSession('backurl', $this->app->request->getUrl());
-		$this->redirect('user/signin');
+		$this->redirect($this->authorizeRedirect);
 	}
 
 	if (!$auth->hasRight($perm)) {
