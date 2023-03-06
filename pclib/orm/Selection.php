@@ -287,6 +287,18 @@ function select($columns)
 	return $rows;
 }
 
+/** See Db->selectPair(). */
+function selectPair($columns)
+{
+	$this->tryModify();
+	$this->query['select'] = is_array($columns)? $columns : explode(',', $columns);
+	$this->execute();
+	$rows = $this->db->fetchPair($this->result);
+	$this->close();
+	$this->query['select'] = array('*');
+	return $rows;
+}
+
 /**
  * Set source table $s. Fluent interface.
  * @return Selection $this

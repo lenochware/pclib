@@ -314,15 +314,8 @@ function selectPair($dsstr)
 	$args = func_get_args();
 	$sql = $this->getSelectSql($dsstr, $args);
 	$res = $this->query($sql);
-	$rows = array(); $n = null;
-	while ($row = $this->drv->fetch($res, 'r')) {
-		$id = array_shift($row);
-		if (!$n) $n = count($row);
-		if ($n == 0) $row = $id;
-		elseif ($n == 1) $row = $row[0];
-		$rows[$id] = $row;
-	}
-	return $rows;
+	
+	return $this->fetchPair($res);
 }
 
 /**
@@ -575,6 +568,21 @@ function fetchAll($res = null, $fmt = 'a')
 	while ($row = $this->drv->fetch($res, $fmt)) {
 		$rows[] = $row;
 	}
+	return $rows;
+}
+
+function fetchPair($res = null)
+{
+	$rows = []; 
+	$n = 0;
+	
+	while ($row = $this->drv->fetch($res, 'r')) {
+		if (!$n) $n = count($row);
+		if ($n == 1) $rows[] = $row[0];
+		elseif($n == 2) $rows[$row[0]] = $row[1];
+		else  $rows[$row[0]] = $row;
+	}
+
 	return $rows;
 }
 
