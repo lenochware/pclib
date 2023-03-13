@@ -119,7 +119,7 @@ public function addScripts()
 	else $this->values[$id] = $scripts;
 }
 
-function addInline($s) 
+function addHeadText($s) 
 {
 	if (!$this->headTag) throw new NoValueException('Missing "head" tag in template.');
 	$this->elements[$this->headTag]['inline'] .= $s;
@@ -148,33 +148,57 @@ public function addMessage($message, $cssClass = null, $params = array())
  */
 function print_Head($id, $sub, $value)
 {
-	$scripts = array();
+	$scripts = [];
+
 	if ($this->elements[$id]['scripts']) {
 		$scripts = array_merge($scripts, explode(',', $this->elements[$id]['scripts']));
 	}
+
 	if ($value) {
 		$scripts = array_merge($scripts, (array)$value);
-	}
+	}	
 
 	foreach(array_unique($scripts) as $script)
 	{	
-		$path = paramStr('{basedir}/'.$script, $this->app->paths);
+		$this->printScriptLink($script);
+	}
+
+	$inline = array_get($this->elements[$id], 'inline');
+	if ($inline) print $inline;
+}
+
+protected function printScriptLink($src)
+{
+	$version = '';
+	$ext = substr($src, strrpos($src, '.'));
+
+	if ($this->isLocalFile($src))
+	{
+		$path = paramStr('{basedir}/'.$src, $this->app->paths);
 
 		if (!file_exists($path)) {
 			throw new FileNotFoundException("File '$path' not found.");
 		}
 		
-		$version = array_get($this->elements[$id], 'noversion')? '' : '?v='.filemtime($script);
-		$ext = substr($script, strrpos($script, '.'));
-		if ($script[0] != '/') $script = BASE_URL.$script;
-		switch($ext) {
-		case '.js': print "<script language=\"JavaScript\" src=\"$script$version\"></script>\n"; break;
-		case '.css': print "<link rel=\"stylesheet\" type=\"text/css\" href=\"$script$version\">\n"; break;
-		}
+		if ($src[0] != '/') $src = BASE_URL.$src;
+
+		$version = '?v='.filemtime($path);
+		$attr = '';
+	}
+	else {
+		$attr = ' crossorigin="anonymous"';
 	}
 
-	$inline = array_get($this->elements[$id], 'inline');
-	if ($inline) print $inline;
+	switch($ext) {
+		case '.js': print "<script src=\"$src$version\"$attr></script>\n"; break;
+		case '.css': print "<link href=\"$src$version\" rel=\"stylesheet\"$attr>\n"; break;
+	}
+}
+
+private function isLocalFile($src)
+{
+	$src = strtolower($src);
+	return !startsWith($src, 'https://') and !startsWith($src, '//');
 }
 
 /**
