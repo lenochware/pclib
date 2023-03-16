@@ -28,8 +28,6 @@ class TplParser extends BaseObject
 
 	public $translator;
 
-	public $legacyBlockSyntax = false;
-
 	public $translateAttrib = array('lb' => 1, 'hint' => 1, 'html_title' => 1);
 
 	function __construct()
@@ -156,18 +154,13 @@ class TplParser extends BaseObject
 
 	private function getDocument($def)
 	{
-		$pat[0] = "/{([a-z0-9_.]+)}/i";
-		$pat[1] = "/{(BLOCK|IF|IF NOT)\s+([a-z0-9_]+)}/i";
+		$pat[0] = "/{([a-z0-9_\-.]+)}/i";
+		$pat[1] = "/{(BLOCK|IF|IF NOT)\s+([a-z0-9_\-]+)}/i";
 		$pat[2] = "%{/(BLOCK|IF)}%i";
 
 		$rep[0] = self::TPL_SEPAR . self::TPL_ELEM  . self::TPL_SEPAR . '\\1' . self::TPL_SEPAR;
 		$rep[1] = self::TPL_SEPAR . self::TPL_BLOCK . self::TPL_SEPAR . '\\2:\\1' . self::TPL_SEPAR;
 		$rep[2] = self::TPL_SEPAR . self::TPL_BLOCK . self::TPL_SEPAR . 'END:\\1' . self::TPL_SEPAR;
-
-		if ($this->legacyBlockSyntax) {
-			$pat[3] = "/<!--\s*BLOCK\s+([a-z0-9_]+)\s*-->/i";
-			$rep[3] = self::TPL_SEPAR . self::TPL_BLOCK . self::TPL_SEPAR . '\\1' . self::TPL_SEPAR;
-		}
 
 		return explode(self::TPL_SEPAR, preg_replace($pat, $rep, $def));
 	}
