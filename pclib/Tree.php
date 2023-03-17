@@ -359,7 +359,8 @@ class Tree extends system\BaseObject
         $html .= $this->getHtmlTplStrip($this->tpl, 'folderBegin', $node);
       }
       else {
-        $html .= $this->getHtmlTplStrip($this->tpl, 'item', $node);
+        $name = ($node['LEVEL'] == 0 and $this->tpl->elements['topitem'])? 'topitem' : 'item';
+        $html .= $this->getHtmlTplStrip($this->tpl, $name, $node);
       }
 
       if ($next['LEVEL'] < $node['LEVEL']) {
@@ -394,6 +395,7 @@ class Tree extends system\BaseObject
   {
     $t->values = $node;
     if ($strip == 'item') return $t->html('item');
+    elseif ($strip == 'topitem') return $t->html('topitem');
     else {
       $t->values['items'] = '__items__';
       list($begin, $end) = explode('__items__',  $t->html('folder'));
