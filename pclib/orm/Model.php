@@ -106,9 +106,14 @@ public static function className($tableName)
 	$className = self::canonicalName($tableName).'Model';
 	$path = self::getFilePath($className, '.php');
 
-	if (!file_exists($path)) return self::$options['defaultClassName'];
-	require_once($path);
-	return $className;
+	if (file_exists($path)) {
+		require_once($path);
+		return $className;
+	}
+
+	//if (class_exists($className)) return $className;
+
+	return self::$options['defaultClassName'];
 }
 
 protected static function canonicalName($tableName)

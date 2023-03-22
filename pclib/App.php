@@ -494,17 +494,20 @@ function deleteSession($name = null, $ns = null)
 
 function newController($name, $module = '')
 {
-	$postfix = 'Controller';
-	$className = ucfirst($name).$postfix;
+	$className = ucfirst($name).'Controller';
 	$moduleDir = $module? "{modules}/$module/" : '';
 	$namespace = $module? "\\$module\\" : '';
+	$fullClassName = $namespace.$className;
 
 	$path = $this->path("$moduleDir{controllers}/$className.php");
 	
-	if (!file_exists($path)) return null;
+	if (file_exists($path)) {
+		require_once($path);
+	}
+	else {
+		if (!class_exists($fullClassName)) return null;
+	}
 
-	require_once($path);
-	$fullClassName = $namespace.$className;
 	return new $fullClassName($this);
 }
 
@@ -541,6 +544,7 @@ function run($rs = null)
 	if ($event and !$event->propagate) return;
 
 	$ct = $this->newController($action->controller, $action->module);
+
 	if (!$ct) {
 		$ct = $this->newController('base');
 		if (!$ct) $this->httpError(404, 'Page not found: "%s"', null, $action->controller);
