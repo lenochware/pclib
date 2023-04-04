@@ -174,13 +174,14 @@ protected function printScriptLink($src)
 
 	if ($this->isLocalFile($src))
 	{
-		$path = paramStr('{basedir}/'.$src, $this->app->paths);
+		if ($src[0] != '/') $src = BASE_URL.$src;
+
+		$path = $this->app->paths['webroot'].$src;
 
 		if (!file_exists($path)) {
 			throw new FileNotFoundException("File '$path' not found.");
 		}
 		
-		if ($src[0] != '/') $src = BASE_URL.$src;
 
 		$version = '?v='.filemtime($path);
 		$attr = '';

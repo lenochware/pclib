@@ -338,7 +338,8 @@ private function normalizeDir($s)
 
 function getPaths()
 {
-	$webroot = str_replace($_SERVER['SCRIPT_NAME'], '', $_SERVER['SCRIPT_FILENAME']);
+	//$webroot = str_replace($_SERVER['SCRIPT_NAME'], '', $_SERVER['SCRIPT_FILENAME']);
+	$webroot = $_SERVER['DOCUMENT_ROOT'];
 
 	return array(
 		'webroot' => $this->normalizeDir($webroot),
