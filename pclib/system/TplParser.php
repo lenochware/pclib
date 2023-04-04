@@ -156,8 +156,8 @@ class TplParser extends BaseObject
 
 	private function getDocument($def)
 	{
-		$pat[0] = "/{([a-z0-9_.]+)}/i";
-		$pat[1] = "/{(BLOCK|IF|IF NOT)\s+([a-z0-9_]+)}/i";
+		$pat[0] = "/{([a-z0-9_\-.]+)}/i";
+		$pat[1] = "/{(BLOCK|IF|IF NOT)\s+([a-z0-9_\-]+)}/i";
 		$pat[2] = "%{/(BLOCK|IF)}%i";
 
 		$rep[0] = self::TPL_SEPAR . self::TPL_ELEM  . self::TPL_SEPAR . '\\1' . self::TPL_SEPAR;
