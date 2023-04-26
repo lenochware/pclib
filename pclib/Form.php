@@ -1280,6 +1280,8 @@ protected function head()
 		$html .= "<input type=\"hidden\" name=\"$k\" value=\"$v\">\n";
 	}
 
+	if (!empty($this->header['header_text'])) $html .= $this->header['header_text'];
+
 	return $html;
 }
 
@@ -1295,7 +1297,8 @@ protected function foot()
 		$html = ob_get_contents();
 		ob_end_clean();
 	}
-	if (!$this->header['noformtag']) $html .= '</form>';
+	if (!empty($this->header['footer_text'])) $html .= $this->header['footer_text'];
+	if (empty($this->header['noformtag'])) $html .= '</form>';
 
 	return $html;
 }
