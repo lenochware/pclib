@@ -787,7 +787,7 @@ protected function print_BlockRow($block, $rowno = null)
 
 	$bval = array_get($this->values, $block);
 
-	if (is_scalar($bval)) {
+	if (!empty($bval) and is_scalar($bval)) {
 		print $this->values[$block];
 		return;
 	}
