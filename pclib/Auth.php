@@ -45,7 +45,7 @@ public $loggedUser;
  * Take \b $user and log him in. See also #$loggedUser.
  * @param AuthUser $user
  */
-function setLoggedUser(pclib\AuthUser $user)
+function setLoggedUser(pclib\AuthUser $user = null)
 {
 	$this->loggedUser = $user;
 	$this->setSessionUser($user);
@@ -74,6 +74,20 @@ function getUser($userName = null)
 	$user = $this->getStorage()->getUser($userName);
 	if ($user) $user->auth = $this;
 	return $user;
+}
+
+/**
+ * Reload logged user from database.
+ * Use if you need propagate changes immediately.
+ * @return AuthUser $user
+ */
+function reloadLoggedUser()
+{
+	if (!$this->loggedUser) return;
+	$name = $this->loggedUser->values['USERNAME'];
+	$user = $this->getUser($name);
+
+	$this->setLoggedUser($user->isValid()? $user : null);
 }
 
 /**
