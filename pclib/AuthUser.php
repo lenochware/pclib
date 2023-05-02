@@ -121,6 +121,23 @@ function getCredentials()
 }
 
 /**
+ * PHP magic method.
+ * Implements following features:
+ * - Access to column value as $model->columnName
+ */
+public function __get($name)
+{
+	return $this->values[$name];
+}
+
+/*
+public function __set($name, $value)
+{
+	$this->values[$name] = $value;
+}
+*/
+
+/**
  * Verify user password.
  * @param string $password
  * @return bool $valid
