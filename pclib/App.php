@@ -316,7 +316,7 @@ function setLanguage($language)
 	if (!empty($this->services['db'])) {
 		try {
 			$trans->usePage('default');
-		} catch (Exception $e) {
+		} catch (\Exception $e) {
 			throw new Exception('Cannot load texts for translator - '.$e->getMessage());
 		}
 

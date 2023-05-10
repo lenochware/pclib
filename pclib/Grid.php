@@ -98,7 +98,7 @@ protected function initPager()
 
 	if ($el['ul']) {
 		$pager->pattern = '%1$s%3$s%2$s';
-		$pager->patternItem = '<li class="%s">%s</li>';
+		$pager->patternItems = '<li class="%s">%s</li>';
 	}
 	if ($el['pglen']) {
 		$pager->setPageLen($el['pglen']);
@@ -337,7 +337,6 @@ function print_Pager($id, $sub)
 	$pgid = $this->elements['pcl_document']['typelist']['pager'];
 	$el = $this->elements[$pgid];
 
-	if ($this->pager->getValue('maxpage') < 2 and !$el['nohide']) return;
 
 	if (!empty($this->values[$pgid])) {
 		print $this->values[$pgid];
@@ -348,6 +347,7 @@ function print_Pager($id, $sub)
 		print $this->pager->getHtml($sub);
 	}
 	else {
+		if ($this->pager->getValue('maxpage') < 2 and !$el['nohide']) return;
 		print $this->pager->html();
 	}
 }

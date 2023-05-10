@@ -37,6 +37,8 @@ class GridPager extends system\BaseObject
 	/** Pattern for rendering of the pager item. */
 	public $patternItem = '<span class="%s">%s</span>';
 
+	public $patternItems = '<span class="%s">%s</span>';
+
 	/** var Translator */
 	public $translator;
 
@@ -149,9 +151,11 @@ class GridPager extends system\BaseObject
 	 * @param string $cssClass
 	 * @return string $html
 	 */
-	function getHtml($id, $cssClass = 'page-item')
+	function getHtml($id, $cssClass = 'page-item', $pattern = null)
 	{
 		$plainValues = array('maxpage','pglen','total','page','active');
+
+		if (!$pattern) $pattern = $this->patternItem;
 
 		if ($id == 'pages') return $this->getPagesHtml();
 		if (in_array($id, $plainValues)) {
@@ -163,7 +167,7 @@ class GridPager extends system\BaseObject
 			$val = "<a href=\"$url\" class=\"page-link\">$lb</a>";
 		}
 		
-		return sprintf($this->patternItem, $cssClass, $val);
+		return sprintf($pattern, $cssClass, $val);
 	}
 
 	/**
@@ -197,9 +201,9 @@ class GridPager extends system\BaseObject
 	function html()
 	{
 		return sprintf($this->pattern, 
-			$this->getHtml('first'),
-			$this->getHtml('last'),
-			$this->getHtml('pages')
+			$this->getHtml('first', 'page-item', $this->patternItems),
+			$this->getHtml('last', 'page-item', $this->patternItems),
+			$this->getHtml('pages', 'page-item', $this->patternItems)
 		);
 	}
 
