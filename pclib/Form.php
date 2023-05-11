@@ -680,7 +680,7 @@ function print_Checkbox($id, $sub, $value, $i = null)
 	$tag['type'] = 'checkbox';
 	$tag['checked'] = in_array($cbid, $value)? 'checked' : null;
 	$tag['value'] = $cbid;
-	$tag['id'] = $id.(isset($i)? '_'.$i : '');
+	$tag['id'] = $tag['id'].(isset($i)? '_'.$i : '');
 	if ($sub) $tag['name'] .= "[$i]";
 
 	$html = $this->htmlTag('input', $tag);
@@ -688,7 +688,7 @@ function print_Checkbox($id, $sub, $value, $i = null)
 		$label = $elem['items'][$sub];
 		$html = "<label>$html$label</label>";
 	}
-	if ($tag['checked']) $html .= $this->ieFix($id,$tag['name'], $cbid);
+	if ($tag['checked']) $html .= $this->ieFix($tag['id'], $tag['name'], $cbid);
 	print $html;
 }
 
@@ -704,14 +704,14 @@ function print_Radio($id, $sub, $value, $i = null)
 	$tag['type'] = 'radio';
 	$tag['checked'] = ($cbid == $value)? 'checked' : null;
 	$tag['value'] = $cbid;
-	$tag['id'] = $id.(isset($i)? '_'.$i : '');
+	$tag['id'] = $tag['id'].(isset($i)? '_'.$i : '');
 
 	$html = $this->htmlTag('input', $tag);
 	if ($sub) {
 		$label = $elem['items'][$sub];
 		$html = "<label>$html$label</label>";
 	}
-	if ($tag['checked']) $html .= $this->ieFix($id,$tag['name'], $cbid);
+	if ($tag['checked']) $html .= $this->ieFix($tag['id'], $tag['name'], $cbid);
 	print $html;
 }
 
