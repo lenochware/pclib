@@ -763,7 +763,7 @@ function print_Select($id, $sub, $value)
 
 	$group = '_nogroup_';
 	foreach ($items as $i => $item) {
-		if (is_array($item)) list($iid,$label,$group) = $item;
+		if (is_array($item)) list($label,$group) = $item;
 		else $label = $item;
 
 		if (is_array($value)) {
