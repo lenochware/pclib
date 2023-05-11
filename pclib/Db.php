@@ -580,7 +580,10 @@ function fetchPair($res = null)
 		if (!$n) $n = count($row);
 		if ($n == 1) $rows[] = $row[0];
 		elseif($n == 2) $rows[$row[0]] = $row[1];
-		else  $rows[$row[0]] = $row;
+		else {
+			$id = array_shift($row);
+			$rows[$id] = $row;
+		}
 	}
 
 	return $rows;
