@@ -853,19 +853,17 @@ private function getTableName($tab)
 protected function uploadFs($tableName, $id)
 {
 	$fs = $this->fileStorage;
-	$files = array();
+	$files = [];
 
 	foreach ($fs->postedFiles() as $file) {
 		$elem = $this->elements[$file['INPUT_ID']];
 		if (!$elem or $elem['nosave']) continue;
 
 		$entity = $elem['entity'] ?: $tableName;
-
-		$file['PREFIX'] = $elem['prefix'] ?: strtolower($entity).'_';
 		$files[] = $file;
 	}
 
-	$fs->save(array($id, $entity), $files);
+	$fs->setFiles([$entity, $id], $files);
 
 	$errors = $fs->getUploadErrors();
 	if ($errors) {
@@ -999,7 +997,7 @@ function delete($tab, $cond)
 protected function deleteFiles($tableName, $data)
 {
 	if ($this->fileStorage) {
-		$this->fileStorage->deleteEntity(array($data['ID'] ?: $data['id'], $tableName));
+		$this->fileStorage->deleteFiles([$tableName, $data['ID'] ?: $data['id'] ]);
 	}
 	else {
 		foreach ($this->elements as $id=>$elem) {
