@@ -72,8 +72,9 @@ function ddump()
 function jdump()
 {
 	global $pclib;
-	$js = '';
 	$args = func_get_args();
+
+	$js = $pclib->app->getSession('pclib.jdump') ?: '';
 	
 	foreach($args as $var) {
 		
@@ -98,11 +99,13 @@ function jdump()
 
 		$js .= 'console.log('.json_encode($output).');';
 	}
+
+	$pclib->app->setSession('pclib.jdump', $js);
 	
-	if ($pclib->app->layout)
-		$pclib->app->layout->addInline("<script>$js</script>");
-	else
-		print "<script>$js</script>";
+	// if ($pclib->app->layout)
+	// 	$pclib->app->layout->addInline("<script>$js</script>");
+	// else
+	// 	print "<script>$js</script>";
 }
 
 /** 
@@ -352,6 +355,12 @@ function array_get($a, $key, $default = null)
 	}
 
 	return isset($a[$key])? $a[$key] : $default;
+}
+
+function debug_sql_log()
+{
+  global $app;
+  $app->db->on('db.after-query', function($e) { jdump($e->data['sql']); });
 }
 
 ?>

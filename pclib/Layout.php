@@ -122,6 +122,7 @@ public function addScripts()
 function addHeadText($s) 
 {
 	if (!$this->headTag) throw new NoValueException('Missing "head" tag in template.');
+	if (!isset($this->elements[$this->headTag]['inline'])) $this->elements[$this->headTag]['inline'] = ''; //suppress notice
 	$this->elements[$this->headTag]['inline'] .= $s;
 }
 
@@ -216,6 +217,15 @@ function print_Messages($id, $sub, $value)
 	$this->app->setSession('pclib.flash', null);
 }
 
+protected function addJdump()
+{
+	$js = $this->app->getSession('pclib.jdump');
+	if ($js) {
+		$this->addHeadText("<script>$js</script>");
+		$this->app->setSession('pclib.jdump', null);		
+	}
+}
+
 /**
  * Print breadcrumb navigator.
  * @copydoc tag-handler
@@ -254,6 +264,7 @@ protected function _init()
 
 protected function _out($block = null)
 {
+	$this->addJdump();
 	parent::_out($block);
 	$this->saveSession();
 }
