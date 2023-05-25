@@ -822,7 +822,13 @@ protected function getWhereSql($cond, $args)
 	if (is_array($cond)) {
 		$s = '';
 		foreach($cond as $k => $v) {
-			$s .= " AND ".$this->escape($k,'ident')."='".$this->escape($v)."'";
+			if (is_array($v)) {
+				$v = implode("','", array_map([$this, 'escape'], $v));
+				$s .= " AND ".$this->escape($k,'ident')."in ('$v')";
+			}
+			else {
+				$s .= " AND ".$this->escape($k,'ident')."='".$this->escape($v)."'";
+			}
 		}
 		$where = substr($s, 5);
 	}
