@@ -306,6 +306,7 @@ protected function getTag($id, $ignoreHtmlAttr = false)
 	if ($html5) {
 		if ($elem['required']) $tag[] = 'required';
 		if (!empty($elem['pattern'])) $tag['pattern'] = $elem['pattern'];
+		if (!empty($elem['minlength'])) $tag['minlength'] = $elem['minlength'];
 	}
 
 	$tag['placeholder'] = $elem['hint'];
