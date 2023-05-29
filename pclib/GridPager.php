@@ -127,6 +127,7 @@ class GridPager extends system\BaseObject
 				case "previous": return $this->clamp($this->page-1, 1, $this->maxPage);
 				case "pglen": return $this->pageLen;
 				case "total": return $this->length;
+				case "visible": return $this->maxPage > 1? 'visible' : 'hidden';
 				case "all": return 'all';
 				case "active": 
 				case "page": return $this->page;
@@ -155,6 +156,8 @@ class GridPager extends system\BaseObject
 	{
 		$plainValues = array('maxpage','pglen','total','page','active');
 
+		if ($id == 'visible') return $this->getValue($id);
+
 		if (!$pattern) $pattern = $this->patternItem;
 
 		if ($id == 'pages') return $this->getPagesHtml();
@@ -180,10 +183,10 @@ class GridPager extends system\BaseObject
 
 		foreach ($this->pagerRange($this->page, $this->linkNumber) as $page) {
 			if ($this->page == $page) {
-				$pages[] = $this->getHtml($page, 'page-item active');
+				$pages[] = $this->getHtml($page, 'page-item active', $this->patternItems);
 			}
 			else {
-				$pages[] = $this->getHtml($page);
+				$pages[] = $this->getHtml($page, 'page-item', $this->patternItems);
 			}
 		}
 
@@ -200,6 +203,8 @@ class GridPager extends system\BaseObject
 	 */
 	function html()
 	{
+		//if ($this->maxPage == 0) return '';
+
 		return sprintf($this->pattern, 
 			$this->getHtml('first', 'page-item', $this->patternItems),
 			$this->getHtml('last', 'page-item', $this->patternItems),
@@ -215,7 +220,7 @@ class GridPager extends system\BaseObject
 	 */
 	protected function pagerRange($page, $size)
 	{
-		if ($this->maxPage <= 0) return array();
+		if ($this->maxPage <= 0) return array(1);
 
 		$middle = floor($size / 2);
 
