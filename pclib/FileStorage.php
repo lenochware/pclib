@@ -116,7 +116,7 @@ function setFile($loc, $data)
 		$filter = [
 			'ENTITY_TYPE'=>$loc[0],
 			'ENTITY_ID'=>$loc[1],
-			'FILE_ID'=>$loc[2],
+			'FILE_ID'=> array_get($loc, 2),
 		];
 
 		$data += $filter;

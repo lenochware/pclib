@@ -298,13 +298,16 @@ protected function isInBlock($id, $block)
 **/
 protected function getAttr($id, $attr)
 {
-	$e = $this->elements[$id];
-	if (isset($e[$attr])) return $e[$attr];
+	if (isset($this->elements[$id])) {
+		$e = $this->elements[$id];
+		if (isset($e[$attr])) return $e[$attr];
 
-	while ($id = $this->elements[$id]['block']) {
-		if (isset($this->elements[$id][$attr]))
-			return $this->elements[$id][$attr];
+		while ($id = $this->elements[$id]['block']) {
+			if (isset($this->elements[$id][$attr]))
+				return $this->elements[$id][$attr];
+		}
 	}
+
 	if (isset($this->header[$attr])) return $this->header[$attr];
 	return null;
 }

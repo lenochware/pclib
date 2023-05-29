@@ -146,6 +146,7 @@ function extractpath($path, $format)
 **/
 function mkident($s, $options = '')
 {
+	$o1 = $o2 = '';
 	$s = preg_replace('/[^\w]+/',' ', utf8_ascii($s));
 	if (strlen($options) == 1) {
 	 if(ctype_alnum($options)) $o1 = $options; else $o2 = $options;
