@@ -857,7 +857,7 @@ protected function uploadFs($tableName, $id)
 	$files = [];
 
 	foreach ($fs->postedFiles() as $file) {
-		$elem = $this->elements[$file['FILE_ID']];
+		$elem = $this->elements[$file['INPUT_ID']];
 		if (!$elem or !empty($elem['nosave'])) continue;
 
 		$entity = array_get($elem, 'entity', $tableName);

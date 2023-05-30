@@ -106,11 +106,22 @@ function setFile($loc, $data)
 
 	if (is_numeric($loc)) {
 		$filter = ['ID' => $loc + 0];
+		$file = $this->getFile($loc);
+		$loc = [$file['ENTITY_TYPE'], $file['ENTITY_ID'], $file['FILE_ID']];
 	}
 	elseif(is_array($loc) and (count($loc) == 3 or count($loc) == 2))
 	{
-		if (count($loc) == 2) {
+		if (count($loc) == 2)
+		{
 			$isNew = true;
+
+			if (!empty($data['FILE_ID'])) {
+				$loc[2] = $data['FILE_ID'];
+
+				if ($this->getFile($loc)) {
+					$isNew = false;
+				}
+			}
 		}
 
 		$filter = [
@@ -118,8 +129,6 @@ function setFile($loc, $data)
 			'ENTITY_ID'=>$loc[1],
 			'FILE_ID'=> array_get($loc, 2),
 		];
-
-		$data += $filter;
 	}
 	else {
 		throw new Exception('Bad parameters.');
@@ -129,11 +138,9 @@ function setFile($loc, $data)
 		$data = $this->insertFile($loc, $data);
 	}
 	else {
-		$file = $this->getFile($loc);
-
 		if ($data['FILEPATH_SRC']) {
-			$this->deleteFile($file['ID']);
-			$data = $this->insertFile($loc, array_merge($data, $file));
+			$this->deleteFile($loc);
+			$data = $this->insertFile($loc, $data);
 		}
 		else {
 			$udata = array_intersect_key($data, ['ANNOT' => 1,'ORIGNAME' => 1]);
@@ -176,9 +183,8 @@ function deleteFile($loc)
 	$this->db->delete($this->TABLE, pri($file['ID']));
 }
 
-
 /** Upload new file into filesystem and create db record. */
-protected function insertFile($loc, $data)
+protected function insertFile(array $loc, array $data)
 {
 	$path = $data['FILEPATH_SRC'];
 	if (!file_exists($path)) throw new FileNotFoundException("File '$path' not found.");
@@ -192,7 +198,7 @@ protected function insertFile($loc, $data)
 	$file = [
 		'ENTITY_TYPE'=> $loc[0],
 		'ENTITY_ID'=>   $loc[1],
-		'FILE_ID' => $data['FILE_ID'] ?: $this->newFileId($loc),
+		'FILE_ID' => isset($loc[2])? $loc[2] : $this->newFileId($loc),
 		'SIZE' => filesize($path),
 		'ORIGNAME' => $data['ORIGNAME'],
 		'MIMETYPE' => $data['MIMETYPE'],
@@ -342,7 +348,7 @@ function postedFiles($input_id = null)
 		}
 
 		$files[] = [
-			//'INPUT_ID' => $data['input_id'],
+			'INPUT_ID' => $data['input_id'], //for multiple input
 			'FILE_ID' => $id,
 			'FILEPATH_SRC' => $data['tmp_name'],
 			'ORIGNAME' => $data['name'],
