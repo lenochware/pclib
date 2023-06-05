@@ -609,11 +609,11 @@ function print_Button($id, $sub, $value)
 		$content = '';
 		if ($elem['img']) $content .= $this->htmlTag('img',array('src'=>$elem['img']));
 		if ($elem['glyph']) $content .= $this->htmlTag('span',array('class'=>$elem['glyph']),'');
-		if ($tag['type'] == 'submit') $tag['name'] = "pcl_form_submit";
+		if ($tag['type'] == 'submit' and !$elem['default']) $tag['name'] = "pcl_form_submit";
 		$tag['value'] = $id;
 		$content .= isset($elem['lb'])? $elem['lb'] : $id;
 	} else {
-		 if ($tag['type'] == 'submit') $tag['name'] = "pcl_form_submit[$id]";
+		 if ($tag['type'] == 'submit' and !$elem['default']) $tag['name'] = "pcl_form_submit[$id]";
 		 $content = null;
 		 $tag['value'] = isset($elem['lb'])? $this->escape($elem['lb']) : $id;
 	}
