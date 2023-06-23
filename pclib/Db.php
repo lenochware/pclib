@@ -740,6 +740,7 @@ function setParams($sql, $params)
 	if (!$has_params) return $sql;
 	
 	preg_match_all($pat, $sql, $found);
+
 	if (!$found[0]) return $sql;
 	$from = $to = array();
 	$empty = false;
@@ -754,7 +755,7 @@ function setParams($sql, $params)
 				if ($found[1][$i] == '#') $to[] = '__PCL_EMPTY0__';
 				else $to[] = '__PCL_EMPTYS__';
 			}
-			if ($found[1][$i] == '#')
+			elseif ($found[1][$i] == '#')
 				$to[] = implode(',', array_map('intval', $params[$key]));
 			elseif($found[1][$i] == '?')
 				$to[] = '';			
