@@ -68,7 +68,7 @@ function __construct($tableName, array $values = array())
 
 	$this->service('db');
 
-	if (!preg_match("/^\w+$/", $tableName)) {
+	if (!preg_match("/^[a-z0-9_.]+$/i", $tableName)) {
 		throw new Exception("Invalid table name.");
 	}
 
