@@ -49,6 +49,8 @@ protected $modified = array();
 /** Role used by model for data access. */
 protected $accessRole;
 
+protected $relationsCache = array();
+
 protected static $columnsCache = array();
 
 protected static $options = array(
@@ -350,10 +352,15 @@ public function __set($name, $value)
  */
 function related($name)
 {
+	if ($this->relationsCache[$name]) {
+		return $this->relationsCache[$name];
+	}
+
 	$rel = new Relation($this, $name);
 
 	if ($rel->params['owner'] or $rel->params['one']) {
-		return $rel->first();
+		$this->relationsCache[$name] = $rel->first();
+		return $this->relationsCache[$name];
 	}
 	else return $rel;
 }
