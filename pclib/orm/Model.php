@@ -394,10 +394,16 @@ function save()
 	if (!$this->testRight('save')) return false;
 
 	if (!$this->modified) return true;
+
+	$this->trigger('model.before-save');
+
 	$ok = $this->isInDb()? $this->update() : $this->insert();
 	if ($ok) {
 		$this->isInDb(true);
 	}
+
+	$this->trigger('model.after-save', ['ok' => $ok]);
+
 	return $ok;
 }
 
@@ -501,6 +507,8 @@ function delete()
 
 	$this->validateRelated();
 
+	$this->trigger('model.before-delete');
+
 	//startTransaction
 	$ok = $this->db->delete($this->tableName, array(self::$options['primaryKey'] => $id));
 	$this->deleteRelated();
@@ -511,6 +519,7 @@ function delete()
 		$this->modified = array_keys($this->values);
 	}
 
+	$this->trigger('model.after-delete', ['ok' => $ok]);
 	return $ok;
 }
 
