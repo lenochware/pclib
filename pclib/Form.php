@@ -618,14 +618,13 @@ function print_Button($id, $sub, $value)
 		 $tag['value'] = isset($elem['lb'])? $this->escape($elem['lb']) : $id;
 	}
 
-	if ($elem['confirm']) {
-		$onclick = "if(!confirm('".$elem['confirm']."')) return false;";
-	}
-	elseif ($url and $elem['popup']) {
-		$onclick = $this->getPopup($id, $elem['popup'], $url);
+	$onclick = !empty($elem['confirm'])? "if(!confirm('".$elem['confirm']."')) return false;" : '';
+	
+	if ($url and $elem['popup']) {
+		$onclick .= $this->getPopup($id, $elem['popup'], $url);
 	}
 	elseif ($url) {
-		$onclick = "window.location='$url';";
+		$onclick .= "window.location='$url';";
 	}
 
 	if ($onclick) {
