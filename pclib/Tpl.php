@@ -1051,7 +1051,7 @@ protected function getItems($id)
 	elseif ($elem['datasource']) $items = $this->getDataSource($elem['datasource']);
 
 	$tr = $this->app->getService('translator');
-	if ($tr) {
+	if ($tr and empty($elem['notranslate'])) {
 		$items = $tr->translateArray($items);
 	}
 
