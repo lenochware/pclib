@@ -269,7 +269,14 @@ protected function getHttpData()
 		}
 
 		$val = array_get($data, $id);
-		if ($elem['type'] == 'check' and !$val and !$elem['noprint']) $data[$id] = array();
+		if ($elem['type'] == 'check' and !$val and !$elem['noprint']) {
+			$multiple = false;
+			foreach(['list', 'query', 'lookup', 'datasource'] as $k) {
+				if (isset($elem[$k])) $multiple = true;
+			}
+
+			$data[$id] = $multiple? array() : '';
+		}
 		if ($elem['type'] == 'radio' and !$val and !$elem['noprint']) $data[$id] = '';
 		elseif ($elem['type'] == 'select' and $elem['multiple'] and !$val and !$elem['noprint']) $data[$id] = array();
 		elseif($elem['type'] == 'input' and is_string($val)) $data[$id] = trim($val);
