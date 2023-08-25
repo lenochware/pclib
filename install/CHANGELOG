@@ -1,335 +1,3 @@
-1.6.0
-  - added PostgreSQL support. For Postgres use connection string
-    "pgsql://user:password@host/dbname".
-  - added function tpl->deletesession()
-  - added function extractpath() - extract part of filesystem path
-  - removed functions pcl_basename(), pcl_ext()
-  - function pcl_filename() renamed to pcl_ident()
-  - Compatibility note: Added field CATEG into table ELOG_LABELS
-  - added config parameter COMPAT_URL
-  - added function db->setlimit() - portable LIMIT clausule
-  - added function db->field() - read one database field.
-    Ex: $name = $db->field('PERSON:NAME', pri($id));
-  - added function db->dbname() - return database name
-  - added function db->metadata() - read database table metadata
-  - added parameter db->force_reconnect
-  - added sql placeholder [!param] which disable escaping characters for param
-    Ex: $db->select("select * from tab where x=[!param]", $param);
-  - grid->setquery() accept parameters: grid->setquery('select * from X where ID=[0]', $id);
-    See also: refman/db-params.html
-  - added attribute href and route for template tag "class grid".
-    It is base url for pager and sort links.
-  - session form is stored in session after it is submitted, not everytime in constructor
-  - form->invalid (form errors) are stored in session
-  - form->update() and form->delete() accept query parameters. See also: refman/db-params.html
-  - removed function form->propagate()
-  - added attribute "format" to form elements. It will preformat values before storing form.
-    ex: input file format "f" - convert filename to filesystem friendly name
-  - fixed form method=get (it will convert url variables into hidden fields)
-  - added config parameter FILE_UPLOAD_BLACKLIST, which do not allow uploading dangerous files
-  - added function app->ident()
-  - added function app->urlmask()
-  - modified function app->bookmark()
-  - various upgrades and bugfixes.
-
-1.7.0
- I renamed and shifted few things in this version, for more consistency,
- transparency and other reasons. 'Breaking compatibility' factor
- is little bigger than usual, however. So sorry! (It's an exception, though)
- 
- - PHP 4 is no longer supported.
- - Added concept of database drivers (added directory pclib/drivers with pgsql and mysql drivers)
- - Support of html5 forms
- - Support of ajax enabled forms, added method form->ajaxsync()
- - Added class-autoloading (You can include only pclib/pclib.php from now)
- - Added object $pclib
- - Global variables moved to object $pclib
- - Note: Use $pclib->db = new db(...); to register db,
-   so other pclib components (grid, form) can use it.
- - Preparing class app for routes and controllers
-
- - Added elements listinput and include
- - Added atributes ajaxget, htmlclass
- - Added atributes html5, color, range and hint
- - Added function eventlog->getlog()
- - Added function form->ajaxsync()
- - Added functions app->setlayout(), app->setconfig(), app->getroute()
- - Added config parameter CODEPAGE - codepage for ajax requests
- - Added config parameter SORTICONS - path to sort-arrow images (pclib/assets)
-
- - Removed db->uni_* methods - now it's in db->drv->*
- - Removed form->seterror()
- - Removed app->unbook(). Use app->bookmarks = null;
- - Removed auth->encrypt(),auth->decrypt()
- - Removed element img
- - Removed attribute "icon". Sort arrows are enabled by default, you can disable it in config.
-
- - Renamed pcl.php  -> pclib.php
- - Renamed app->tpl -> app->layout
- - Renamed app->ident() -> app->input()
- - Renamed tpl->loadfile() -> tpl->load()
- - Renamed form_validator.js -> pclib.js
- - Renamed directory pclib/res -> pclib/assets
- - Renamed directory pclib/ext -> pclib/extensions
- - Renamed app->modul -> app->module
- - Renamed app->getmodul() -> app->modulename()
-
- - Altered db-table structures - added fields ELOG.DT, ELOG_MESSAGES.DT (datetime)
-
- - function tpl->enable() now can take more parameters. Ex: tpl->enable('update','delete');
- - __toString() support - you can use print $grid; instead of $grid->out()
- - Active sorting links are marked now with css-class, so you can style them
- - bugfixes, finetuning, cleaning-up etc.
-
-1.7.1
- - rewritten block code, using 'repeat' attribute is not needed anymore
-   you can assign block as $t->values['blockname'] = $dataarray;
- - session code cleaned up
- - added connection throught socket for pgsql, type 'socket' as host
-
-1.7.2
- - bugfixing, finetuning (mostly lazygrid, lazyform)
- - renamed tpl->format_dbdate : tpl->format_date, form->db_date : form->to_sqldate
- - added support of textarea maxlength attribute
- - form->insert() and ->update() uses internally new functions
-   form->prepare() and form->upload()
- - form->dbsync() set 'nosave' for form-fields not existing in db-table, instead of warning
- - functions in pclib.js moved into new javascript object pclib
- - you can invoke callback function after ajax call, use pclib.ajaxcomplete = myfunction;
-
-1.7.3
- - utf-8 support (However system names, such as routes, permissions, template-tags etc.
-   are supposed to be in plain ascii)
- - Default codepage is utf-8, default language is czech (cz). If you need
-   english messages, replace file pclib/config.php with install/config.en.php
- - added functions utf8_ascii() which replace diacritics from utf8 string
- - some tweaking and cleaning things up
-
-1.7.6
-- classes lazygrid, lazyform, metatpl has been deprecated
-- removed default templates: out_default() methods
-- removed config parameter USE_DEFAULT_LAYOUT
-- removed db->elements()
-- removed db->metadata()
-- added db->columns($table) - will return array of standardized
- $table columns meta information
-- added function tpl->create($sql) - creating default templates
-  (Uses default grid/form/tpl template in "pclib/assets/def_*.tpl")
-- You can store template generated from database with:
-  form->create($table, $path); where $path is path to created template file.
-- added tags {tpl.items}, {grid.head}, {grid.items}, {form.fields} which will
-  generate html for grid items, form fields etc.
-- added class app_module as ancestor of your application controlers
-- added method app->run() which dispatch request to the proper method of the
-  application controller. Example: index.php?module=blog&action=view&id=1 will
-  call blog->view_action($id); where class "blog" must be stored
-  in modules/blog.php and be ancestor of app_module.
-- It's possible access template values as tpl->_FIELDNAME. (experimental)
-
-1.8.0
-- added class "tree". You can create HTML-tree menu/list from database table
- (TREE_LOOKUPS by default) or from text file. See example.
-- refactoring of form and grid code
-- added grid->multisort (boolean) - possibility sort by more than one column
-- added function grid->setsort($fields) - set sorting by $fields,
-  removed property grid->sort
-- renamed pager modificators ptotal,active to maxpage,page
-- form will trim values from input tags automatically
-- possibility escape and quote of database field names
-- added function db->indexes($table) - return array of table indexes
-- added assets/pclib.css
-- removed config parameters COMPAT_GRIDQUERY,DB_NO_ESCAPE and DB_QUOTE_KEYWORDS
-- removed array based lookups
-- possibility access elements array as tpl->_FIELDNAME->attribute.
-- bugfixing
-
-1.8.2
-- PClib throws exceptions instead of errors from now
-- Added new block syntax: {BLOCK name}Content{/BLOCK}
-- Added new config param COMPAT_TPL - if enabled, you can use previous
-  block syntax too. Default: true
-- Added {BLOCK ELSE} part, which is shown when there are no block items
-  Ex: {BLOCK items}...{BLOCK ELSE}-- No items. --{/BLOCK}
-- Removed BLOCK NEWLINE
-- Added {IF field} and {IF NOT field} section, shown when field is
-  not empty/empty respectively. Ex: {IF title}<h1>{title}</h1>{/IF}
-- Removed "intext" attribute - use {IF} instead
-- Added string "loop" attribute: it will return cyclic sequence of defined values,
-  if used in cyclic block. Ex: string ROW loop "odd,even"
-- Removed tag autoinc
-- Removed deprecated metatpl,lazygrid,lazyform classes
-- Removed tpl->definition()
-- Tag "include" renamed as "meta" for app->layout. You can use function
-  app->layout->addscripts() too (put scripts into {HEAD} tag in layout).
-- Removed db->open() - use db->connect() instead.
-- Removed db->createsql(), db->altersql()
-- Removed deprecated app->getmenu()
-
-1.8.8
-- Renamed config parameters, now config keys are starting with string 'pclib.'
-- Removed *_TAB config params, you can change default table names in object itself
-- Removed config parameters 'ELOG_PHP', 'MLS_AUTOUPDATE' and 'COMPAT_URL'
-- Added config parameters pclib.compat_db, pclib.tpl.escape, pclib.tpl.escape_function,
-  pclib.app.index, pclib.app.controllers_dir and pclib.logger.log
-- Const LIB_DIR renamed to PCLIB_DIR
-- Added tag 'include action "controller/action"' - will include result of controller->action()
-  method into template. The 'action' is route to the controller's methods
-- Changed popup attribute - you can write for example popup "800x600" now - see doc
-- You can set template fields' events new way as $tpl->_field->onprint = function(...) {...}
-  previous syntax is deprecated and can be disabled with pclib.compat_tpl config parameter.
-- Double quote escaping in template elements is now \", previous syntax "" is deprecated
-- You can set any html attribute in elements section of template. Use syntax
-  html_attribute_name - for example html_class "css-class"
-- HTML in template values is escaped automatically, if config param pclib.tpl.escape = true.
-  It is meant as XSS attack prevention.
-- Added attribute 'noescape'. It disable automatic html escaping for some element.
-- Global objects, such as db, are moved to app->services
-- Error and exception handlers are moved to class app
-- $pcl_strings are moved to $pclib->strings
-- Added method grid->setpage($page)
-- Added attribute 'singlepage' - creates simplified url, if grid is only one on the page.
-  Useful for nice urls. Example: 'class grid xyz ... singlepage'
-- Class 'eventlog' renamed to 'logger', logger tables renamed
-  to LOGGER, LOGGER_LABELS, LOGGER_MESSAGES
-- Added property logger->categories - array of categories which will be logged. See
-  also config parameter pclib.logger.log
-- For logging, use function logger->log() now. Added property logger->storage - customizable
-  log storage
-- Dynamic SQL placeholders are marked with curly brackets {} instead of [].
-  Old syntax is deprecated.
-  You can allow old syntax with config parameter pclib.compat_db
-- Added pdo_sqlite and pdo_mysql database drivers
-- Class app has been rewriten significantly and now you must initialize app object before
-  using of other pclib objects. It contains global services, layout template, manage exceptions
-  and error handling and handle http requests. See examples, please.
-- Nice URL support. For using nice urls copy pclib/install/.htaccess to your web-root.
-  For your own format of nice-url, override methods app->getroute() and app->geturl()
-- PClib default urls now uses '?r=route' instead of '?module=m&action=a'
-- Class app_module renamed to app_controller, some changes in internal structure
-- Minor changes and bugfixes
-
-1.8.9
-- controller classname has postfix '_controller' by default
- (variable $app->CONTROLLER_POSTFIX)
-- added $app->routestr (return current route string)
-- added $app->getsession(), $app->setsession(), $app->deletesession(),
-  changed internal session structure.
-- $app->error(), $app->warning() can take array of arguments (messages)
-- $app->run() can take route string as argument
-- added $authc->setright(), $authc->setrole()
-- added 'pclib.randomhash.characters' bank to $config for function randomhash()
-- added function $db->run_dump($filename) Execute sql-dump file $filename
-- added $db_driver->version() Return database driver version
-- added mimetype(), filedata(), randomhash(), dump()
-- added javascript functions pclib.getUrl(rs), pclib.redirect(rs) for route -> url conversion
-- Minor changes and bugfixes
-
-1.9.3
-- Added class debugger
-- Added functions $app->getdebugger(), $app->getcontroller(), $app->getmodel()
-- Application error handlers now uses debugger object
-- Function dump() (var_dump() replacement) now uses debugger class
-- pclib.auth.salt renamed to pclib.auth.secret
-- added config param 'pclib.auth.hash_function'. When set, it is used for password
-  hashing. MD5 is used by default.
-- added config param 'pclib.form.buttontag'. When set to 'button', form will generate
-  <button> tag. Otherwise <input type="button"> is used. Default: 'input'
-- If you enable <button> tag, you can use attributes 'img' and 'glyph' for buttons.
-  It inserts image or font-glyph graphic into button.
-- Added csrf protection - type 'csrf' in form template. Ex: class form test csrf
-- Added regexp validation rule. Use 'pattern' atribute in form template.
-  Ex: input test pattern "[a-z]+"
-- Generating of radio and checkbox groups has been rewritten.
-  You can use {RADIO.1} {RADIO.2} for single items from radio/checkbox group.
-- attribute size of radio/check has been removed, now you can use attribute 'columns'
-  for multiple columns in radio/checkbox group. It uses css-attribute 'columns'.
-  Ex: check CARTYPES lookup "cartypes" columns "3"
-- Form validation has been rewritten, including js-validation. Added form_validator object.
-  All validation rules are supported in js-validation now.
-- Attribute 'optgroup' for element 'select' has been removed, now you can create optgroup
-  simply by adding third field in the query.
-  Ex: select CARTYPES query "select ID,NAME,COMPANY from CARTYPES order by COMPANY,NAME"
-- Database conditions can take array parameter, db->select_pair() tweaked little bit
-- Deprecated classes lazygrid, lazyform, metatpl has been removed.
-- Various finetuning, bugfixing
-
-1.9.6
-- Added class event manager (eventmng) - you can hook your functions on pclib events like this:
-  $app->events->add('pclib.app.onerror', function() {...});
-- Added class translator (removed class mls) - brand new translation service.
-- Added property $app->language = $language; - shortcut for enabling translation
-  Use $app->language = 'cs'; for czech library messages and labels
-- Added method $app->t($s) - it will translate string $s
-- czech pclib text messages moved to file localization/cs.php, default language is english
-- Removed database table MLS, added database tables TRANSLATOR, TRANSLATOR_LABELS
-- logdump() can log into pclib database logger (if $app->debugmode enabled)
-- extractpath() format string has been changed
-- form required fields are not marked "(*)" by default, but labels have css-class "required"
-  Add LABEL.required:before { color:red; content:"(*) "; } to your css styles 
-  for previous presentation of required fields
-- pclib.form.buttontag is boolean now (default false), removed pclib.mls.defaultlang
-- Added variable $app->enviroment (it can contains for example 'develop', 'test' or 'production')
-- Config file can contains variable $enviroment. It will set app->enviroment value and load 
-  specific configuration parameters for different enviroments
-- Added variable $app->debugmode
-- Added extension debugbar - you can show debugbar in your app with $app->debugmode = true;
-- Method $app->addconfig($source) has only one parameter now
-- Removed deprecated $app->modulename(), $app->input()
-- Flash messages are enveloped by <div> tag, not <p>
-- Bugfixing
-
-1.9.7
-- Indentation uses tabs instead of spaces
-- Switched to camelCase 
-  It was done with compatibility in the mind.
-  Changes has been done only where php is case insensitive.
-  You can use both variants of functions with underscore: selectOne() or select_One()
-  Exception: In class names and print_Xxx handlers underscore has been kept, so 
-  use App_Controller or print_Input() for example.
-- Documentation in source code revisited
-- Doxygen \param format changed to more common @param
-- PClib is now using typehints
-- Source code formatting cleaning up somehow
-- Changed access modifiers of some methods and attributes
-- Some minor tweaks and bugfixes
-
-1.9.8
-- Updated class Tree: Bugfixes, added methods getChidren(), addChildren(), rmCHildren(), addNodeBefore()
-  added property $tree->LEVEL_SEPAR
-- pclib.js cleaned up
-
-1.9.10
-- php 5.3 is required
-- Added class BaseObject
-- Added class Autoloader
-- Added class ErrorHandler
-- Removed class Eventmng (replaced with new event handling support in BaseObject)
-- AuthC renamed to AuthManager, renamed db-driver classes (see pclib/system/database/)
-- Directory structure reorganized a little bit, filenames has (mostly) same names as class inside
-- Unused config parameters has been removed, or can be set from source code
-- New config parameter 'pclib.errors' => array('display', 'develop', 'log', 'template') 
-  You can use any combination of parameters: 
-   - display - show error messages
-   - develop - show development details such as stack trace
-   - log - do error logging
-   - template - path to template file used for error messages in production mode
-- New config parameter 'pclib.locale' replaces old parameters dateformat and datetimeformat
-- New config parameter 'pclib.logger' enables $app->logger
-- New config parameter 'pclib.compatibility' enables backward compatibility mode - by default, everything is on
-- New config parameter 'pclib.directories' different paths used by pclib objects
-
-1.9.15
-- Improved App->message(), App->errors(): You can use individual css-class
-- Layout template: message container must be declared as 'messages PRECONTENT'
-- Added App->paths, App->httpError(), App->router, App->enviromentIp()
-- Added Tpl->disable()
-- Added classes Router, Action
-- Added Request->clientIp(), Request->serverIp()
-- Routing code rewritten and moved from App to Router
-- App->enviroment rewritten, now it is based on server IP address
-- Exceptions moved to system/exceptions.php
-- various bugfixes
-
 2.0.0
 - Added namespaces: Most used classes (App, Grid, Form, Auth,...) are in namespace pclib
   i.e. pclib\App, pclib\Grid, ...
@@ -414,3 +82,62 @@
 - Added calculated fields
 - bugfixes
 - PHP 5.4 is required
+
+2.4.0
+- Removed php notices
+- Added FileStorage->copyFile(), css-class "sort active", tag "select multiple", AuthConsole->executeScript()
+- Added Tree.setQuery(), Tree.htmlTemplate()
+- Bugfixes
+
+2.6.0
+- Added 'size_mb' atrribute to input file (max allowed size of file in MB)
+- Improved DebugBar ($app->debugMode = true)
+- Added EventManager. Changed working with events. Example: $app->events->on('app.error', $myHandler);
+- Added function ddump(), jdump() rewritten
+- Added Controller->action(), Controller->template() - shortcuts to call action or create template
+- Added Controller->authorize() - use it before actions requiring authorization
+- Set BaseController->defaultAction() for page-not-found message
+- Added AuthUser->changePassword()
+- Removed legacy features - config key 'pclib.compatibility'
+- Added config key 'pclib.app' - quick setup of the application (databaze connection, auth, logger, default route etc.)
+- Some bugfixes, as always
+
+
+2.6.5
+- Class Tree rewritten (output is fully customizable with template now)
+- Added Grid->exportExcel(), Db->insertUpdate(), Form->getFile()
+- Db: Support of array-to-list parameters
+- Added function safe_session_start()
+- Cleaning up, bugfixes
+
+2.7.0
+- PHP 8.2 support
+- Date format uses date() instead of deprecated strftime()
+- Security fixes
+- Added Db->slowQueryLog
+
+2.8.0
+- Enabled config parameter tpl-escape - template variables are escaped by default
+- Form is generating &lt;button> tag for buttons by default
+- Removed XHTML support, removed Form ajaxget
+- Added template globals: TplGlobals class
+- Added application parameters: AppParams class
+- Added bcrypt-md5 password hash algo
+- Added Db->info, Db->fetchPair(), Selection->selectPair()
+- Added Grid->setFields()
+- Php 7 and 8 fixes, various small changes and improvements
+
+2.8.5
+- Rewritten FileStorage API
+- Improved Layout->addScripts()
+- Added Auth->reloadLoggedUser()
+- Improved GridPager, removed pager "nohide", added {pager.visible}
+- Improved jdump(), added debug_sql_log()
+- Bugfixes
+
+2.8.8
+- Added template attribute 'default' for button
+- Added Model relationsCache
+- Added Model events (model.before-save, model.after-save, model.before-delete, model.after-delete)
+- Added template attribute 'notranslate' for lookup tags (do not translate lookup values)
+- Bugfixes, small updates

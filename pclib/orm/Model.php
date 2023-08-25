@@ -661,6 +661,7 @@ function getValue($name)
 protected function getCalculated($name)
 {
 	$el = $this->getElement($name);
+	if ($el['get'] == 1) $el['get'] = 'get'.ucfirst($name);
 
 	if (!method_exists($this, $el['get'])) {
 		$class = get_class($this);
@@ -673,6 +674,7 @@ protected function getCalculated($name)
 protected function setCalculated($name, $value)
 {
 	$el = $this->getElement($name);
+	if ($el['set'] == 1) $el['set'] = 'set'.ucfirst($name);
 
 	if (!method_exists($this, $el['set'])) {
 		$class = get_class($this);
