@@ -956,7 +956,7 @@ function htmlTag($name, $attr = [], $content = null, $startTagOnly = false)
 	foreach($attr as $k => $v) {
 		if (is_array($v)) $v = implode(' ', $v);
 		if (is_numeric($k)) $html .= " $v";
-		elseif(strlen($v ?: '')) $html .= " $k=\"$v\"";
+		elseif(strlen((string)$v)) $html .= " $k=\"$v\"";
 	}
 
 	if ($startTagOnly) {

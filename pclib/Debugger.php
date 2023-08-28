@@ -267,7 +267,7 @@ function getSource($fileName, $line, $width = 3)
 private function relpath($path)
 {
  $webroot = str_replace($_SERVER['SCRIPT_NAME'], '', $_SERVER['SCRIPT_FILENAME']);
- return strtr(substr($path ?: '', strlen($webroot)), "\\", "/");
+ return strtr(substr((string)$path, strlen($webroot)), "\\", "/");
 }
 
 
