@@ -362,7 +362,7 @@ function rGrant($srole, $sright, $rval = '1', $obj_id = 0)
 	if (!$right_id) return false;
 
 	$this->db->delete($this->REGISTER_TAB,
-	"ROLE_ID={0} AND RIGHT_ID={1} AND OBJ_ID='{2}'",
+	"ROLE_ID='{0}' AND RIGHT_ID='{1}' AND OBJ_ID='{2}'",
 	$role_id, $right_id, $obj_id);
 
 	if (isset($rval)) {
@@ -396,7 +396,7 @@ function uGrant($suser, $sright, $rval = '1', $obj_id = 0)
 	if (!$right_id) return false;
 
 	$this->db->delete($this->REGISTER_TAB,
-	"USER_ID={0} AND RIGHT_ID={1} AND OBJ_ID='{2}'",
+	"USER_ID='{0}' AND RIGHT_ID='{1}' AND OBJ_ID='{2}'",
 	$user_id, $right_id, $obj_id);
 	if (isset($rval)) {
 		$right = array(
@@ -432,7 +432,7 @@ function uRole($suser, $srole, $assign = true, $obj_id = 0)
 
 	if ($assign) {
 		if ($this->db->exists(
-			$this->USERROLE_TAB, "USER_ID={0} AND ROLE_ID={1}", $uid, $rid)) {
+			$this->USERROLE_TAB, "USER_ID='{0}' AND ROLE_ID='{1}'", $uid, $rid)) {
 				$this->setError('User already has this role.');
 				return false;
 			}
