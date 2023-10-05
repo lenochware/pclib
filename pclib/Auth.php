@@ -38,6 +38,9 @@ public $realm;
 /** Check if remote address changed. */
 public $verifyRemote = true;
 
+/** Delete plain-text default password from database on first login. */
+public $cleanDefaultPassword = true;
+
 /** var AuthUser User which is logged in. */
 public $loggedUser;
 
@@ -145,6 +148,11 @@ function login($userName, $password)
 	if ($result == 'LOGIN_OK') {
 		$this->setLoggedUser($user);
 		$user->values['IP'] = $this->getUserIp($user);
+
+		if ($this->cleanDefaultPassword and $user->hasDefaultPassword()) {
+			$user->changePassword($password);
+		}
+
 		$user->values['LAST_LOGIN'] = date('Y-m-d H:i:s');
 		$this->getStorage()->setUser($user);
 		$this->trigger('auth.login', ['user' => $user]);

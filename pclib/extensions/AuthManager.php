@@ -29,7 +29,7 @@ public $db;
 
 public $USERNAME_PATTERN = "/^[a-z0-9\._\-\@]+$/i";
 
-public $defaultPasswordLength = 8;
+public $defaultPasswordLength = 10;
 
 public $USERS_TAB = 'AUTH_USERS',
 	$REGISTER_TAB = 'AUTH_REGISTER',
@@ -119,7 +119,7 @@ function mkUser($sname, $fullName = null, $srole = null, $annot = '')
 	$user = array (
 	'USERNAME' => $sname,
 	'FULLNAME' => $fullName,
-	'DPASSW' => $this->genPassw(),
+	//'DPASSW' => $this->genPassw(),
 	'DT' => date("Y-m-d H:i:s"),
 	'ANNOT' => $annot
 	);
@@ -506,8 +506,7 @@ function setUser($sname, array $user)
 }
 
 /**
- * Set password $passw for user $sname. Password with length < 6
- * generates warning. Empty password will enable default password.
+ * Set password $passw for user $sname.
  * @param string $sname "user_name" or "#user_id"
  * @param string $passw Password
  * @return bool $ok
@@ -517,7 +516,7 @@ function setPassw($sname, $passw)
 	$uid = $this->sname($sname, 'user');
 	if (!$uid) return false;
 	if (strlen($passw) > 0) $passw = $this->passwordHash($passw);
-	$this->db->update($this->USERS_TAB, "PASSW='$passw'", pri($uid));
+	$this->db->update($this->USERS_TAB, "PASSW='$passw',DPASSW=''", pri($uid));
 	$this->modified($this->USERS_TAB, $uid);
 	return true;
 }

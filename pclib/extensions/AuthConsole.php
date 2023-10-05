@@ -362,7 +362,11 @@ protected function executeCmd($cmd)
 				}
 
 				$ok = $this->mng->mkUser($name, $fullname, null, $annot);
-				if ($ok) $this->message("User `%s` added.", $name);
+				if ($ok) {
+					$password = $this->mng->genPassw();
+					$this->mng->setPassw($name, $password);
+					$this->message("User `%s` added with password: %s", [$name, $password]);
+				}
 				break;
 			case '-user':
 				$ok = $this->mng->rmUser($name);
@@ -451,10 +455,9 @@ protected function executeCmd($cmd)
 				$user = array();
 
 				$uid = $this->mng->sname($m_name, 'user');
-				$user['DPASSW'] = $passw? $passw : $this->mng->genPassw();
-				$ok = $this->mng->setUser('#'.$uid, $user);
-				if ($ok) $this->mng->setPassw($m_name, '');
-				if ($ok) $this->message("Default password enabled: %s", $user['DPASSW']);
+				$password = $passw? $passw : $this->mng->genPassw();
+				$ok = $this->mng->setPassw('#'.$uid, $password);
+				if ($ok) $this->message("Default password set: %s", $password);
 			}
 			else $this->setError('Runtime error in `%s`', $cmd[0]);
 		break;
