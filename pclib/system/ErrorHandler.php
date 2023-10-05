@@ -206,7 +206,7 @@ class ErrorHandler extends BaseObject
 			);
 		}
 		catch(\Exception $ex) {
-			print "<br>Error while logging exception: ".$ex->getMessage();
+			//print "<br>Error while logging exception: ".$ex->getMessage(); //silently ignore logger exceptions
 		}
 	}
 

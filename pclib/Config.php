@@ -37,4 +37,8 @@ $config = [
 	],
 ];
 
+$production = [
+	'pclib.errors' => ['display', 'log'],
+];
+
 ?>
