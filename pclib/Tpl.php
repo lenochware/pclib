@@ -265,14 +265,14 @@ function disable()
 /**
  * Set attribute globally for template elements.
  *
- * @param string $id Attribute id
- * @param string $value Attribute value
- * @param string $block Set attribute for specified block
+ * @param string $id Element/Attribute id
+ * @param string $value Attribute id/Attribute value
+ * @param string $value2 Attribute value
  */
-function setAttr($id, $value, $block = null)
+function setAttr($id, $value, $value2 = null)
 {
-	if ($block) {
-		$this->elements[$block][$id] = $value;
+	if (isset($value2)) {
+		$this->elements[$id][$value] = $value2;
 	}
 	else {
 		$this->header[$id] = $value;

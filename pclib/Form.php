@@ -699,7 +699,7 @@ function print_Checkbox($id, $sub, $value, $i = null)
 		$label = $elem['items'][$sub];
 		$html = "<label>$html$label</label>";
 	}
-	if ($tag['checked']) $html .= $this->ieFix($tag['id'], $tag['name'], $cbid);
+	if ($tag['checked']) $html .= $this->ieFix($id, $tag['name'], $cbid);
 	print $html;
 }
 
@@ -722,7 +722,7 @@ function print_Radio($id, $sub, $value, $i = null)
 		$label = $elem['items'][$sub];
 		$html = "<label>$html$label</label>";
 	}
-	if ($tag['checked']) $html .= $this->ieFix($tag['id'], $tag['name'], $cbid);
+	if ($tag['checked']) $html .= $this->ieFix($id, $tag['name'], $cbid);
 	print $html;
 }
 

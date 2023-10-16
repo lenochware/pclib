@@ -116,9 +116,9 @@ protected function getValues()
 	return $rows;
 }
 
-function setAttr($id, $value, $block = null)
+function setAttr($id, $value, $value2 = null)
 {
-	$this->form->setAttr($id, $value, $block);
+	$this->form->setAttr($id, $value, $value2);
 }
 
 /**
