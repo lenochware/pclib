@@ -1284,7 +1284,7 @@ protected function head()
 
 	if (!empty($this->header['fileupload'])) $tag['enctype'] = 'multipart/form-data';
 
-	$html = $this->htmlTag('form', $tag, null, true)."\n";
+	$html = $this->htmlTag('form', $tag)."\n";
 
 	$hidden = (array)$hidden + $this->extraHidden; 
 	foreach ($hidden as $k => $v) {

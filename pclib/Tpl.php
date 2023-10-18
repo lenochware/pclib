@@ -636,7 +636,7 @@ function print_Link($id, $sub, $value)
 	}
 
 	if ($elem['img']) {
-		$lb = $this->htmlTag('img', ['src' => $elem['img'], 'title' => $elem['lb'], 'class' => 'link'], '');
+		$lb = $this->htmlTag('img', ['src' => $elem['img'], 'title' => $elem['lb'], 'class' => 'link']);
 	}
 	elseif ($elem['glyph']) {
 		$lb = $this->htmlTag('span', ['class' => $elem['glyph'], 'title' => $elem['lb']], '');
@@ -947,7 +947,7 @@ private function insertAfter(array $a, array $elem, $after)
 /** 
  * Return html tag $name with attributes $attr: "<$name $attr>$content</$name>".
  */
-function htmlTag($name, $attr = [], $content = null, $startTagOnly = false)
+function htmlTag($name, $attr = [], $content = null)
 {
 	$html = '<'.$name;
 	if(isset($attr['__attr'])) {
@@ -960,10 +960,7 @@ function htmlTag($name, $attr = [], $content = null, $startTagOnly = false)
 		elseif(strlen((string)$v)) $html .= " $k=\"$v\"";
 	}
 
-	if ($startTagOnly) {
-		return $html.'>';
-	}
-	elseif (!isset($content)) {
+	if (!isset($content)) {
 		return $html.'>';
 	}
 	else {
