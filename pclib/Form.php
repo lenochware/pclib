@@ -666,7 +666,7 @@ function print_Checkbox_Radio_Group($id, $sub, $value)
 	$style = array_get($elem['html'], 'style');
 	$class = trim(($is_radio?'radio':'checkbox').'-group '.$class);
 	if ($c = $elem['columns'])
-		$style = "-moz-columns:$c;-webkit-columns:$c;columns:$c;".$style;
+		$style = "columns:$c;".$style;
 
 	print '<div id="'.$id.'-group" class="'.$class.'"'.($style? ' style="'.$style.'"':'').'>';
 	$i = 0;
