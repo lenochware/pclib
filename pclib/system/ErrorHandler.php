@@ -186,7 +186,7 @@ class ErrorHandler extends BaseObject
 
 		try {
 			$template = $this->options['template'];
-			$t = new Tpl($template? $template : PCLIB_DIR.'assets/error.tpl');
+			$t = new Tpl($template? $template : PCLIB_DIR.'tpl/error.tpl');
 			$t->values = $this->getValues($e);
 			print $t->html();
 		}

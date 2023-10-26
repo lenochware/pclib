@@ -50,7 +50,7 @@ class Tree extends system\BaseObject
   {
     parent::__construct();
 
-    if (!$path)  $path = PCLIB_DIR.'assets/default-tree.tpl';
+    if (!$path)  $path = PCLIB_DIR.'tpl/default-tree.tpl';
 
     $this->tpl = new PCTpl($path);
     $this->reset();

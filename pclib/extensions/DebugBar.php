@@ -97,7 +97,7 @@ protected function log($category, $message)
 
 function html()
 {
-	$t = new PCTpl(PCLIB_DIR.'assets/debugbar.tpl');
+	$t = new PCTpl(PCLIB_DIR.'tpl/debugbar.tpl');
 	$t->values['POSITION'] = $this->app->config['pclib.debugbar.position'] ?: $this->positionDefault;
 	$t->values['VERSION'] = PCLIB_VERSION;
 	$t->values['TIME'] = $this->getTime($this->startTime);
@@ -176,9 +176,9 @@ protected function logUrl()
 
 protected function printLogWindow()
 {
-	print file_get_contents(PCLIB_DIR.'assets/debugmenu.tpl');
+	print file_get_contents(PCLIB_DIR.'tpl/debugmenu.tpl');
 	print '<h4>Debug Log</h4>';
-	$grid = new PCGrid(PCLIB_DIR.'assets/debuglog.tpl');
+	$grid = new PCGrid(PCLIB_DIR.'tpl/debuglog.tpl');
 	$data = $this->logger->getLog(100, array('LOGGERNAME' => $this->logger->name));
 	$grid->setArray($data);
 	print $grid;
@@ -187,7 +187,7 @@ protected function printLogWindow()
 
 protected function printInfoWindow()
 {
-	print file_get_contents(PCLIB_DIR.'assets/debugmenu.tpl');
+	print file_get_contents(PCLIB_DIR.'tpl/debugmenu.tpl');
 	print '<h4>_SESSION</h4>';
 	print $this->getDump($_SESSION);
 	print '<h4>_COOKIE</h4>';

@@ -18,7 +18,7 @@ $config = [
 	'pclib.locale' => ['date' => 'd. m. Y', 'datetime' => 'd.m.Y H:i:s'],
 
 	'pclib.directories' => [
-		'assets' => '{pclib}/assets/',
+		'assets' => '{pclib}/www/',
 		'localization' => '{webroot}{pclib}/localization/',
 		'uploaded' => '{basedir}/uploaded',
 	],

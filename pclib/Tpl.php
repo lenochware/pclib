@@ -75,7 +75,7 @@ private $inBlock = array();
 /** Function for escaping html in template values. */
 public $escapeHtmlFunction;
 
-public $defaultTemplatePath =  PCLIB_DIR.'assets';
+public $defaultTemplatePath =  PCLIB_DIR.'tpl';
 
 /** List of id's to be printed in {grid.fields} tag. */
 protected $fields = [];
