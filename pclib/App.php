@@ -275,7 +275,7 @@ public function configure()
 
 	if (!empty($c['db'])) $this->db = new pclib\Db($c['db']);
 	if (!empty($c['logger'])) $this->logger = new pclib\Logger();
-	if (!empty($c['file-storage'])) $this->fileStorage = new pclib\FileStorage($this->config['pclib.directories']['uploaded']);
+	if (!empty($c['file-storage'])) $this->fileStorage = new pclib\FileStorage($c['file-storage']);
 	if (!empty($c['language'])) $this->setLanguage($c['language']);
 	if (!empty($c['debugbar'])) $this->debugMode = true;
 	if (!empty($c['friendly-url'])) $this->router->friendlyUrl = true;

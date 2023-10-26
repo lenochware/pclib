@@ -20,7 +20,6 @@ $config = [
 	'pclib.directories' => [
 		'assets' => '{pclib}/www/',
 		'localization' => '{webroot}{pclib}/localization/',
-		'uploaded' => '{basedir}/uploaded',
 	],
 
 	'pclib.security' => ['tpl-escape' => true, 'csrf' => false, 'form-prevent-mass' => false],
@@ -30,7 +29,7 @@ $config = [
 		'db' => '',
 		'auth' => false,
 		'logger' => false,
-		'file-storage' => false,
+		'file-storage' => '',
 		'language' => 'cs',
 		'default-route' => '',
 		'layout' => '',
