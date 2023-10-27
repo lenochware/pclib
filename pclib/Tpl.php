@@ -347,7 +347,7 @@ function getBlock($block)
 **/
 function getValue($id)
 {
-	if (strpos($id, '_tvar_') === 0) {
+	if (strpos($id, '_tvar_') === 0 or $id[0] == '@') {
 		return $this->getVariable($id);
 	}
 
@@ -371,25 +371,31 @@ function getValue($id)
 /** Get template variable _tvar_... */
 protected function getVariable($id)
 {
-	$bid = $this->inBlock[0];
-	$b = $this->elements[$bid];
 
-	$parts = explode('_', $id, 4);
+	if (strpos($id, '_tvar_') === 0) {
+		$id = '@'.substr($id, 6);
+	}
 
-	if (in_array($parts[2], array('get', 'post', 'cookie', 'session'))) {
-		$value = $this->getHttpVariable($parts[2], $parts[3]);
+	if (isset($this->inBlock[0])) {
+		$bid = $this->inBlock[0];
+		$b = $this->elements[$bid];		
+	}
+
+	if (strpos($id, '@GET') === 0) {
+		list($tmp, $key) = explode('_', $id);
+		$value = $_GET[$key];
 	}
 	else {
 		switch ($id) {
-			case '_tvar_baseurl': $value = BASE_URL; break;
-			case '_tvar_rowno': $value = $this->getRowNo(); break;
-			case '_tvar_count': $value = count($this->values[$bid]); break;
-			case '_tvar_top': $value = ($b['rowno'] == 0)? '1':'0'; break;
-			case '_tvar_bottom': $value = ($b['rowno'] == count($this->values[$bid]) - 1)? '1':'0'; break;
+			case '@baseurl': $value = BASE_URL; break;
+			case '@rowno': $value = $this->getRowNo(); break;
+			case '@count': $value = count($this->values[$bid]); break;
+			case '@top': $value = ($b['rowno'] == 0)? '1':'0'; break;
+			case '@bottom': $value = ($b['rowno'] == count($this->values[$bid]) - 1)? '1':'0'; break;
 		}	
 	}
 	
-	return $this->escapeHtmlFunction($value);
+	return $value; //$this->escapeHtmlFunction($value);
 }
 
 //unsafe
