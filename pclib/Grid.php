@@ -306,7 +306,7 @@ function print_Element($id, $sub, $value)
 			print $elem['lb']? $elem['lb']:$id;
 		return;
 	}
-	elseif ($sub == 'value') {
+	elseif ($sub == 'value' or $sub == 'int_value' or $sub == 'string_value') {
 		parent::print_Element($id, $sub, $value);
 		return;
 	}

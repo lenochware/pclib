@@ -372,7 +372,7 @@ function print_Element($id, $sub, $value)
 		return;
 	}
 
-	if ($sub == 'value') {
+	if ($sub == 'value' or $sub == 'int_value' or $sub == 'string_value') {
 		parent::print_Element($id, $sub, $value);
 		return;
 	}

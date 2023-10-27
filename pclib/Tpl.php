@@ -492,6 +492,14 @@ function print_Element($id, $sub, $value)
     print $value;
     return;
   }
+  elseif ($sub == 'int_value') {
+    print (int)$value;
+    return;
+  }
+  elseif ($sub == 'string_value') {
+    print json_encode($value);
+    return;
+  }
 
 	if (isset($this->types[$elem["type"]])) {
 		print call_user_func($this->types[$elem["type"]], $this, $id, $sub, $value);
