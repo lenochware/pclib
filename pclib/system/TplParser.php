@@ -280,6 +280,7 @@ class TplParser extends BaseObject
 
 				$elements[$block] += [
 					'noprint' => null, 
+					'onprint' => null, 
 					'if' => null, 
 					'ifnot' => null, 
 					'repeat' => null,

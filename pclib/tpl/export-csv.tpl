@@ -6,9 +6,9 @@ class grid
 {elements}
 pager pager
 ?:>
-{block head}{:{name}.lb:}{if not _tvar_bottom}<csv-separ>{/if}{/block}
+{block head}{:{name}.lb:}{if not @block_bottom}<csv-separ>{/if}{/block}
 <csv-row-separ>
 {:block items:}
-{block columns}{:{name}:}{if not _tvar_bottom}<csv-separ>{/if}{/block}
-{:if not _tvar_last:}<csv-row-separ>{:/if:}
+{block columns}{:{name}:}{if not @block_bottom}<csv-separ>{/if}{/block}
+{:if not @block_last:}<csv-row-separ>{:/if:}
 {:/block:}

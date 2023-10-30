@@ -383,15 +383,15 @@ protected function getVariable($id)
 
 	if (strpos($id, '@GET') === 0) {
 		list($tmp, $key) = explode('_', $id);
-		$value = $_GET[$key];
+		$value = array_get($_GET, $key);
 	}
 	else {
 		switch ($id) {
 			case '@baseurl': $value = BASE_URL; break;
-			case '@rowno': $value = $this->getRowNo(); break;
-			case '@count': $value = count($this->values[$bid]); break;
-			case '@top': $value = ($b['rowno'] == 0)? '1':'0'; break;
-			case '@bottom': $value = ($b['rowno'] == count($this->values[$bid]) - 1)? '1':'0'; break;
+			case '@block_rowno': $value = $this->getRowNo(); break;
+			case '@block_count': $value = count(array_get($this->values, $bid, [])); break;
+			case '@block_top': $value = ($b['rowno'] == 0)? '1':'0'; break;
+			case '@block_bottom': $value = ($b['rowno'] == count(array_get($this->values, $bid, [])) - 1)? '1':'0'; break;
 		}	
 	}
 	

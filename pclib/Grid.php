@@ -420,17 +420,21 @@ protected function getVariable($id)
 	$page = $this->pager->getValue('page');
 	$maxpage =  $this->pager->getValue('maxpage');
 
+	if (strpos($id, '_tvar_') === 0) {
+		$id = '@'.substr($id, 6);
+	}	
+
 	switch ($id) {
-		case '_tvar_first': 
-			$value = ($page == 1 and parent::getVariable('_tvar_top'))? '1':'0';
+		case '@block_first': 
+			$value = ($page == 1 and parent::getVariable('@block_top'))? '1':'0';
 		break;	
-		case '_tvar_last': 
-			$value = ($page == $maxpage and parent::getVariable('_tvar_bottom'))? '1':'0';
+		case '@block_last': 
+			$value = ($page == $maxpage and parent::getVariable('@block_bottom'))? '1':'0';
 		break;	
 		default: return parent::getVariable($id);
 	}
 	
-	return $this->escapeHtmlFunction($value);
+	return $value;
 }
 
 /**

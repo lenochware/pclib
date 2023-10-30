@@ -133,6 +133,10 @@ class ElementsDef extends BaseObject
 						$elem = self::$elem['pager'];
 				break;
 
+			case 'variable':
+						$elem = ['skip' => 1];
+				break;
+
 			default:
 						$elem = [];
 				break;
@@ -141,7 +145,7 @@ class ElementsDef extends BaseObject
 		$elem['id'] = $id;
 		$elem['type'] = $type;
 
-		return self::$elem['base'] + $elem;
+		return  $elem + self::$elem['base'];
 	}
 
 }
