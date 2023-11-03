@@ -105,12 +105,13 @@ function __construct($path = '', $sessName = '')
 	$this->sessName = $sessName;
 	$this->loadSession();
 
+	$this->name = $sessName ?: $this->className;
+
 	if ($path) {
 		if (strpos($path, '{') !== false) {
 			$path = $this->app->path($path);
 		}
 		
-		$this->name = extractpath($path, '%f');
 		$this->load($path);
 		$this->init();
 	}
@@ -123,8 +124,9 @@ protected function _init()
 	}
 	else $this->header = [];
 
-	if(isset($this->header['name'])) $this->name = $this->header['name'];
-	if (!$this->name) $this->name = $this->className;
+	if(isset($this->header['name'])) {
+		$this->name = $this->header['name'];
+	}
 
 	$globals = $this->app->getService('globals');
 	if ($globals) $globals->addGlobals($this, $this->header);
@@ -503,7 +505,7 @@ function print_Element($id, $sub, $value)
     return;
   }
   elseif ($sub == 'string_value') {
-    print json_encode($value);
+    print json_encode((string)$value);
     return;
   }
 

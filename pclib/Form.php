@@ -480,7 +480,7 @@ protected function divPrintElement($elem)
 {
 	$id = $elem['id'];
 	if ($elem['hidden']) return;
-	print "<div class=\"form-group\">";
+	print "<div>";
 	$this->print_Element($id, 'lb', null);
 	$value = $this->getValue($id);
 	if (!$this->fireEventElem('onprint',$id, '', $value)) {
