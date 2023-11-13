@@ -772,6 +772,8 @@ function print_Select($id, $sub, $value)
 		$value = explode(',', $value);
 	}
 
+	$disabled = isset($elem['disabled']) ? $elem['disabled'] : [];
+
 	$group = '_nogroup_';
 	foreach ($items as $i => $item) {
 		if (is_array($item)) list($label,$group) = $item;
@@ -787,7 +789,14 @@ function print_Select($id, $sub, $value)
 		$i = $this->escape($i);
 		$label = $this->escape($label);
 
-		$options[$group] = array_get($options, $group)."<option value=\"$i\"$ch>$label</option>";
+		$dis = in_array($i, $disabled)? ' disabled' : '';
+		if ($dis and $ch) {
+			$dis = '';
+			$this->elements[$id]['noedit'] = 1;
+			$tag = $this->getTag($id);
+		}
+
+		$options[$group] = array_get($options, $group)."<option value=\"$i\"$ch$dis>$label</option>";
 	}
 	if (isset($options['_nogroup_'])) $html .= $options['_nogroup_'];
 	else {
