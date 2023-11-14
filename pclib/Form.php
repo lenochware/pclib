@@ -519,6 +519,11 @@ function print_Input($id, $sub, $value)
 
 	if ($elem['file'] and $sub == 'filename') { print $value; return; }
 
+	if (isset($elem['file-info']) and isset($elem['file-info'][$sub])) {
+		print $elem['file-info'][$sub];
+		return;
+	}
+
 	$html5 = $this->getAttr($elem['id'],'html5');
 	$tag = $this->getTag($id);
 	$tag['maxlength'] = $elem['maxlength']? $elem['maxlength'] : $elem['size'];
@@ -531,6 +536,8 @@ function print_Input($id, $sub, $value)
 	if ($elem['password']) $type = 'password';
 	elseif($elem['file'])  {
 		$type = 'file';
+		if (!empty($elem['accept'])) $tag['accept'] = $elem['accept'];
+
 		if ($elem['multiple']) {
 			$tag['name'] = $tag['id'].'[]';
 			$tag['multiple'] = 1;
@@ -879,7 +886,7 @@ protected function uploadFs($tableName, $id)
 		$elem = $this->elements[$file['INPUT_ID']];
 		if (!$elem or !empty($elem['nosave'])) continue;
 
-		$entity = array_get($elem, 'entity', $tableName);
+		$entity = array_get($this->header, 'entity', $tableName);
 		$files[] = $file;
 	}
 
@@ -893,7 +900,7 @@ protected function uploadFs($tableName, $id)
 	}
 }
 
-protected function uploadBasic($old = array())
+protected function uploadBasic($old = [])
 {
 	foreach ($_FILES as $id => $aFile) {
 		$elem = $this->elements[$id];
@@ -919,7 +926,7 @@ protected function uploadBasic($old = array())
  * Upload form files.
  * @param array $old List of previous versions of files - will be deleted
  */
-function upload($tableName, $id, $old = array())
+function upload($tableName, $id, $old = [])
 {
 	if ($this->fileStorage) {
 		$this->uploadFs($tableName, $id);
@@ -940,6 +947,21 @@ function getFile($id)
 	if (!$aFile['size'] or $aFile['error']) return false;
 	if ($this->fileInBlackList($this->values[$id])) return false;
 	return file_get_contents($aFile['tmp_name']);
+}
+
+function loadFiles($entityName, $id)
+{
+	$fs = $this->fileStorage;
+	if (!$fs) return false;
+	$files = $fs->getFiles([$entityName, $id]);
+
+	foreach ($files as $file) {
+		$elemId = $file['FILE_ID'];
+		$this->values[$elemId] = $file['ORIGNAME'];
+		if ($this->elements[$elemId]) {
+			$this->elements[$elemId]['file-info'] = $file;
+		}
+	}
 }
 
 /**
@@ -1012,14 +1034,15 @@ function delete($tab, $cond)
 	$this->db->delete($tab, $cond, $params);
 
 	if ($this->header['fileupload']) {
-		$this->deleteFiles($tab, $data);
+		$entity = array_get($this->header, 'entity', $tab);
+		$this->deleteFiles($entity, $data);
 	}
 }
 
-protected function deleteFiles($tableName, $data)
+protected function deleteFiles($entityName, $data)
 {
 	if ($this->fileStorage) {
-		$this->fileStorage->deleteFiles([$tableName, $data['ID'] ?: $data['id'] ]);
+		$this->fileStorage->deleteFiles([$entityName, $data['ID'] ?: $data['id'] ]);
 	}
 	else {
 		foreach ($this->elements as $id=>$elem) {

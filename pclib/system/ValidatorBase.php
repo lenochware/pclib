@@ -214,6 +214,11 @@ class ValidatorBase extends BaseObject
 			return true;
 		}
 
+		if ($elem['file']) {
+			$file = array_get($_FILES, $elem['id']);
+			$value = isset($file['name'])? $file : [];
+		}
+
 		foreach ((array)$elem as $rule => $param) {
 			if (is_null($param)) continue;
 			if (!$this->hasRule($rule)) {

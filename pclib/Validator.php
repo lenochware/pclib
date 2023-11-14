@@ -35,17 +35,44 @@ class Validator extends system\ValidatorBase
 		$this->setRule('url', array($this, 'isUrl'), "Invalid url!");
 		$this->setRule('date', array($this, 'isDateTime'), "Invalid date!");
 		$this->setRule('time', array($this, 'isTime'), "Invalid time!");
-		$this->setRule('file', array($this, 'matchShell'), "Bad file type!");
+		//$this->setRule('file', array($this, 'matchShell'), "Bad file type!");
 		$this->setRule('pattern', array($this, 'matchPattern'), "Value does not match requested format!");
 		$this->setRule('range', array($this, 'inRange'), 'Value is not in range [%4$s] !');
 		$this->setRule('number', array($this, 'isNumeric'), "Not a number!");
 		$this->setRule('integer', array($this, 'isNumericInt'), "Not an integer value!");
 		$this->setRule('minlength', array($this, 'minLength'), 'Minimum %4$s characters required!');
+		$this->setRule('size_mb', array($this, 'maxFileSize'), 'Maximum file size exceed!');
+		$this->setRule('accept', array($this, 'matchFileType'), 'Invalid file type!');
+	}
+
+	/** Rule handler: Max file size. */
+	function maxFileSize($file, $size)
+	{
+		if (!$file) return;
+		return ($file['size'] <= $size * 1024 * 1024);
+	}
+
+	/** Rule handler: Check file type. */
+	function matchFileType($file, $pattern)
+	{
+		if (!$file) return;
+
+		foreach (explode(',', $pattern) as $value) {
+			$value = trim($value);
+			if ($value[0] == '.') {
+				if (extractpath($file['name'], ".%e") == $value) return true;
+			}
+			elseif (fnmatch($value, $file['type'])) return true;
+		}
+
+		return false;
 	}
 
 	/** Rule handler: Match regexp pattern. */
 	function matchPattern($value, $pattern)
 	{
+		if (!is_scalar($value)) return false;
+
 		return (bool)preg_match('~^'.$pattern.'$~', $value);
 	}
 
@@ -64,18 +91,24 @@ class Validator extends system\ValidatorBase
 	/** Rule handler: Match php identifier. */
 	function isIdentifier($value)
 	{
+		if (!is_scalar($value)) return false;
+
 		return (bool)preg_match(self::PATTERN_IDENTIFIER, $value);
 	}
 
 	/** Rule handler: Minimum number of characters. */
 	function minLength($value, $length)
 	{
+		if (!is_scalar($value)) return false;
+
 		return (utf8_strlen($value) >= $length);
 	}
 
 	/** Rule handler: Match wildcards. */
 	function matchShell($value, $wildcards)
 	{
+		if (!is_scalar($value)) return false;
+
 		if ($wildcards == 1) $wildcards = '*';
 		$wildcards = explode(';', $wildcards);
 
@@ -101,6 +134,8 @@ class Validator extends system\ValidatorBase
 	/** Rule handler: Check if value is in range [min, max]. */
 	function inRange($value, $range)
 	{
+		if (!is_scalar($value)) return false;
+
 		if (!is_array($range)) $range = $this->parseRange($range);
 		return ($range[0] <= $value and $range[1] >= $value);
 	}
@@ -129,6 +164,8 @@ protected function parseDate($datestr, $format)
 /** Rule handler: Match datetime against format $format. */
 function isDateTime($value, $format = '')
 {
+	if (!is_scalar($value)) return false;
+
 	if (!$format or $format == 1) $format = $this->dateTimeFormat;
 	list($d,$m,$y,$h,$i,$s) = $this->parseDate($value, $format);
 	if (!checkdate($m,$d,$y)) return false;
@@ -139,6 +176,8 @@ function isDateTime($value, $format = '')
 /** Rule handler: Match time in format HH:MM:SS. */
 function isTime($value)
 {
+	if (!is_scalar($value)) return false;
+
 	return (bool)preg_match(self::PATTERN_TIME24, $value);
 }
 
