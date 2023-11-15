@@ -16,7 +16,7 @@
 */
 
 /* Namespace for pclib functions. */
-var pclib = {
+const pclib = {
 
 xhr: null,
 
@@ -143,6 +143,12 @@ validateForm: function(form) {
 
 					if (elem.value.match('^' + patterns[j] + '$')) {result = true; break;}
 				}
+
+				if (!this._validateFileType(elem.object)) {
+					result = false;
+					elem.message = 'form-err-file';
+				}
+
 				if (!result) {
 					if (!elem.message) elem.message = 'form-err-file';
 					isValid = false;
@@ -168,6 +174,29 @@ _validateFileSize: function(input, size_mb)
 	}
 
 	return true;
+},
+
+_validateFileType: function(input)
+{
+	if (!input.accept) return true;
+
+	const accept = input.accept.split(',');
+	const type = input.files[0].type;
+	const ext = input.files[0].name.split('.').pop();
+
+	for (let j in accept) {
+		let pattern = accept[j].trim();
+		if (pattern.charAt(0) == '.') {
+			if (pattern == ('.' + ext)) return true;
+		}
+		else {
+		 let regexPattern = pattern.replace(/\*/g, '.*');
+  		 let regex = new RegExp(`^${regexPattern}$`);
+         if (regex.test(type)) return true;
+		}
+	}
+
+	return false;
 },
 
 /**
