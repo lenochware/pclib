@@ -183,6 +183,7 @@ CREATE TABLE filestorage (
   filepath character varying(255) DEFAULT NULL,
   origname character varying(255) DEFAULT NULL,
   annot character varying(255) DEFAULT NULL,
+  hash character varying(16) DEFAULT NULL,
   entity_id integer DEFAULT NULL,
   file_id character varying(100) DEFAULT NULL,
   entity_type character varying(100) DEFAULT NULL,
@@ -194,6 +195,7 @@ CREATE TABLE filestorage (
 );
 
 CREATE INDEX i_filestorage_entity ON filestorage USING btree (entity_type, entity_id);
+CREATE INDEX i_filestorage_hash ON filestorage USING btree (hash);
 
 CREATE TABLE jobs (
   id serial NOT NULL,

@@ -76,6 +76,9 @@ function getFile($loc, $withContent = false)
 			'FILE_ID'=>$loc[2],
 		];
 	}
+	elseif(!empty($loc['HASH'])) {
+		$filter = ['HASH' => $loc['HASH']];
+	}
 	else {
 		throw new Exception('Bad parameters.');
 	}
@@ -139,7 +142,8 @@ function setFile($loc, $data)
 	}
 	else {
 		if ($data['FILEPATH_SRC']) {
-			$this->deleteFile($loc);
+			$oldFile = $this->deleteFile($loc);
+			$data['HASH'] = $oldFile['HASH'];
 			$data = $this->insertFile($loc, $data);
 		}
 		else {
@@ -181,6 +185,7 @@ function deleteFile($loc)
 	}
 
 	$this->db->delete($this->TABLE, pri($file['ID']));
+	return $file;
 }
 
 /** Upload new file into filesystem and create db record. */
@@ -200,6 +205,7 @@ protected function insertFile(array $loc, array $data)
 		'ENTITY_ID'=>   $loc[1],
 		'FILE_ID' => isset($loc[2])? $loc[2] : $this->newFileId($loc),
 		'SIZE' => filesize($path),
+		'HASH' => isset($data['HASH'])? $data['HASH'] : $this->getUniqueHash(),
 		'ORIGNAME' => $data['ORIGNAME'],
 		'MIMETYPE' => $data['MIMETYPE'],
 		'ANNOT' => $data['ANNOT'],
@@ -370,7 +376,7 @@ function output($loc, $showDownload = false)
 {
 	$file = $this->getFile($loc, true);
 	$path = $this->rootDir.$file['FILEPATH'];
-	if (!file_exists($path)) throw new FileNotFoundException("File not found.");
+	if (!$file or !file_exists($path)) throw new FileNotFoundException("File not found.");
 	$disposition = $showDownload? 'attachment':'inline';
 	header('Content-type: '.$file['MIMETYPE']);
 	header('Content-Disposition: '.$disposition.'; filename="'.$file['ORIGNAME'].'"');
@@ -463,6 +469,17 @@ protected function getDir($format, $file)
 	return $dir;
 }
 
+protected function getUniqueHash()
+{
+	$hash = randomstr(11);
+
+	while($this->db->exists($this->TABLE, "HASH='{0}'", $hash)) {
+		$hash = randomstr(11);
+	}
+
+	return $hash;
+}
+
 /**
  * Return filename used for storing particular $file.
  * You can setup filename format by setting attribute FileStorage->fileNameFormat.
@@ -473,7 +490,7 @@ protected function getFileName($format, $file)
 {
 	$file['ORIGNAME_NORMALIZED'] = $this->normalize($file['ORIGNAME']);
 	$file['EXT'] = pathinfo($file['ORIGNAME'], PATHINFO_EXTENSION);
-	$file['HASH'] = randomstr(8);
+	//$file['HASH'] = randomstr(8);
 	return paramstr($format, $file);
 }
 
