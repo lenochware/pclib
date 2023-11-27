@@ -30,17 +30,7 @@ class Router extends system\BaseObject implements IService
 	/** var Action Current %Action */
 	public $action;
 
-	/** Occurs after Action is created from HTTP request and before dispatch. */ 
-	public $onGetAction;
-
-	/** Occurs when url (link) is created from Action. */ 
-	public $onCreateUrl;
-
-	/** Occurs before redirect. */
-	public $onRedirect;
-
 	public $redirects;
-
 
 function __construct()
 {
