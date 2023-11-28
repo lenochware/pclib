@@ -26,6 +26,7 @@ $messages = array
   'Permission denied.' => 'Přístup zamítnut.',
   'Please sign in.' => 'Prosím, přihlaste se.',
   'This page requires authentication.' => 'Tato stránka vyžaduje autentizaci.',
+  'Page not found: "%s"' => 'Stránka nenalezena: "%s"',
   'yes' => 'ano',
   'no' => 'ne',
 );

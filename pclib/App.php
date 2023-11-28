@@ -425,9 +425,7 @@ function error($message, $cssClass = null)
  **/
 function httpError($code, $message, $cssClass = null)
 {
-	if (function_exists('http_response_code')) {
-		http_response_code($code);
-	}
+	http_response_code($code);
 
 	$args = array_slice(func_get_args(), 3);
 	$message = $this->text($message, $args);
