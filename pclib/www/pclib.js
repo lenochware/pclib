@@ -270,6 +270,52 @@ ajaxLoad: function (elem, url) {
 	this.xhr.send();
 },
 
+fetchLink: async function(e) {
+	e.stopPropagation();
+	e.preventDefault();
+	const response = await fetch(this.href, {method: 'GET'});
+	const text = await response.text();
+ 	
+	if (!text) return;
+
+	const data = JSON.parse(text);
+	pclib._updateDom(this, data);
+	pclib.initLinks();
+
+	//alert(response.ok);
+},
+
+fetch: async function(url) {
+	const response = await fetch(url, {method: 'GET'});
+	const text = await response.text();
+ 	
+	if (!text) return;
+
+	const data = JSON.parse(text);
+	pclib._updateDom(this, data);
+	pclib.initLinks();
+},
+
+_updateDom: function(self, data) {
+	for(id in data) {
+		let elem = (id == 'self')? self : document.getElementById(id);
+
+		if (elem) {
+			elem.insertAdjacentHTML('afterend', data[id]);
+			elem.remove();
+		}
+	}
+},
+
+initLinks: function()
+{
+	const links = document.querySelectorAll('a[data-method]');
+	links.forEach(function(elem) {
+		elem.onclick = pclib.fetchLink;
+	});
+
+},
+
 /**
  * Onclick handler for pctree.
  * @private
