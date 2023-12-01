@@ -191,5 +191,20 @@ function authorize($perm = '')
 	}
 }
 
+/**
+ * Output json data and exit. Use for actions called by ajax.
+ * @param array $data
+ * @param string $code Http response code
+ **/
+public function outputJson(array $data, $code = '')
+{
+  if ($code) {
+    http_response_code($code);
+  }
+
+  header('Content-Type: application/json; charset=utf-8');
+  die(json_encode($data, JSON_UNESCAPED_UNICODE));
+}
+
 
 }
