@@ -103,6 +103,8 @@ function log($category, $message_id, $message = null, $item_id = null)
 		}
 	}
 
+	$this->trigger('logger.log', $message);
+
 	return $this->getStorage()->log($message);
 }
 
