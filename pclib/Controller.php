@@ -26,6 +26,9 @@ public $action;
 /** authorize() fallback when user is not logged in. */
 public $authorizeRedirect = 'user/signin';
 
+/** Convert url action some-thing into someThingAction() call. */
+public $allowDashInAction = true;
+
 /**
  * Each action method name must have following postfix.
  * Only action methods are callable by sending request from user browser.
@@ -71,6 +74,13 @@ function getArgs($actionMethod, array $params)
 function findActionName($action)
 {
 	if (!$action) $action = 'index';
+
+	if ($this->allowDashInAction and strpos($action, '-')) {
+		if (strpos($action, '--')) return false;
+		$action = lcfirst(str_replace('-', '', ucwords(strtolower($action), '-')));
+		if (in_array($action.$this->ACTION_POSTFIX, get_class_methods($this))) return $action;
+		return false;
+	}
 
 	if (method_exists($this, $action.$this->ACTION_POSTFIX)) {
 		return $action;
