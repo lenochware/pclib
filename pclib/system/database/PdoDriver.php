@@ -91,9 +91,14 @@ function quote($str)
 	return $this->connection->quote($str);
 }
 
+function quoteIdent($str)
+{
+	return '"'.pcl_ident($str).'"';
+}
+
 function escape($str, $type = 'string')
 {
-	if ($type == 'ident') return $this->quote(pcl_ident($str));
+	if ($type == 'ident') return $this->quoteIdent($str);
 	if (!$str or is_numeric($str)) return $str;
 	return substr($this->connection->quote($str),1,-1);
 }

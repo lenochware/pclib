@@ -206,14 +206,19 @@ private function u_type($type, $size)
 	return $type;
 }
 
+function quoteIdent($str)
+{
+	return "`".pcl_ident($str)."`";
+}
+
 function quote($str)
 {
-	return "`".$str."`";
+	return "'".mysql_real_escape_string ($str, $this->connection)."'";
 }
 
 function escape($str, $type = 'string')
 {
-	if ($type == 'ident') return $this->quote(pcl_ident($str));
+	if ($type == 'ident') return $this->quoteIdent($str);
 	if (!$str or is_numeric($str)) return $str;
 
 	if ($this->connection)

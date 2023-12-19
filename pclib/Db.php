@@ -334,7 +334,7 @@ function insert($tab, $data)
 		$sep = '';
 		$kstr = $vstr = '';
 		foreach($data as $k => $v) {
-			$kstr .= $sep.$this->drv->quote($k);
+			$kstr .= $sep.$this->escape($k, 'ident');
 			if (is_null($v)) $vstr .= $sep."NULL";
 			else $vstr .= $sep."'".$this->escape($v)."'";
 			$sep = ',';
@@ -427,7 +427,7 @@ function replace($tab, $data)
 	if (is_array($data)) {
 		$sep = '';
 		foreach($data as $k => $v) {
-			$kstr .= $sep.$this->drv->quote($k);
+			$kstr .= $sep.$this->escape($k, 'ident');
 			if (is_null($v)) $vstr .= $sep."NULL";
 			else $vstr .= $sep."'".$this->escape($v)."'";
 			$sep = ',';
@@ -460,7 +460,7 @@ function update($tab, $data, $cond)
 		foreach($data as $k => $v) {
 			//if ($k == '' or $v == '') continue;
 			if (is_null($v)) $v = 'NULL'; else $v = "'".$this->escape($v)."'";
-			$fields .= $sep.$this->drv->quote($k)."=$v";
+			$fields .= $sep.$this->escape($k, 'ident')."=$v";
 			$sep = ',';
 		}
 	}

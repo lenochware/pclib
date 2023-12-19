@@ -138,8 +138,9 @@ private function u_type($type, $size)
 	return $type;
 }
 
-function quote($str) {
-	return "`".$str."`";
+function quoteIdent($str)
+{
+	return "`".pcl_ident($str)."`";
 }
 
 } //class
