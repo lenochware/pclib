@@ -43,7 +43,7 @@ public $layout;
 public $services = array();
 
 /** Current environment (such as 'develop','test','production'). */
-public $environment;
+public $environment = '';
 
 /** Enabling debugMode will display debug-toolbar. */
 public $debugMode = false;
@@ -72,13 +72,13 @@ function __construct($name)
 
 	$this->paths = $this->getPaths();
 
-	$this->environmentIp(
-		array(
+	if (!$this->environment) {
+		$this->environmentIp([
 			'127.0.0.1' => 'develop',
 			'::1' => 'develop',
 			'*' => 'production',
-		)
-	);
+		]);
+	}
 
 	$this->addConfig( PCLIB_DIR.'Config.php' );
 }

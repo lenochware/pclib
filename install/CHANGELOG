@@ -141,3 +141,20 @@
 - Added Model events (model.before-save, model.after-save, model.before-delete, model.after-delete)
 - Added template attribute 'notranslate' for lookup tags (do not translate lookup values)
 - Bugfixes, small updates
+
+2.9.0
+- Default password is never stored in db
+- Errors will print debug information only on localhost by default (use $app->environmentIp(['your-ip' => 'develop']) to setup develop environment)
+
+2.9.5
+- Assets moved to new directories pclib/www and pclib/tpl
+- Added Controller->allowDashInAction, Controller->outputJson()
+- Fixed escaping SQL identifiers
+- Added html5 input file attribute accept "allowed-file-types" (e.g. accept "image/*")
+- Validation file size and type ond client and server
+- Added FILESTORAGE.HASH
+- Added Form->loadFiles(): after loading you can access file information in template as {file."param"} e.g. {file.ORIGNAME}
+- Added template tag modifiers {field.int_value}, {field.string_value} (for escaping in javascript code)
+- Template variables such as {@baseurl}
+- Tpl->setAttr(), Tpl->htmlTag() clean-up
+- Added javascript function pclib.initLinks() which enable ajax links

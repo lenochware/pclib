@@ -249,11 +249,11 @@ function randomstr($size, $characters = '0123456789abcdefghijklmnopqrstuvwxyzABC
 /**
  * Configure session cookie for safe usage and call session_start().
 **/
-function safe_session_start()
+function safe_session_start($httpsOnly = false)
 {
   //ini_set('session.use_only_cookies', 1);
   ini_set('session.cookie_httponly', 1);
-  ini_set('session.cookie_secure', 1);
+  if ($httpsOnly) ini_set('session.cookie_secure', 1);
   ini_set('session.use_strict_mode', 1);
   ini_set('session.cookie_samesite', 'lax');
 

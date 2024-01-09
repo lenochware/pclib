@@ -1,0 +1,9 @@
+Poznámky ke kompatibilitě s předchozí verzí PCLIB
+
+2.9.5
+
+- Soubor pclib.js (a ostatní css a img soubory) byl přesunutý z adresáře pclib/assets do nového adresáře pclib/www. Pokud ho linkujete pomocí <script src> je potřeba upravit odkaz.
+- Pokud používáte pro práci se soubory FileStorage, je potřeba přidat do tabulky FILESTORAGE sloupec HASH VARCHAR(16)
+- Funkce Tpl->setAttr() změna signatury: $form->setAttr('noedit', true) - vypne editaci pro celý formulář, $form->setAttr('block_id' noedit', true) - pouze pro blok block_id
+- Nová metoda outputJson() v controlleru může kolidovat, pokud máte metodu se stejným názvem
+- Třída App: Prostředí je automaticky přednastavené na 'develop' pokud vyvíjíte na localhostu, jinde 'production' (nevypisuje při chybě debugovací detaily). Nastavení prostředí viz dokumentace $app->environment, $app->environmentIp()
