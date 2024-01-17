@@ -84,6 +84,8 @@ function log($category, $message_id, $message = null, $item_id = null)
 	if (!in_array('ALL', $this->categories)
 		and !in_array($category, $this->categories)) return false;
 
+	$ua = $this->app->request->userAgent;
+
 	$message = array(
 		'LOGGER' => $this->name,
 		'CATEGORY' => $category,
@@ -91,7 +93,7 @@ function log($category, $message_id, $message = null, $item_id = null)
 		'MESSAGE' => $message,
 		'ITEM_ID' => $item_id,
 		'IP'       => ip2long($this->app->request->clientIp),
-		'UA'       => implode(' ', $this->app->request->userAgent),
+		'UA'       => $ua[0] . ' ' . $ua[1],
 		'DT'       => date("Y-m-d H:i:s"),
 	);
 

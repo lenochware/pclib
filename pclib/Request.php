@@ -23,7 +23,7 @@ use pclib;
 class Request extends system\BaseObject implements IService
 {
 
-protected $userAgents = array('Chrome', 'Safari', 'Konqueror', 'Opera', 'Firefox', 'Netscape', 'MSIE');
+protected $userAgents = array('Chrome', 'Safari', 'Opera', 'Firefox', 'MSIE');
 
 protected $headers;
 
@@ -145,6 +145,14 @@ function getHeaders()
 }
 
 /**
+ * Return request body.
+ */
+function getRawBody()
+{
+  return file_get_contents('php://input');
+}
+
+/**
  * Match current url against pattern.
  * @param string $pattern fnmatch pattern Example: 'http://localhost/*'
  */
@@ -165,6 +173,8 @@ function getUserAgent()
 		if (stristr($signature, $name)) { $agent = $name; break; }
 	}
 
+	if (stristr($signature, ' Edg/')) $agent = 'Edge';
+
 	if ($agent) {
 		$version = substr(stristr($signature, $agent),strlen($agent)+1);
 		list($major,$minor) = sscanf($version, "%d.%d");
@@ -173,9 +183,12 @@ function getUserAgent()
 
 	if (!$agent and stristr($signature, 'Mozilla')) $agent = 'Mozilla like';
 	if (!$agent) $agent = '?';
-	if (stristr($signature, 'Linux')) $os = 'Linux';
-	elseif (stristr($signature, ' Mac')) $os = 'MacOS';
-	elseif (stristr($signature, 'Windows')) $os = 'Windows';
+	
+	if (stristr($signature, 'Windows')) $os = 'Windows';
+	elseif (stristr($signature, 'iPhone')) $os = 'iPhone';
+	elseif (stristr($signature, 'Android')) $os = 'Android';
+	elseif (stristr($signature, 'Mac OS')) $os = 'MacOS';
+	elseif (stristr($signature, 'Linux')) $os = 'Linux';
 	else $os = '?';
 
 	return array($os,$agent,$version);

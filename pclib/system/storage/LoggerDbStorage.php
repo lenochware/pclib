@@ -79,6 +79,8 @@ function delete($keepDays, $allLogs = false)
 function getLabelId($label, $category)
 {
 	$this->service('db');
+
+	$label = substr($label, 0, 80);
 	
 	list($id) = $this->db->select($this->LABELS_TAB.':ID',
 		"LABEL='{0}' AND CATEGORY='{1}'", $label, $category
