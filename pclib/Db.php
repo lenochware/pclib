@@ -235,7 +235,7 @@ function query($_sql, $param = null)
   $tmEnd = microtime(true);
   if ($this->slowQueryLog and $tmEnd - $tm > $this->slowQueryLog) {
   	if (!strpos($this->lastQuery, 'LOGGER')) { //avoid recursion
-  		$this->app->log('db', 'slow-query', $this->lastQuery . sprintf(" (%01.2fs)", $tmEnd - $tm));
+  		$this->app->log('db', 'db/slow-query', $this->lastQuery . sprintf(" (%01.2fs)", $tmEnd - $tm));
   	}	
   }
 

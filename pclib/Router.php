@@ -51,6 +51,7 @@ function getAction()
 	//%form button has been pressed, set route accordingly.
 	if (!empty($_REQUEST['pcl_form_submit'])) {
 		$action->method = $_REQUEST['pcl_form_submit'];
+		$action->setPath($action->controller.'/'.$action->method);
 	}
 
 	return $action;

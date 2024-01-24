@@ -201,7 +201,7 @@ class ErrorHandler extends BaseObject
 		try {
 			$error = $this->getValues($e);
 			
-			$this->service('logger')->log($error['severity'], $error['severity'],
+			$this->service('logger')->log('php/error', $error['severity'],
 				paramStr("{exceptionClass}: {message} in '{file}' on line {line} processing '{route}' at {timestamp}", $error)
 			);
 		}
