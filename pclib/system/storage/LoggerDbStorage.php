@@ -115,9 +115,9 @@ function getLog($rowCount, array $filter = null)
 		left join $this->MESSAGES_TAB LM on LM.LOG_ID=L.ID
 		 where 1=1
 		~ AND L.LOGGER = '{LOGGER}'
-		~ AND L.CATEGORY='{CATEGORY}'
-		~ AND U.USERNAME like '{USERNAME}%'
-		~ AND LL2.LABEL like '{ACTIONNAME}%'
+		~ AND LL4.LABEL like '%{CATEGORY}%'
+		~ AND U.USERNAME like '%{USERNAME}%'
+		~ AND LL2.LABEL like '%{ACTIONNAME}%'
 		order by L.ID desc", $filter
 	);
 

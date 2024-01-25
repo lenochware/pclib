@@ -575,9 +575,7 @@ function print_String($id, $sub, $s)
 	if (isset($elem['size'])) {
 		if (!isset($elem['endian'])) $elem['endian'] = '...';
 		if(utf8_strlen($s) > $elem['size'] + 2/*add length of endian*/) {
-			if ($elem['tooltip']) {
-				$title = utf8_htmlspecialchars($s);
-			}
+			if ($elem['tooltip']) $title = $s;
 			$s = utf8_substr($s, 0, $elem['size']) . $elem['endian'];
 		}
 	}
