@@ -42,6 +42,9 @@ class Tree extends system\BaseObject
 
   public $values;
 
+  /** If set, it will check user rights against RKEY column. */
+  public $auth = null;
+
   /**
    * Create %Tree instance.
    * @param string $path Filename of template file. By default it uses default-tree.tpl.
@@ -135,6 +138,9 @@ class Tree extends system\BaseObject
     foreach ($nodes as $node) {
       $this->addNode($node);
     }
+
+    if ($this->auth) $this->map([$this, 'authFilter']);
+
   }
 
   /**
@@ -191,6 +197,17 @@ class Tree extends system\BaseObject
   {
     foreach ($this->nodes as $node) {
       if ($node[$key] == $value) return $node;
+    }
+  }
+
+  /**
+   * Call $fn for each node.
+   * @param callable $fn(array $node) : array Callback function. It takes %Tree $node and must return this $node.
+   */
+  function map(callable $fn)
+  {
+    foreach ($this->nodes as $i => $node) {
+      $this->nodes[$i] = call_user_func($fn, $node);
     }
   }
 
@@ -325,6 +342,15 @@ class Tree extends system\BaseObject
     foreach($this->nodes as $i => $node) {
       if ($node['LEVEL'] <= $level) $this->nodes[$i]['OPEN'] = 'open';
     }
+  }
+
+  protected function authFilter($node)
+  {
+    if ($node['RKEY'] and !$this->auth->hasRight($node['RKEY'])) {
+      $node['ACTIVE'] = 0;
+    }
+
+    return $node;
   }
 
   /**
