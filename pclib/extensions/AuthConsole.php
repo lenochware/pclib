@@ -100,7 +100,10 @@ function execute($line)
 	if (!$this->masterCmd) {
 		$master = array_shift($terms);
 		$ok = $this->executeCmd($master);
-		if (!$ok) return false;
+		if (!$ok) {
+			$this->setError($this->mng->errors[0]);
+			return false;
+		}
 		$this->masterCmd = $master;
 	}
 	if ($terms)
@@ -134,7 +137,12 @@ protected function userFilter(array $terms)
 			break;
 			case 'right':
 				$rid = $this->mng->sname($name, 'right');
-				if (!$rid) break;
+
+				if (!$rid) {
+					$this->setError('Right `%s` does not exist.', $name);
+					break;
+				}
+
 				if ($filter['RIGHT'] or $op != '+') {
 					$this->setError('Runtime error in `%s`', $cmd[0]);
 					break;
@@ -153,7 +161,12 @@ protected function userFilter(array $terms)
 			break;
 			case 'role':
 				$rid = $this->mng->sname($name, 'role');
-				if (!$rid) break;
+
+				if (!$rid) {
+					$this->setError('Role `%s` does not exist.', $name);
+					break;
+				}
+
 				if ($filter['ROLE'] or $op != '+') {
 					$this->setError('Runtime error in `%s`', $cmd[0]);
 					break;
@@ -235,7 +248,7 @@ protected function query(array $terms)
 			else $this->messages[] = 'user rights: -';
 		}
 		else {
-			$this->setError('User %s not exists.', $name);
+			$this->setError('User `%s` does not exist.', $name);
 			return false;
 		}
 	break;
@@ -270,7 +283,7 @@ protected function query(array $terms)
 			$this->messages[] = "Assigned to $role_n users.";
 		}
 		else {
-			$this->setError('Role %s not exists.', $name);
+			$this->setError('Role `%s` does not exist.', $name);
 			return false;
 		}
 	break;
@@ -301,7 +314,7 @@ protected function query(array $terms)
 
 		}
 		else {
-			$this->setError('Right %s not exists.', $name);
+			$this->setError('Right `%s` does not exist.', $name);
 			return false;
 		}
 

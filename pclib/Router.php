@@ -104,6 +104,13 @@ function redirect($route, $code = null)
 	exit();
 }
 
+function reload()
+{
+	global $pclib;
+	$this->redirect(['url' => $pclib->app->request->url]);
+}
+
+
 /**
  * Transform internal action (for example 'products/edit/id:1') to URL.
  * @param string|Action $s
