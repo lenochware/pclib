@@ -64,6 +64,7 @@ CREATE TABLE AUTH_ROLES (
   ID integer primary key,
   SNAME varchar(100),
   ANNOT varchar(100),
+  AUTHOR_ID integer,
   LASTMOD datetime,
   DT datetime
 );
@@ -94,6 +95,7 @@ CREATE TABLE AUTH_USERS (
   LAST_LOGIN datetime,
   LOGINFAIL integer DEFAULT 0,
   ACTIVE integer DEFAULT 1,
+  AUTHOR_ID integer,
   LASTMOD datetime,
   DT datetime,
   IP integer

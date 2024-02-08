@@ -124,6 +124,12 @@ function mkUser($sname, $fullName = null, $srole = null, $annot = '')
 	'ANNOT' => $annot
 	);
 
+	$auth = $this->app->getService('auth');
+
+	if (/*PCLIB_VERSION > '2.9.5' and*/ $auth and $auth->loggedUser) {
+		$user['AUTHOR_ID'] = $auth->loggedUser->ID;
+	}
+
 	$id = $this->db->insert($this->USERS_TAB, $user);
 	if ($srole) $this->uRole('#'.$id, $srole);
 	return $id;
@@ -269,6 +275,13 @@ function mkRole($sname, $annot = '')
 		'LASTMOD' => date("Y-m-d H:i:s"),
 		'DT' => date("Y-m-d H:i:s")
 	);
+
+	$auth = $this->app->getService('auth');
+
+	if (/*PCLIB_VERSION > '2.9.5' and*/ $auth and $auth->loggedUser) {
+		$role['AUTHOR_ID'] = $auth->loggedUser->ID;
+	}
+
 	$id = $this->db->insert($this->ROLES_TAB, $role);
 	return $id;
 }

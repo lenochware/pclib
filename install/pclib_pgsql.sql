@@ -69,6 +69,7 @@ CREATE TABLE auth_roles (
   id serial NOT NULL,
   sname character varying(100) DEFAULT NULL,
   annot character varying(100) DEFAULT NULL,
+  author_id integer DEFAULT NULL,
   lastmod timestamp without time zone,
   dt timestamp without time zone,
   CONSTRAINT pk_auth_roles_id PRIMARY KEY (id)
@@ -99,6 +100,7 @@ CREATE TABLE auth_users (
   last_login timestamp without time zone,
   loginfail smallint DEFAULT 0,
   active smallint DEFAULT 1,
+  author_id integer DEFAULT NULL,
   lastmod timestamp without time zone,
   dt timestamp without time zone,
   ip integer DEFAULT NULL,
