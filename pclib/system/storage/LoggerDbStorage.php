@@ -62,10 +62,17 @@ function delete($keepDays, $allLogs = false)
 	$date = date('Y-m-d H:i:s', time() - ($keepDays * 24 * 3600));
 	if (!$allLogs) $logger = $this->getLabelId($this->logger->name,1);
 
-	$this->db->delete($this->LOGGER_TAB,
-	"DT<'{0}'
-	~ AND LOGGER='{1}'", $date, $logger);
-	$this->db->delete($this->MESSAGES_TAB, "DT<'{0}'", $date);
+	while(1) {
+		//Delete max 30k rows at once - avoid too long table lock
+		$stmt = $this->db->delete($this->LOGGER_TAB,
+		"DT<'{0}'
+		~ AND LOGGER='{1}'
+		LIMIT 30000", $date, $logger);
+		
+		if (!$stmt->rowCount()) break;
+		
+		$this->db->delete($this->MESSAGES_TAB, "DT<'{0}'", $date);
+	}
 
 	$this->db->query("OPTIMIZE TABLE $this->LOGGER_TAB");
 	$this->db->query("OPTIMIZE TABLE $this->MESSAGES_TAB");
