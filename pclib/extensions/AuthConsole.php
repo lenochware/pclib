@@ -119,6 +119,33 @@ private function addHtmlClass($value, $clsid)
 	return "<span class=\"$clsid\">$value</span>";
 }
 
+/** Build filter for querying roles. */
+protected function roleFilter(array $terms)
+{
+	if (!$terms) return array();
+	$filter = array();
+	foreach ($terms as $cmd) {
+		$op    = trim($cmd[1]);
+		$ty   = $cmd[2];
+		$name  = $cmd[4];
+		switch ($ty) {
+			case 'right':
+				$rid = $this->mng->sname($name, 'right');
+
+				if (!$rid) {
+					$this->setError('Right `%s` does not exist.', $name);
+					break;
+				}
+
+				$filter['RIGHT'] = $rid;
+				break;
+		}
+	}	
+
+	return $filter;
+}
+
+
 /** Build filter for querying users. Return filter array. Used in query(). */
 protected function userFilter(array $terms)
 {
@@ -255,8 +282,18 @@ protected function query(array $terms)
 	case 'role':
 		$role_n = $this->db->count($this->mng->ROLES_TAB, "SNAME like '{0}'", $name);
 		if ($role_n > 1) {
+			$filter = $this->roleFilter($terms);
+			if ($this->errors) break;
+			$filter['SNAME'] = $name;
+
 			$roles = $this->db->selectOne(
-				$this->mng->ROLES_TAB.':SNAME',"SNAME like '{0}'", $name);
+				"select distinct R.SNAME from {$this->mng->ROLES_TAB} R
+				~ left join {$this->mng->REGISTER_TAB} REG on REG.ROLE_ID=R.ID
+				where R.SNAME like '{SNAME}'
+				~ AND REG.RIGHT_ID='{RIGHT}' AND REG.RVAL<>'0'",
+				$filter
+			);
+
 			$this->messages[] = wordwrap(implode(' ', $roles), 60, '<br>');
 			$this->messages[] = "\nFound ".count($roles)." roles.";
 		}
