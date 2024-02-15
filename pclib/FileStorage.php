@@ -175,6 +175,8 @@ function deleteFile($loc)
 {
 	$file = $this->getFile($loc);
 
+	$this->trigger('file.before-delete', ['loc' => $loc, 'file' => $file]);
+
 	if (!$file) throw new FileNotFoundException("File not found.");
 
 	$path = $this->rootDir.$file['FILEPATH'];
@@ -185,6 +187,9 @@ function deleteFile($loc)
 	}
 
 	$this->db->delete($this->TABLE, pri($file['ID']));
+
+	$this->trigger('file.after-delete', ['loc' => $loc, 'file' => $file]);
+
 	return $file;
 }
 

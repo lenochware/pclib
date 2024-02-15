@@ -110,6 +110,21 @@ function getLog($rowCount, array $filter = null)
 {
 	$this->service('db');
 
+	if (!empty($filter['ACTIONNAME'])) {
+		$ids = $this->db->selectOne($this->LABELS_TAB.':ID', "CATEGORY=2 and LABEL like '%{ACTIONNAME}%'", $filter);
+		$filter['ACTIONNAME'] = $ids ?: -1;
+	}
+
+	if (!empty($filter['CATEGORY'])) {
+		$ids = $this->db->selectOne($this->LABELS_TAB.':ID', "CATEGORY=4 and LABEL like '%{CATEGORY}%'", $filter);
+		$filter['CATEGORY'] = $ids ?: -1;
+	}
+
+	if (!empty($filter['USERNAME'])) {
+		$ids = $this->db->selectOne('AUTH_USERS:ID', "USERNAME like '%{USERNAME}%'", $filter);
+		$filter['USERNAME'] = $ids ?: -1;
+	}
+
 	$this->db->setLimit($rowCount);
 	$events = $this->db->selectAll(
 		"select L.*,LM.MESSAGE, U.USERNAME, U.FULLNAME, LL4.LABEL AS CATEGORY,
@@ -122,9 +137,9 @@ function getLog($rowCount, array $filter = null)
 		left join $this->MESSAGES_TAB LM on LM.LOG_ID=L.ID
 		 where 1=1
 		~ AND L.LOGGER = '{LOGGER}'
-		~ AND LL4.LABEL like '%{CATEGORY}%'
-		~ AND U.USERNAME like '%{USERNAME}%'
-		~ AND LL2.LABEL like '%{ACTIONNAME}%'
+		~ AND L.CATEGORY in ({#CATEGORY})
+		~ AND L.USER_ID in ({#USERNAME})
+		~ AND L.ACTION in ({#ACTIONNAME})
 		order by L.ID desc", $filter
 	);
 
