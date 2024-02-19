@@ -111,18 +111,18 @@ function getLog($rowCount, array $filter = null)
 	$this->service('db');
 
 	if (!empty($filter['ACTIONNAME'])) {
-		$ids = $this->db->selectOne($this->LABELS_TAB.':ID', "CATEGORY=2 and LABEL like '%{ACTIONNAME}%'", $filter);
-		$filter['ACTIONNAME'] = $ids ?: -1;
+		$found = $this->db->selectOne($this->LABELS_TAB.':ID', "CATEGORY=2 and LABEL like '%{ACTIONNAME}%'", $filter);
+		if ($found) $filter['ACTIONNAME'] = $found; else return [];
 	}
 
 	if (!empty($filter['CATEGORY'])) {
-		$ids = $this->db->selectOne($this->LABELS_TAB.':ID', "CATEGORY=4 and LABEL like '%{CATEGORY}%'", $filter);
-		$filter['CATEGORY'] = $ids ?: -1;
+		$found = $this->db->selectOne($this->LABELS_TAB.':ID', "CATEGORY=4 and LABEL like '%{CATEGORY}%'", $filter);
+		if ($found) $filter['CATEGORY'] = $found; else return [];
 	}
 
 	if (!empty($filter['USERNAME'])) {
-		$ids = $this->db->selectOne('AUTH_USERS:ID', "USERNAME like '%{USERNAME}%'", $filter);
-		$filter['USERNAME'] = $ids ?: -1;
+		$found = $this->db->selectOne('AUTH_USERS:ID', "USERNAME like '%{USERNAME}%'", $filter);
+		if ($found) $filter['USERNAME'] = $found; else return [];
 	}
 
 	$this->db->setLimit($rowCount);
