@@ -30,6 +30,9 @@ class Router extends system\BaseObject implements IService
 	/** var Action Current %Action */
 	public $action;
 
+	/** var index Default index page - for example 'index-dev.php' */
+	public $index = '';
+
 	public $redirects;
 
 function __construct()
@@ -87,8 +90,10 @@ function followRedirects()
  */
 function redirect($route, $code = null)
 {
-	if ($code and function_exists('http_response_code')) {
-		http_response_code($code);
+	if ($code) http_response_code($code);
+
+	if ($route == '/self') {
+		$this->reload();
 	}
 
 	if (is_array($route)) {
@@ -110,7 +115,6 @@ function reload()
 	$this->redirect(['url' => $pclib->app->request->url]);
 }
 
-
 /**
  * Transform internal action (for example 'products/edit/id:1') to URL.
  * @param string|Action $s
@@ -128,7 +132,7 @@ function createUrl($s)
 		return $this->baseUrl.$action->path.($params? '?'.$this->buildQuery($params) : '');
 	} else {
 		$params = array('r' => $action->path) + $action->params;
-		return $this->baseUrl.'?'.$this->buildQuery($params);
+		return $this->baseUrl.$this->index.'?'.$this->buildQuery($params);
 	}
 }
 
