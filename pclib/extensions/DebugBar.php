@@ -29,8 +29,6 @@ private function __construct()
 	global $pclib;
 	$this->app = $pclib->app;
 	$this->logger = $this->getLogger();
-
-	$this->logUrl();	
 }
 
 public static function getInstance()
@@ -122,7 +120,10 @@ function onAfterOut($event)
 
 function onBeforeRun($event)
 {
-	if (!$this->isDebugBarRequest()) return;
+	if (!$this->isDebugBarRequest()) {
+		$this->logUrl();
+		return;
+	}
 
 	switch ($event->action->method) {
 		case 'show': $this->printLogWindow(); break;

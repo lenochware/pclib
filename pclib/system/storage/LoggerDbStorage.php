@@ -18,7 +18,8 @@ public $db;
 
 public $LOGGER_TAB   = 'LOGGER',
  $LABELS_TAB   = 'LOGGER_LABELS',
- $MESSAGES_TAB = 'LOGGER_MESSAGES';
+ $MESSAGES_TAB = 'LOGGER_MESSAGES',
+ $AUTH_USERS_TAB = 'AUTH_USERS';
 
 function __construct(\pclib\Logger $logger)
 {
@@ -129,7 +130,7 @@ function getLog($rowCount, array $filter = null)
 	$events = $this->db->selectAll(
 		"select L.*,LM.MESSAGE, U.USERNAME, U.FULLNAME, LL4.LABEL AS CATEGORY,
 		LL1.LABEL AS LOGGERNAME,LL2.LABEL AS ACTIONNAME,LL3.LABEL AS UA from $this->LOGGER_TAB L
-		left join AUTH_USERS U on U.ID=L.USER_ID
+		left join $this->AUTH_USERS_TAB U on U.ID=L.USER_ID
 		left join $this->LABELS_TAB LL1 on LL1.ID=L.LOGGER
 		left join $this->LABELS_TAB LL2 on LL2.ID=L.ACTION
 		left join $this->LABELS_TAB LL3 on LL3.ID=L.UA
