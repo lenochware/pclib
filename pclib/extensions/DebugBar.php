@@ -10,7 +10,6 @@ use pclib\system\BaseObject;
  */
 class DebugBar
 {
-protected $logger;
 protected $app;
 
 protected $queryTime;
@@ -19,7 +18,6 @@ protected $queryTimeSum;
 
 protected $positionDefault = 'position:fixed;bottom:10px;right:10px;';
 
-protected $updating = false;
 public $registered = false;
 
 private static $instance;
@@ -28,7 +26,17 @@ private function __construct()
 {
 	global $pclib;
 	$this->app = $pclib->app;
-	$this->logger = $this->getLogger();
+
+	if (!isset($_SESSION['pclib.debuglog'])) {
+		$_SESSION['pclib.debuglog'] = [];
+	}
+
+	if (!$this->isDebugBarRequest()) {
+		if (isset($_SESSION['pclib.debuglog.viewed'])) $_SESSION['pclib.debuglog'] = [];
+		$_SESSION['pclib.debuglog.viewed'] = null;
+	}	
+
+	$this->logUrl();
 }
 
 public static function getInstance()
@@ -36,6 +44,7 @@ public static function getInstance()
   if (self::$instance === null) {
       self::$instance = new self;
   }
+
   return self::$instance;
 }
 
@@ -62,14 +71,6 @@ public static function register()
 	$that->registered = true;
 }
 
-protected function getLogger()
-{
-	//Use logger with independent db connection to avoid conflicts.
-	$logger = new PCLogger('debuglog');
-	$logger->storage = new \pclib\system\storage\LoggerDbStorage($logger);
-	$logger->storage->db = clone $this->app->db;	
-	return $logger;
-}
 
 protected function addEvents($events)
 {
@@ -80,17 +81,8 @@ protected function addEvents($events)
 
 protected function log($category, $message)
 {
-	if ($this->updating) return;
 	if ($this->isDebugBarRequest()) return;
-
-	$this->updating = true;
-
-	if (rand(1,100) == 1) {
-		$this->logger->deleteLog(1);
-	}
-		
-	$this->logger->log('DEBUG', $category, $message);
-	$this->updating = false;
+	$_SESSION['pclib.debuglog'][] = ['category' => $category, 'message' => $message];
 }
 
 function html()
@@ -100,7 +92,7 @@ function html()
 	$t->values['VERSION'] = PCLIB_VERSION;
 	$t->values['TIME'] = $this->getTime($this->startTime);
 	$t->values['MEMORY'] = round(memory_get_peak_usage()/1048576,2);
-
+	
 	return $t->html();
 }
 
@@ -120,15 +112,12 @@ function onAfterOut($event)
 
 function onBeforeRun($event)
 {
-	if (!$this->isDebugBarRequest()) {
-		$this->logUrl();
-		return;
-	}
+	if (!$this->isDebugBarRequest()) return;
 
 	switch ($event->action->method) {
 		case 'show': $this->printLogWindow(); break;
-		case 'clear': $this->logger->deleteLog(0); break;
 		case 'variables': $this->printInfoWindow(); break;
+		case 'clear': $_SESSION['pclib.debuglog.viewed'] = true; break;
 	}
 
 	$event->propagate = false;
@@ -143,10 +132,7 @@ function onAfterQuery($event)
 {
 	$msec = $this->getTime($this->queryTime);
 	$this->queryTimeSum += $msec;
-	$this->log('query',
-		preg_replace("/(\s*[\r\n]+\s*)/m", "\\1<br>", htmlspecialchars($event->sql)) // \n => <br>
-		." <span style=\"color:blue\">($msec ms)</span>"
-	);
+	$this->log('query', htmlspecialchars($event->sql) ." <span style=\"color:blue\">($msec ms)</span>");
 }
 
 function onError($event)
@@ -156,33 +142,32 @@ function onError($event)
 
 function onRedirect($event)
 {
-	$this->log('redirect', '<b>Redirect to ' . $event->url . '</b>');
+	$this->log('redirect', 'Redirect to ' . $event->url);
 }
 
 protected function logUrl()
 {
 	$request = $this->app->request;
-	$message = date("H:m:s ").'<b>'
+	$message = '<b>'
 	.($request->isAjax()? 'AJAX ': '')
 	.$request->method
 	.'</b> '
 	.$request->url;
 
-	if ($request->method == 'POST') {
-		$message = $this->getDump($_POST) . '<br>' . $message;
-	}
+	$this->log('url', $message);
 
-	$this->log('url', $message . '<hr>');
+	if ($request->method == 'POST') {
+		$this->log('dump', $this->getDump($_POST));
+	}	
 }
 
 protected function printLogWindow()
 {
 	print file_get_contents(PCLIB_DIR.'tpl/debugmenu.tpl');
-	print '<h4>Debug Log</h4>';
+	//print '<h4>Debug Log</h4>';
 	$grid = new PCGrid(PCLIB_DIR.'tpl/debuglog.tpl');
-	$data = $this->logger->getLog(100, array('LOGGERNAME' => $this->logger->name));
-	$grid->setArray($data);
-	print $grid;
+	$grid->setArray($_SESSION['pclib.debuglog']);
+	print $grid;	
 	die();
 }
 
@@ -214,14 +199,8 @@ protected function getDump()
 public function dump($vars)
 {
 	$dbg = $this->app->debugger;
-
-	$sav = $dbg->useHtml;
-	$dbg->useHtml = false;
-
 	$message = $dbg->getDump($vars);
 	$this->log('dump', $message);
-	
-	$dbg->useHtml = $sav;	
 }
 
 }

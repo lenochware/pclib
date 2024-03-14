@@ -358,7 +358,7 @@ function array_get($a, $key, $default = null)
 	return isset($a[$key])? $a[$key] : $default;
 }
 
-function debug_sql_log()
+function jdump_sql()
 {
   global $app;
   $app->db->on('db.after-query', function($e) { jdump($e->data['sql']); });

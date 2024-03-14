@@ -259,17 +259,6 @@ getValue: function (id) {
 	return false;
 },
 
-/** @private */
-ajaxLoad: function (elem, url) {
-	if (!this.xhr) this.xhr = new XMLHttpRequest();
-	this.xhr.onreadystatechange = function(){
-		if (this.readyState!=4 || this.status!=200) return;
-		elem.innerHTML = this.responseText;
-	};
-	this.xhr.open('GET', url, true);
-	this.xhr.send();
-},
-
 fetchLink: async function(e) {
 	e.stopPropagation();
 	e.preventDefault();
@@ -335,11 +324,14 @@ initTree: function(className) {
 	}
 },
 
-showModal: function(id, url) {
+showModal: async function(id, url) {
 	document.getElementById('pc-overlay').style.display='block';
 	this.modalWin = document.getElementById(id);
 	this.modalWin.style.display = 'block';
-	this.ajaxLoad(this.modalWin, url);
+
+	const response = await fetch(url, {method: 'GET'});
+	const text = await response.text();
+	this.modalWin.innerHTML = text;
 },
 
 hideModal: function() {

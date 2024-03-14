@@ -1,16 +1,15 @@
 <?elements
 class grid name "LOGGER"
-string DT date "%H:%M:%S" lb "TIME"
-string LOGGERNAME
-string ACTIONNAME
-bind COLOR field "ACTIONNAME" list "url,green,error,red,*,black"
-string MESSAGE noescape
+string category
+string message noescape
 pager pager pglen "1000"
 ?>
 <table>
-{block items}
-<tr>
-<td style="color:{COLOR}">{MESSAGE}</td>
-</tr>
-{/block}
+	{block items}
+	<tr class="{category}">
+		<td>{category}</td>
+		<td>{message}</td>
+		<td>{time}</td>
+	</tr>
+	{/block}
 </table>
