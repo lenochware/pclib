@@ -82,11 +82,10 @@ function execute($line)
 	}
 	else $this->masterCmd = null;
 
-	if ($pos = utf8_strpos($line, ';')) $line = utf8_substr($line, 0, $pos);
+	if ($pos = Str::strpos($line, ';')) $line = Str::substr($line, 0, $pos);
 
 	$keywords = "user|role|right|active|passw|dpassw";
 	$patt = '/([+-\? ])\s*('.$keywords.')\s(\s*([\w\/\*\.-]+))?(\s*\"([^\"]+)\")?/i';
-	//utf8_preg_match_all()?
 	$terms_n = preg_match_all($patt, ' '.$line.' ', $terms, PREG_SET_ORDER);
 	if (!$terms_n) {
 			$this->setError('Syntax error in `%s`', $line);

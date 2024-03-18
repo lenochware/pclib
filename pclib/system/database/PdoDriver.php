@@ -11,6 +11,7 @@
 namespace pclib\system\database;
 use pclib\DatabaseException;
 use pclib\NotImplementedException;
+use pclib\Str;
 
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -93,7 +94,7 @@ function quote($str)
 
 function quoteIdent($str)
 {
-	return '"'.pcl_ident($str).'"';
+	return '"'.Str::id($str).'"';
 }
 
 function escape($str, $type = 'string')

@@ -101,7 +101,7 @@ class Validator extends system\ValidatorBase
 	{
 		if (!is_scalar($value)) return false;
 
-		return (utf8_strlen($value) >= $length);
+		return (Str::length($value) >= $length);
 	}
 
 	/** Rule handler: Match wildcards. */

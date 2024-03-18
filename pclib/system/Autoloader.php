@@ -14,6 +14,9 @@
 
 namespace pclib\system;
 
+require_once PCLIB_DIR . 'Str.php';
+use pclib\Str;
+
 /**
  * Simple autoloading of the classes.
  * Usually you will use default pclib autoloader: $pclib->autoloader.
@@ -44,7 +47,7 @@ class Autoloader
 			foreach ($this->directories as $directory) {
 				$opt = $directory['options'];
 				if (isset($opt['namespace'])) {
-					if (startsWith($classPath, $opt['namespace'])) {
+					if (Str::startsWith($classPath, $opt['namespace'])) {
 						$classPath = substr($classPath, strlen($opt['namespace'])+1);
 					}
 					else continue;

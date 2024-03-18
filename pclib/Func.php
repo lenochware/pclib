@@ -135,32 +135,6 @@ function extractpath($path, $format)
 	return strtr($format, $trans);
 }
 
-/**
- * Convert string to identificator.
- * Convert characters to ascii and remove other characters. You can set words
- * separator or convert to uppercase/lowercase.
- *
- * @param string $s input text
- * @param string $options ex: '' : camelcase, '-' : 'camel-case', '_U': CAMEL_CASE etc.
- * @return string $identificator
-**/
-function mkident($s, $options = '')
-{
-	$o1 = $o2 = '';
-	$s = preg_replace('/[^\w]+/',' ', utf8_ascii($s));
-	if (strlen($options) == 1) {
-	 if(ctype_alnum($options)) $o1 = $options; else $o2 = $options;
-	}
-	else { $o1 = $options[1]; $o2 = $options[0]; }
-
-	switch($o1) {
-		case 'u': $s = ucwords($s);    break;
-		case 'U': $s = strtoupper($s); break;
-		case 'l': $s = strtolower($s); break;
-	}
-	$s = str_replace(' ',$o2, $s);
-	return $s;
-}
 
 /**
  * Similar to array_shift() but for string.
@@ -173,18 +147,6 @@ function str_shift($separ, &$str)
 	$beg = substr($str, 0, $pos);
 	$str = substr($str, $pos + strlen($separ));
 	return $beg;
-}
-
-/**
- * Convert string to pcl identificator, valid for system purposes.
- * Reduce input text to alphanumeric characters plus underscore, dot and hyphen
- *
- * @param string $str input text
- * @return string $identificator system correct
-**/
-function pcl_ident($str)
-{
-	return preg_replace("/[^a-z0-9_\-\.]/i","", strtr($str,' -','__'));
 }
 
 function pcl_build_query($query_data)
@@ -234,19 +196,6 @@ function filedata($path, $force_download = false, $filename = null)
 }
 
 /**
- * Return string of size $size with random characters.
-**/
-function randomstr($size, $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
-{
-	$s = '';
-	$max = mb_strlen($characters, '8bit') - 1;
-	for ($i = 0; $i < $size; ++$i) {
-		$s .= $characters[mt_rand(0, $max)];
-	}
-	return $s;
-}
-
-/**
  * Configure session cookie for safe usage and call session_start().
 **/
 function safe_session_start($httpsOnly = false)
@@ -266,88 +215,6 @@ if(!function_exists('fnmatch')) {
 				return preg_match("#^".strtr(preg_quote($pattern, '#'), array('\*' => '.*', '\?' => '.'))."$#i", $string);
 		}
 } // end if
-
-// Utf-8 wrapper
-
-function utf8_preg_replace($pattern, $replacement ,$subject)
-{
-	if (extension_loaded('mbstring')) $pattern .= 'u';
-	return preg_replace($pattern, $replacement ,$subject);
-}
-
-
-function utf8_substr($s , $start, $length = null)
-{
-	return extension_loaded('mbstring')? mb_substr($s , $start,
-		is_null($length)? mb_strlen($s, 'UTF-8') : $length, 'UTF-8')
-		: substr($s , $start, $length);
-}
-
-function utf8_strpos($haystack , $needle ,$offset = 0)
-{
-	return extension_loaded('mbstring')? mb_strpos($haystack , $needle ,$offset, 'UTF-8')
-		: strpos($haystack , $needle ,$offset);
-}
-
-function utf8_strlen($s)
-{
-	$s = (string)$s;
-	
-	return extension_loaded('mbstring')? mb_strlen($s, 'UTF-8') : strlen($s);
-}
-
-function utf8_strtoupper($s)
-{
-	return extension_loaded('mbstring')? mb_strtoupper($s, 'UTF-8') : strtoupper($s);
-}
-
-function utf8_strtolower($s)
-{
-	return extension_loaded('mbstring')? mb_strtolower($s, 'UTF-8') : strtolower($s);
-}
-
-//Remove accents in $s
-function utf8_ascii($s)
-{
-	static $accents = array(
-	//german
-	'ä'=>'a','ö'=>'o','ü'=>'u','ß'=>'ss',
-	'Ä'=>'A','Ö'=>'O','Ü'=>'U',
-	//french
-	'û'=>'u','ÿ'=>'y','â'=>'a','æ'=>'ae','ç'=>'c','ê'=>'e','ë'=>'e','ï'=>'i','î'=>'i','ô'=>'o','œ'=>'oe',
-	'Û'=>'U','Ÿ'=>'Y','Â'=>'A','Æ'=>'AE','Ç'=>'C','Ê'=>'E','Ë'=>'E','Ï'=>'I','Î'=>'I','Ô'=>'O','Œ'=>'OE',
-	//czech
-	'ú'=>'u','ů'=>'u','ý'=>'y','ž'=>'z','á'=>'a','č'=>'c','ď'=>'d','é'=>'e','ě'=>'e','í'=>'i','ň'=>'n','ó'=>'o','ř'=>'r','š'=>'s','ť'=>'t',
-	'Ú'=>'U','Ů'=>'U','Ý'=>'Y','Ž'=>'Z','Á'=>'A','Č'=>'C','Ď'=>'D','É'=>'E','Ě'=>'E','Í'=>'I','Ň'=>'N','Ó'=>'O','Ř'=>'R','Š'=>'S','Ť'=>'T',
-	//italian
-	'à'=>'a','è'=>'e','ì'=>'i','ò'=>'o','ù'=>'u',
-	'À'=>'A','È'=>'E','Ì'=>'I','Ò'=>'O','Ù'=>'U',
-	//polish
-	'ą'=>'a','ć'=>'c','ę'=>'e','ł'=>'l','ń'=>'n','ś'=>'s','ź'=>'z','ż'=>'z',
-	'Ą'=>'A','Ć'=>'C','Ę'=>'E','Ł'=>'L','Ń'=>'N','Ś'=>'S','Ź'=>'Z','Ż'=>'Z',
-	//spanish
-	'ñ'=>'n','Ñ'=>'N',
-	//swed/danisch/dutch/fin/nor
-	'å'=>'a','ø'=>'o',
-	'Å'=>'A','Ø'=>'O',
-	//hungarian
-	'ő'=>'o','ű'=>'u',
-	'Ő'=>'O','Ű'=>'U',
-	);
-
-	return preg_replace('/[^(\x20-\x7F)]*/','', strtr($s, $accents));
-}
-
-
-function utf8_htmlspecialchars($s)
-{
-	return htmlspecialchars((string)$s, ENT_COMPAT, 'UTF-8');
-}
-
-function startsWith($s, $substr)
-{
-	return (strpos($s, $substr) === 0);
-}
 
 function array_get($a, $key, $default = null)
 {

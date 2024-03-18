@@ -237,7 +237,7 @@ static function contains($str, $search, $ignoreCase = false)
  */
 static function webalize($str)
 {
-	return Str::id($str, '\w-', '-');
+	return Str::id($str, '\w-', '-', true);
 }
 
 /**
@@ -248,7 +248,7 @@ static function webalize($str)
  * @param $separator Separator of words, '_' by default
  * @param bool $lower Make string lower-case?
  */
-static function id($str, $preserve = '\w', $separator = '_', $lower = true)
+static function id($str, $preserve = '\w', $separator = '_', $lower = false)
 {
 	$str = Str::ascii($str);
 	if ($lower) $str = strtolower($str);

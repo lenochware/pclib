@@ -453,7 +453,7 @@ function getErrorMessage($code)
  */
 protected function normalize($filename)
 {
-	return mkident($filename, '_');
+	return Str::id($filename, '\w\.-');
 }
 
 /**
@@ -476,10 +476,10 @@ protected function getDir($format, $file)
 
 protected function getUniqueHash()
 {
-	$hash = randomstr(11);
+	$hash = Str::random(11);
 
 	while($this->db->exists($this->TABLE, "HASH='{0}'", $hash)) {
-		$hash = randomstr(11);
+		$hash = Str::random(11);
 	}
 
 	return $hash;

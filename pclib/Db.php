@@ -139,7 +139,7 @@ function connect($dataSource)
 	
 	$this->dataSource = $dataSource;	
 
-	$drvname = pcl_ident($dsarray['driver']);
+	$drvname = Str::id($dsarray['driver']);
 	
 	if (strpos($drvname, 'pdo_') === 0) {
 		$className = '\\pclib\\system\\database\\Pdo'.ucfirst(substr($drvname, 4)).'Driver';

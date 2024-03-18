@@ -574,9 +574,9 @@ function print_String($id, $sub, $s)
 
 	if (isset($elem['size'])) {
 		if (!isset($elem['endian'])) $elem['endian'] = '...';
-		if(utf8_strlen($s) > $elem['size'] + 2/*add length of endian*/) {
+		if(Str::length($s) > $elem['size'] + 2/*add length of endian*/) {
 			if ($elem['tooltip']) $title = $s;
-			$s = utf8_substr($s, 0, $elem['size']) . $elem['endian'];
+			$s = Str::substr($s, 0, $elem['size']) . $elem['endian'];
 		}
 	}
 
@@ -984,7 +984,7 @@ function htmlTag($name, $attr = [], $content = null)
 
 function escapeHtml($s)
 {
-	return utf8_htmlspecialchars($s);
+	return Str::htmlspecialchars($s);
 }
 
 /**
@@ -1024,12 +1024,12 @@ protected function formatStr($s, $fmt)
 	for($i = 0; $i < $len; $i++) {
 		switch ($fmt[$i]) {
 		case "n": $s = nl2br($s, false); break;
-		case "h": $s = utf8_htmlspecialchars($s); break;
+		case "h": $s = Str::htmlspecialchars($s); break;
 		case "H": $s = strip_tags($s); break;
-		case "u": $s = utf8_strtoupper($s); break;
-		case "l": $s = utf8_strtolower($s); break;
+		case "u": $s = Str::upper($s); break;
+		case "l": $s = Str::lower($s); break;
 		case "s": $s = addslashes($s); break;
-		case "f": $s = pcl_ident($s); break;
+		case "f": $s = Str::id($s, '\w\.-'); break;
 		}
 	}
 	return $s;

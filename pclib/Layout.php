@@ -76,11 +76,11 @@ function getNavig($options = array())
 		$alt = '';
 		if (!$title) continue;
 
-		$title = utf8_htmlspecialchars($title);
+		$title = Str::htmlspecialchars($title);
 
-		if (utf8_strlen($title) > 30) {
+		if (Str::length($title) > 30) {
 			$alt = 'title="'.$title.'"';
-			$title = utf8_substr($title, 0, 30). '...';
+			$title = Str::substr($title, 0, 30). '...';
 		}
 
 		$class = ($i == $maxlevel)? "pc-nav-$i pc-nav-active" : "pc-nav-$i";
@@ -201,7 +201,7 @@ protected function printScriptLink($src)
 private function isLocalFile($src)
 {
 	$src = strtolower($src);
-	return !startsWith($src, 'https://') and !startsWith($src, '//');
+	return !Str::startsWith($src, 'https://') and !Str::startsWith($src, '//');
 }
 
 /**

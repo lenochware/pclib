@@ -1207,15 +1207,15 @@ protected function fileName($id)
 	$baseName = extractPath($fileName, '%f');
 	$ext = extractPath($fileName, '.%e');
 
-	if (utf8_strlen($ext) > 6) {
+	if (Str::length($ext) > 6) {
 		$baseName .= $ext; 
 		$ext = '';
 	}
 
-	$baseName = substr(mkident($baseName, '-'), 0, 80);
+	$baseName = substr(Str::id($baseName, '\w\.-'), 0, 80);
 
 	while (true) {
-		$fileName = $baseName.'-'.randomstr(8).$ext;
+		$fileName = $baseName.'-'.Str::random(8).$ext;
 		if (!file_exists(realpath($elem['path']).'/'.$fileName)) break;
 	}
 
@@ -1270,7 +1270,7 @@ protected function toBitField(array $bitArray)
 /** escape value for using in form input */
 protected function escape($s)
 {
-	return utf8_htmlspecialchars($s);
+	return Str::htmlspecialchars($s);
 }
 
 /** return <form> header */
@@ -1351,7 +1351,7 @@ private function getCsrfToken()
 	if (!session_id()) return '';
 	$token = $this->app->getSession('pclib.csrf_token');
 	if (!$token) {
-		$token = randomstr(10);
+		$token = Str::random(10);
 		$this->app->setSession('pclib.csrf_token', $token);
 	}
 	return $token;
