@@ -1204,8 +1204,8 @@ protected function fileName($id)
 	$elem = $this->elements[$id];
 
 	$fileName = $this->values[$id];
-	$baseName = extractPath($fileName, '%f');
-	$ext = extractPath($fileName, '.%e');
+	$baseName = Str::extractPath($fileName, '%f');
+	$ext = Str::extractPath($fileName, '.%e');
 
 	if (Str::length($ext) > 6) {
 		$baseName .= $ext; 

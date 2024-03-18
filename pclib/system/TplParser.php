@@ -15,6 +15,7 @@
 namespace pclib\system;
 
 use pclib\system\ElementsDef;
+use pclib\Str;
 
 /**
  * Parse pclib template with pclib-elements code.
@@ -182,7 +183,7 @@ class TplParser extends BaseObject
 	{
 		global $pclib;
 		if (!$pclib->app) return $dir;
-		return paramStr($dir, $pclib->app->paths);
+		return Str::format($dir, $pclib->app->paths);
 	}
 
 	protected function mergePartials($templ, $partials, $level = 1)

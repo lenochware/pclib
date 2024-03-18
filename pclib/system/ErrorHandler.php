@@ -14,6 +14,7 @@
 
 namespace pclib\system;
 use pclib\Tpl;
+use pclib\Str;
 
 /**
  * Catch errors and exceptions and show improved error messages.
@@ -133,7 +134,7 @@ class ErrorHandler extends BaseObject
 		if (!in_array('develop', $this->options)) return;
 
 		$this->service('debugger')->errorDump(
-		paramStr($this->MESSAGE_PATTERN, $this->getValues($e)),$e);
+		Str::format($this->MESSAGE_PATTERN, $this->getValues($e)),$e);
 	}
 
 	protected function getValues($e)
@@ -166,7 +167,7 @@ class ErrorHandler extends BaseObject
 		try {
 			//throw new Exception('ErrorHandlerDisplayBug');
 			$this->service('debugger')->errorDump(
-			paramStr($this->MESSAGE_PATTERN, $this->getValues($e)),$e);
+			Str::format($this->MESSAGE_PATTERN, $this->getValues($e)),$e);
 		}
 		//fallback to most straighforward error message
 		catch(\Exception $ex) {
@@ -202,7 +203,7 @@ class ErrorHandler extends BaseObject
 			$error = $this->getValues($e);
 			
 			$this->service('logger')->log('php/error', $error['severity'],
-				paramStr("{exceptionClass}: {message} in '{file}' on line {line} processing '{route}' at {timestamp}", $error)
+				Str::format("{exceptionClass}: {message} in '{file}' on line {line} processing '{route}' at {timestamp}", $error)
 			);
 		}
 		catch(\Exception $ex) {

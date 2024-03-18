@@ -60,7 +60,7 @@ class Validator extends system\ValidatorBase
 		foreach (explode(',', $pattern) as $value) {
 			$value = trim($value);
 			if ($value[0] == '.') {
-				if (extractpath($file['name'], ".%e") == $value) return true;
+				if (Str::extractPath($file['name'], ".%e") == $value) return true;
 			}
 			elseif (fnmatch($value, $file['type'])) return true;
 		}

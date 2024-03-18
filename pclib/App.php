@@ -268,7 +268,7 @@ public function configure()
 	$this->errorHandler->options = $this->config['pclib.errors'];
 
 	foreach ($this->config['pclib.directories'] as $k => $dir) {
-		$this->config['pclib.directories'][$k] = paramstr($dir, $this->paths);
+		$this->config['pclib.directories'][$k] = Str::format($dir, $this->paths);
 	}
 
 	$c = $this->config['pclib.app'];
@@ -361,7 +361,7 @@ function getPaths()
 /** Replace path variables e.g. {basedir} */
 function path($path)
 {
-	return paramStr($path, $this->paths);
+	return Str::format($path, $this->paths);
 }
 
 /**

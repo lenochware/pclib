@@ -12,35 +12,6 @@
 # License as published by the Free Software Foundation; either
 # version 2.1 of the License, or (at your option) any later version.
 
-/** Placeholders in string $str will be replaced with values from $param array.
- *  Format is the same like for template file. \n
- *  Ex: print paramstr("{A} is {B}", array('A' => 'pclib', 'B' => 'best')); \n
- *  $param can be two-dimensional array of n-rows, each row is formated with string $str.
- *
- * @param string $str string with {PARAM} parameters (placeholders)
- * @param array $param associative array PARAM=>VALUE
- * @param bool $keepEmpty Keep (don't delete) tags undefined in $param
- * @return string $str
- */
-function paramstr($str, $param, $keepEmpty = false)
-{
-	preg_match_all("/{([a-z0-9_.]+)}/i", $str, $found);
-	if (!$found[1]) return $str;
-	if (!is_array(array_get($param, 0))) $param = array($param);
-
-	$n = count($param);
-	$newstr = '';
-	for ($i = 0; $i < $n; $i++) {
-		$from = $to = null;
-		foreach($found[1] as $key) {
-			if ($keepEmpty and !isset($param[$i][$key])) continue;
-			$from[] = '{'.$key.'}';
-			$to[] = $param[$i][$key];
-		}
-		$newstr .= str_replace($from, $to, $str);
-	}
-	return $newstr;
-}
 /**
  * Dump variable(s) for debugging and stop application.
  * Usage: dump($a,$b,...);
@@ -101,11 +72,6 @@ function jdump()
 	}
 
 	$pclib->app->setSession('pclib.jdump', $js);
-	
-	// if ($pclib->app->layout)
-	// 	$pclib->app->layout->addInline("<script>$js</script>");
-	// else
-	// 	print "<script>$js</script>";
 }
 
 /** 
@@ -117,36 +83,6 @@ function pri($id)
 {
 	$id = (int)$id;
 	return "ID='$id'";
-}
-
-/**
- * Return part of the filesystem path.
- * Format can use placeholders %d directory, %f filename, %e extension.
- * Example: extractpath($path, "%f.%e"); //return "filename.extension"
- */
-function extractpath($path, $format)
-{
-	$path_a = pathinfo($path);
-	$trans = array(
-		'%d' => rtrim($path_a['dirname'],"/\\"),
-		'%f' => $path_a['filename'],
-		'%e' => $path_a['extension'],
-	);
-	return strtr($format, $trans);
-}
-
-
-/**
- * Similar to array_shift() but for string.
- * Return beginning of the string to the separator $separ, shortening original $str
- */
-function str_shift($separ, &$str)
-{
-	$pos = strpos($str, $separ);
-	if ($pos === false) return '';
-	$beg = substr($str, 0, $pos);
-	$str = substr($str, $pos + strlen($separ));
-	return $beg;
 }
 
 function pcl_build_query($query_data)
@@ -164,7 +100,7 @@ function pcl_build_query($query_data)
 function mimetype($path)
 {
 	global $app;
-	$ext = strtolower(extractpath($path,'%e'));
+	$ext = strtolower(Str::extractPath($path,'%e'));
 	if ($app and $app->config['pclib.mimetypes'][$ext])
 		$ret = $app->config['pclib.mimetypes'][$ext];
 	else
@@ -180,7 +116,7 @@ function mimetype($path)
 function filedata($path, $force_download = false, $filename = null)
 {
 	if (!file_exists($path)) throw new Exception('File not found.'); //FileNotFoundException;
-	if (!$filename) $filename = extractpath($path, '%f.%e');
+	if (!$filename) $filename = Str::extractPath($path, '%f.%e');
 
 	if ($force_download) {
 		header('Content-type: '.mimetype($path));
