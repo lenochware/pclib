@@ -85,6 +85,15 @@ function pri($id)
 	return "ID='$id'";
 }
 
+/** 
+ * Replace {param} placeholders in string with values from array $param.
+ * @deprecated Use Str::format() instead.
+ */
+function paramStr($str, $params, $keepEmpty = false)
+{
+	return pclib\Str::format($str, $params, $keepEmpty);
+}
+
 function pcl_build_query($query_data)
 {
 	$trans = array('%2F'=>'/','%3A'=>':','%2C'=>',');

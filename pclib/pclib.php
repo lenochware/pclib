@@ -49,6 +49,7 @@ class Pclib
 	function init()
 	{
 		$aliases = array(
+			'PCStr' => '\pclib\Str',
 			'PCApp' => '\pclib\App',
 			'PCDb' => '\pclib\Db',
 			'PCTpl' => '\pclib\Tpl',

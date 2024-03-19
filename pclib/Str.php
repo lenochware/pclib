@@ -237,7 +237,7 @@ static function contains($str, $search, $ignoreCase = false)
  */
 static function webalize($str)
 {
-	return Str::id($str, '\w-', '-', true);
+	return strtolower(Str::id($str, '\w-', '-'));
 }
 
 /**
@@ -246,12 +246,10 @@ static function webalize($str)
  * @param string $str Source string
  * @param string $preserve Which characters should be preserved (regex)
  * @param $separator Separator of words, '_' by default
- * @param bool $lower Make string lower-case?
  */
-static function id($str, $preserve = '\w', $separator = '_', $lower = false)
+static function id($str, $preserve = '\w', $separator = '_')
 {
 	$str = Str::ascii($str);
-	if ($lower) $str = strtolower($str);
 	$words = preg_split("/\s+/", $str);
 	return Str::replace(implode($separator, $words), '~[^'.$preserve.']+~', '');
 }
