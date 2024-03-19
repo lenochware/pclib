@@ -1,3 +1,9 @@
+<?elements
+string VERSION
+string TIME
+string MEMORY
+string POSITION
+?>
 <style>
 #pc-debugbar {
   {POSITION}
@@ -79,7 +85,6 @@ function pc_debugbar_resize(top, height)
 
 async function pclibShowModal(id, url)
 {
-  document.getElementById('pc-overlay').style.display='block';
   pclibDebugWin = document.getElementById(id);
   pclibDebugWin.style.display = 'block';
   const response = await fetch(url);
@@ -89,7 +94,6 @@ async function pclibShowModal(id, url)
 
 function pclibHideModal()
 {
-  document.getElementById('pc-overlay').style.display='none';
   pclibDebugWin.style.display='none';
 }
 
@@ -98,7 +102,6 @@ window.addEventListener('load', function () {
 })
 </script>
 
-<div id="pc-overlay" onclick="pclibHideModal();event.stopPropagation()"></div>
 <div id="pc-debugbar" onclick="pclibShowModal('pcwin0','?r=pclib_debugbar/show');event.stopPropagation()">
   <a href="#" onclick="document.getElementById('pc-debugbar').style.display='none';event.stopPropagation()">×</a>
   pclib {VERSION}|{TIME} ms|{MEMORY} MB

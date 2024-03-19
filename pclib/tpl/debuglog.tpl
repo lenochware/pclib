@@ -1,7 +1,8 @@
 <?elements
-class grid name "LOGGER"
+class grid name "debuglog"
 string category
 string message noescape
+string time
 pager pager pglen "1000"
 ?>
 <table>

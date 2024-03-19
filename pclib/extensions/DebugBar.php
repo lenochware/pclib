@@ -59,6 +59,7 @@ public static function register()
 		'app.after-out'  => [$that, 'onAfterOut'],
 		'app.before-run' => [$that, 'onBeforeRun'],
 		'app.error' => [$that, 'onError'],
+		'php-exception'   => [$that, 'onPhpException'],
 		'db.before-query' => [$that, 'onBeforeQuery'],
 		'db.after-query'  => [$that, 'onAfterQuery'],
 		'router.redirect' => [$that, 'onRedirect'],
@@ -88,7 +89,7 @@ protected function log($category, $message)
 function html()
 {
 	$t = new PCTpl(PCLIB_DIR.'tpl/debugbar.tpl');
-	$t->values['POSITION'] = $this->app->config['pclib.debugbar.position'] ?: $this->positionDefault;
+	$t->values['POSITION'] = array_get($this->app->config, 'pclib.debugbar.position', $this->positionDefault);
 	$t->values['VERSION'] = PCLIB_VERSION;
 	$t->values['TIME'] = $this->getTime($this->startTime);
 	$t->values['MEMORY'] = round(memory_get_peak_usage()/1048576,2);
@@ -118,6 +119,7 @@ function onBeforeRun($event)
 		case 'show': $this->printLogWindow(); break;
 		case 'variables': $this->printInfoWindow(); break;
 		case 'clear': $_SESSION['pclib.debuglog.viewed'] = true; break;
+		case 'cshow': $_SESSION['pclib.debuglog'] = []; $this->printLogWindow(); break;
 	}
 
 	$event->propagate = false;
@@ -138,6 +140,12 @@ function onAfterQuery($event)
 function onError($event)
 {
 	$this->log('error', "<span style=\"color:red\">".$event->message."</span>");
+}
+
+function onPhpException($event)
+{
+	$this->log('error', $event->Exception->getMessage() . $this->app->debugger->getTrace($event->Exception));
+//	$this->app->debugger->errorDump('aaa', $event->Exception);
 }
 
 function onRedirect($event)
