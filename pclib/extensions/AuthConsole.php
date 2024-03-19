@@ -358,7 +358,7 @@ protected function query(array $terms)
 	case 'dpassw':
 	$uid = $this->mng->sname($name, 'user');
 	if (!$uid) return false;
-	$user = $this->db->select($this->mng->USERS_TAB, pri($uid));
+	$user = $this->db->select($this->mng->USERS_TAB, ['ID' => $uid]);
 	$msg = "dpassw: ".$this->addHtmlClass($user['DPASSW'],'console-value')." enabled: ";
 	$msg .= $user['PASSW']? 'no.':'yes.';
 	$this->message($msg);

@@ -49,7 +49,7 @@ function setUser(AuthUser $user)
 	$cols = $this->db->columns($this->USERS_TAB);
 	$data = array_intersect_key($user->values, $cols);
 
-	$this->db->update($this->USERS_TAB, $data, pri($user->values['ID']));
+	$this->db->update($this->USERS_TAB, $data, ['ID' => $user->values['ID']]);
 }
 
 /**
@@ -60,7 +60,7 @@ function setUser(AuthUser $user)
 function getCredentials($userId)
 {
 	$this->service('db');
-	$data = $this->db->select($this->USERS_TAB, pri($userId));	
+	$data = $this->db->select($this->USERS_TAB, ['ID' => $userId]);	
 	return array($data['USERNAME'], $data['PASSW'], $data['DPASSW']);
 }
 

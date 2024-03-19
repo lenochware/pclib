@@ -186,7 +186,7 @@ function deleteFile($loc)
 		if (!$ok) throw new IOException("File '$path' cannot be deleted.");
 	}
 
-	$this->db->delete($this->TABLE, pri($file['ID']));
+	$this->db->delete($this->TABLE, ['ID' => $file['ID']]);
 
 	$this->trigger('file.after-delete', ['loc' => $loc, 'file' => $file]);
 

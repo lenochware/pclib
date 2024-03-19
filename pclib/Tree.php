@@ -259,7 +259,7 @@ class Tree extends system\BaseObject
     $flt = '';
 
     if ($topId) {
-      $first = $this->db->select($this->table, pri($topId));     
+      $first = $this->db->select($this->table, ['ID' => $topId]);     
       $last = $this->db->select($this->table, "TREE_ID='$treeId' AND ID>'{ID}' AND LEVEL<='{LEVEL}' ORDER BY ID", $first);
       $flt .= $last? sprintf("AND ID BETWEEN %d AND %d", $first['ID'], $last['ID'] - 1) : "AND ID>".$first['ID'];
     }

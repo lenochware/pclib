@@ -80,7 +80,7 @@ public function sname($sname, $type)
 protected function modified($table, $id)
 {
 	$now = date('Y-m-d H:i:s');
-	$this->db->update($table, "LASTMOD='$now'", pri($id));
+	$this->db->update($table, "LASTMOD='$now'", ['ID' => $id]);
 }
 
 /**
@@ -147,7 +147,7 @@ function rmUser($sname)
 
 	$this->db->delete( $this->REGISTER_TAB, "USER_ID='{0}'", $uid);
 	$this->db->delete( $this->USERROLE_TAB, "USER_ID='{0}'", $uid);
-	$this->db->delete( $this->USERS_TAB, pri($uid));
+	$this->db->delete( $this->USERS_TAB, ['ID' => $uid]);
 	return $uid;
 }
 
@@ -225,7 +225,7 @@ function rmRight($sname, $force = false)
 			$this->setError('Cannot remove - %s is used.', $sname);
 			return false;
 		}
-	$this->db->delete($this->RIGHTS_TAB, pri($rid));
+	$this->db->delete($this->RIGHTS_TAB, ['ID' => $rid]);
 	if ($force) $this->db->delete($this->REGISTER_TAB, "RIGHT_ID='{0}'", $rid);
 	return true;
 }
@@ -238,7 +238,7 @@ function rmRight($sname, $force = false)
 function setRight($right)
 {
 	$id = $right['ID'];
-	if (!$this->db->exists($this->RIGHTS_TAB, pri($id))) {
+	if (!$this->db->exists($this->RIGHTS_TAB, ['ID' => $id])) {
 		$this->setError('Error: Right %s not exists.', '#'.$id);
 		return false;
 	}
@@ -247,7 +247,7 @@ function setRight($right)
 		return false;
 	}
 	
-	$this->db->update($this->RIGHTS_TAB, $right, pri($id));
+	$this->db->update($this->RIGHTS_TAB, $right, ['ID' => $id]);
 	if ($this->db->drv->error) {
 		$this->setError($this->db->drv->error);
 		return false;
@@ -304,7 +304,7 @@ function rmRole($sname, $force = false)
 		}
 
 	$this->db->delete($this->REGISTER_TAB, "ROLE_ID='{0}'", $rid);
-	$this->db->delete($this->ROLES_TAB, pri($rid));
+	$this->db->delete($this->ROLES_TAB, ['ID' => $rid]);
 	if ($force) $this->db->delete($this->USERROLE_TAB, "ROLE_ID='{0}'", $rid);
 	return true;
 }
@@ -339,7 +339,7 @@ function cpRole($sname1, $sname2)
 function setRole($role)
 {
 	$id = $role['ID'];
-	if (!$this->db->exists($this->ROLES_TAB, pri($id))) {
+	if (!$this->db->exists($this->ROLES_TAB, ['ID' => $id])) {
 		$this->setError('Error: Role %s not exists.', '#'.$id);
 		return false;
 	}
@@ -348,7 +348,7 @@ function setRole($role)
 		return false;
 	}
 
-	$this->db->update($this->ROLES_TAB, $role, pri($id));
+	$this->db->update($this->ROLES_TAB, $role, ['ID' => $id]);
 	if ($this->db->drv->error) {
 		$this->setError($this->db->drv->error);
 		return false;
@@ -478,7 +478,7 @@ function getUser($sname)
 {
 	$uid = $this->sname($sname, 'user');
 	if (!$uid) return false;
-	$user = $this->db->select($this->USERS_TAB, pri($uid));
+	$user = $this->db->select($this->USERS_TAB, ['ID' => $uid]);
 	return $user;
 }
 
@@ -493,7 +493,7 @@ function getUser($sname)
 function setUser($sname, array $user)
 {
 	$uid = $this->sname($sname, 'user');
-	if (!$this->db->exists($this->USERS_TAB, pri($uid))) {
+	if (!$this->db->exists($this->USERS_TAB, ['ID' => $uid])) {
 		$this->setError('Error: User %s not exists.', '#'.$uid);
 		return false;
 	}
@@ -509,7 +509,7 @@ function setUser($sname, array $user)
 		$user['USERNAME'] = strtolower($user['USERNAME']);
 	}
 
-	$this->db->update($this->USERS_TAB, $user, pri($uid));
+	$this->db->update($this->USERS_TAB, $user, ['ID' => $uid]);
 	if ($this->db->drv->error) {
 		$this->setError($this->db->drv->error);
 		return false;
@@ -529,7 +529,7 @@ function setPassw($sname, $passw)
 	$uid = $this->sname($sname, 'user');
 	if (!$uid) return false;
 	if (strlen($passw) > 0) $passw = $this->passwordHash($passw);
-	$this->db->update($this->USERS_TAB, "PASSW='$passw',DPASSW=''", pri($uid));
+	$this->db->update($this->USERS_TAB, "PASSW='$passw',DPASSW=''", ['ID' => $uid]);
 	$this->modified($this->USERS_TAB, $uid);
 	return true;
 }

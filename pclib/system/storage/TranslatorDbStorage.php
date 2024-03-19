@@ -65,7 +65,7 @@ function getLabelId($label, $category)
 
 protected function removeUnusedLabel($id)
 {
-	$label = $this->db->select($this->LABELS_TAB, pri($id));
+	$label = $this->db->select($this->LABELS_TAB, ['ID' => $id]);
 	switch ($label['CATEGORY']) {
 		case 1: $fld = 'TRANSLATOR'; break;
 		case 2: $fld = 'LANG'; break;
@@ -73,7 +73,7 @@ protected function removeUnusedLabel($id)
 	}
 
 	if (!$this->db->exists($this->TRANSLATOR_TAB, $fld."='{0}'", $id)) {
-		$this->db->delete($this->LABELS_TAB, pri($id));
+		$this->db->delete($this->LABELS_TAB, ['ID' => $id]);
 	}
 }
 
@@ -96,7 +96,7 @@ function saveDefault($pageName, $s)
 		$data = $params;
 		$data['DT'] = date('Y-m-d H:i:s');
 		$text_id = $this->db->insert($this->TRANSLATOR_TAB, $data);
-		$this->db->update($this->TRANSLATOR_TAB, "TEXT_ID='$text_id'", pri($text_id));
+		$this->db->update($this->TRANSLATOR_TAB, "TEXT_ID='$text_id'", ['ID' => $text_id]);
 	}
 }
 

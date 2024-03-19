@@ -76,8 +76,8 @@ function jdump()
 
 /** 
  * Return string "ID='$id'".
- * Helper for db queries on primary key. \n
- * Ex: $db->select('PRODUCTS', pri($id));
+ * Helper for db queries on primary key.
+ * @deprecated Use [ID => $id] instead.
  */
 function pri($id)
 {
