@@ -89,7 +89,7 @@ protected function modified($table, $id)
 **/
 function genPassw()
 {
-	return Str::random($this->defaultPasswordLength);
+	return \pclib\Str::random($this->defaultPasswordLength);
 }
 
 /**

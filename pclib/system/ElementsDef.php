@@ -120,9 +120,12 @@ class ElementsDef extends BaseObject
 
 			case 'input':	
 			case 'text':
-			case 'listinput':
 					$elem = self::$elem['input'];
 				break;
+
+			case 'listinput':
+					$elem = self::$elem['input'] + self::$elem['selector'];
+			break;				
 
 			case 'button':
 			case 'link':

@@ -78,7 +78,7 @@ function __construct($path = '', $sessName = '')
  **/
 protected function getHttpData()
 {
-	$data = $this->header['get']? $_GET['data'] : $_POST['data'];
+	$data = array_get($this->header['get']? $_GET : $_POST, 'data');
 	$rowdata = $this->header['get']? $_GET['rowdata'] : $_POST['rowdata'];
 
 

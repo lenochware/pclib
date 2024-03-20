@@ -2,6 +2,7 @@
 
 namespace pclib\extensions;
 use pclib\system\AuthBase;
+use pclib\Str;
 
 /**
  * Execute auth console commands, see execute() method.
@@ -169,7 +170,7 @@ protected function userFilter(array $terms)
 					break;
 				}
 
-				if ($filter['RIGHT'] or $op != '+') {
+				if (!empty($filter['RIGHT']) or $op != '+') {
 					$this->setError('Runtime error in `%s`', $cmd[0]);
 					break;
 				}
@@ -193,7 +194,7 @@ protected function userFilter(array $terms)
 					break;
 				}
 
-				if ($filter['ROLE'] or $op != '+') {
+				if (!empty($filter['ROLE']) or $op != '+') {
 					$this->setError('Runtime error in `%s`', $cmd[0]);
 					break;
 				}
@@ -216,7 +217,7 @@ protected function query(array $terms)
 	$op    = trim($master[1]);
 	$ty   = $master[2];
 	$name  = strtr($master[4],'*','%');
-	$annot = array_get($master, 6);
+	$annot = array_get($master, 6, '');
 	
 	$pgsql = (get_class($this->db->drv) == 'pgsql')? $this->db->drv : null;
 
@@ -375,7 +376,7 @@ protected function executeCmd($cmd)
 	$op    = trim($cmd[1]);
 	$opt   = $cmd[1].$cmd[2];
 	$name  = $cmd[4];
-	$annot = array_get($cmd, 6);
+	$annot = array_get($cmd, 6, '');
 
 	if (!$op) return true;
 

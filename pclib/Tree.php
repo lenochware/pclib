@@ -385,7 +385,7 @@ class Tree extends system\BaseObject
         $html .= $this->getHtmlTplStrip($this->tpl, 'folderBegin', $node);
       }
       else {
-        $name = ($node['LEVEL'] == 0 and $this->tpl->elements['topitem'])? 'topitem' : 'item';
+        $name = ($node['LEVEL'] == 0 and isset($this->tpl->elements['topitem']))? 'topitem' : 'item';
         $html .= $this->getHtmlTplStrip($this->tpl, $name, $node);
       }
 

@@ -36,7 +36,7 @@ function getMethod()
 /** Is current request AJAX request? */
 function isAjax()
 {
-	return ($_SERVER['HTTP_X_REQUESTED_WITH']=='XMLHttpRequest');
+	return (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) and $_SERVER['HTTP_X_REQUESTED_WITH']=='XMLHttpRequest');
 }
 
 /** We have HTTPS? */
