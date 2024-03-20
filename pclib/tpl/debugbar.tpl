@@ -16,19 +16,6 @@ string POSITION
   z-index: 2100;
 }
 
-#pc-overlay {
-  display:none;
-  position: fixed;
-  top: 0vh;
-  left: 0vw;
-  width: 100vw;
-  height: 100vh;
-  background: #000;
-  opacity: 0.1;
-  filter: alpha(opacity=50);
-  z-index: 1500;
-}
-
 .pc-debugbar-window {
   display: none;
   position:fixed;
@@ -66,11 +53,10 @@ string POSITION
   background-color: #deebff;
 }
 
-
 .pc-debugbar-menu {
   position:fixed;
-  background-color: white; 
-  width: 80%;
+  background-color: #f4f5f7; 
+  width: calc(100vw - 50px);
   padding: 10px 0px;
 }
 </style>

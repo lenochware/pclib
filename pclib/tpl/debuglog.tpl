@@ -10,7 +10,6 @@ pager pager pglen "1000"
 	<tr class="{category}">
 		<td>{category}</td>
 		<td>{message}</td>
-		<td>{time}</td>
 	</tr>
 	{/block}
 </table>

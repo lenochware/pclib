@@ -380,6 +380,7 @@ function tracePath($levels = 100, $e = null)
 function errorDump($message, $e = null)
 {
 	global $pclib;
+
 	$s = $this->useHtml? '<meta charset="utf-8">':'';
 	$s .= $message.' ';
 	if ($this->useHtml) {

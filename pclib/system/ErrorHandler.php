@@ -27,7 +27,7 @@ use pclib\Str;
  */
 class ErrorHandler extends BaseObject
 {
-	/** var array [log, display, develop, error_reporting, template] */
+	/** var array [log, display, develop, error_reporting, template] or [disabled] */
 	public $options = array();
 
 	public $MESSAGE_PATTERN = "<b>{severity} {code}: {exceptionClass}</b> {message}";
@@ -63,6 +63,8 @@ class ErrorHandler extends BaseObject
 	 */	
 	function _onException($e)
 	{
+		if (in_array('disabled', $this->options)) return;
+
 		// disable error capturing to avoid recursive errors
 		restore_exception_handler();
 		$this->trigger('php-exception', ['Exception' => $e]);
@@ -88,6 +90,8 @@ class ErrorHandler extends BaseObject
 	 */	
 	function _onError($code, $message, $file, $line, $context = null)
 	{
+		if (in_array('disabled', $this->options)) return false;
+
 		// disable error capturing to avoid recursive errors
 		restore_error_handler();
 
@@ -134,7 +138,7 @@ class ErrorHandler extends BaseObject
 		if (!in_array('develop', $this->options)) return;
 
 		$this->service('debugger')->errorDump(
-		Str::format($this->MESSAGE_PATTERN, $this->getValues($e)),$e);
+			Str::format($this->MESSAGE_PATTERN, $this->getValues($e)),$e);
 	}
 
 	protected function getValues($e)
