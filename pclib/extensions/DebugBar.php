@@ -145,7 +145,6 @@ function onError($event)
 function onPhpException($event)
 {
 	$this->log('error', $event->Exception->getMessage() . $this->app->debugger->getTrace($event->Exception));
-//	$this->app->debugger->errorDump('aaa', $event->Exception);
 }
 
 function onRedirect($event)

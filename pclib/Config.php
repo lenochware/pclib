@@ -14,7 +14,7 @@
 
 /** pclib default configuration */
 $config = [
-	'pclib.errors' => ['display', 'develop', /*,'log','template'=>'error.tpl' */],
+	'pclib.errors' => ['display' => true, 'develop' => true, 'log' => false, 'template'=> PCLIB_DIR.'tpl/error.tpl' ],
 	'pclib.locale' => ['date' => 'd. m. Y', 'datetime' => 'd.m.Y H:i:s'],
 
 	'pclib.directories' => [
@@ -37,11 +37,11 @@ $config = [
 ];
 
 $develop = [
-	'pclib.errors' => ['display', 'develop'],
+	'pclib.errors' => ['develop' => true],
 ];
 
 $production = [
-	'pclib.errors' => ['display', 'log'],
+	'pclib.errors' => ['develop' => false, 'log' => true],
 ];
 
 ?>

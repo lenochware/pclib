@@ -27,10 +27,10 @@ use pclib\Str;
  */
 class ErrorHandler extends BaseObject
 {
-	/** var array [log, display, develop, error_reporting, template] or [disabled] */
-	public $options = array();
+	/** var array [log, display, develop, error_reporting, template] */
+	public $options = [];
 
-	public $MESSAGE_PATTERN = "<b>{severity} {code}: {exceptionClass}</b> {message}";
+	public $MESSAGE_PATTERN = "<br><b>{severity} {code}: {exceptionClass}</b> {message}";
 
 	/** var Logger */
 	public $logger; 
@@ -43,10 +43,10 @@ class ErrorHandler extends BaseObject
 	 */	
 	function register()
 	{
-		set_error_handler(array($this, '_onError'), 
+		set_error_handler([$this, '_onError'], 
 			array_get($this->options, 'error_reporting', E_ALL ^ E_NOTICE)
 		);
-		set_exception_handler(array($this, '_onException'));
+		set_exception_handler([$this, '_onException']);
 	}
 
 	/**
@@ -63,25 +63,28 @@ class ErrorHandler extends BaseObject
 	 */	
 	function _onException($e)
 	{
-		if (in_array('disabled', $this->options)) return;
-
 		// disable error capturing to avoid recursive errors
 		restore_exception_handler();
+
+		if (array_get($this->options, 'display') === 'php') throw $e;
+
+		http_response_code(500);
 		$this->trigger('php-exception', ['Exception' => $e]);
-		if (in_array('log', $this->options)) $this->logError($e);
-		if (!in_array('display', $this->options)) return;
+		if (array_get($this->options, 'log')) $this->logError($e);
+		if (!array_get($this->options, 'display')) exit(1);
 
 		if ($e instanceof \pclib\ApiException) {
 			http_response_code(500);
 			die($e->getMessage());
 		}
 
-		if (in_array('develop', $this->options)) {
+		if (array_get($this->options, 'develop')) {
 			$this->displayError($e);
 		}
 		else {
 			$this->displayProductionError($e);
 		}
+
 		exit(1);
 	}
 
@@ -90,10 +93,10 @@ class ErrorHandler extends BaseObject
 	 */	
 	function _onError($code, $message, $file, $line, $context = null)
 	{
-		if (in_array('disabled', $this->options)) return false;
-
 		// disable error capturing to avoid recursive errors
 		restore_error_handler();
+
+		if (array_get($this->options, 'display') === 'php') return false;
 
 		//Handle warnings...
 		if ($this->codeSeverity($code) != 'Error') {
@@ -134,8 +137,9 @@ class ErrorHandler extends BaseObject
 	 */	
 	function _onWarning($e)
 	{
-		if (in_array('log', $this->options)) $this->logError($e);
-		if (!in_array('develop', $this->options)) return;
+		if (array_get($this->options, 'log')) $this->logError($e);
+		if (!array_get($this->options, 'develop')) return;
+		if (!array_get($this->options, 'display')) return;
 
 		$this->service('debugger')->errorDump(
 			Str::format($this->MESSAGE_PATTERN, $this->getValues($e)),$e);
@@ -190,8 +194,7 @@ class ErrorHandler extends BaseObject
 		}
 
 		try {
-			$template = $this->options['template'];
-			$t = new Tpl($template? $template : PCLIB_DIR.'tpl/error.tpl');
+			$t = new Tpl(array_get($this->options, 'template'));
 			$t->values = $this->getValues($e);
 			print $t->html();
 		}
