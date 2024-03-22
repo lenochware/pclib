@@ -158,6 +158,7 @@ function login($userName, $password)
 		$this->trigger('auth.login', ['user' => $user]);
 	}
 	else {
+		http_response_code(401);
 		$this->setError($result);
 		if ($user) {
 			$this->log('auth/fail', $result, null, $user->values['ID']);
@@ -242,8 +243,8 @@ function testRight($name, $objectId = 0)
 		return true;
 	}
 
+	http_response_code(403);
 	$message = "Required permission '$name'. Access denied.";
-
 	$this->log('auth/fail', 'auth/unauthorized-access', $message);
 	throw new AuthException($message);
 }

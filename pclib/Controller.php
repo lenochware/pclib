@@ -197,6 +197,7 @@ function authorize($perm = '')
 	}
 
 	if (!$auth->hasRight($perm)) {
+		http_response_code(403);
 		$this->app->error('Permission denied.');
 	}
 }
