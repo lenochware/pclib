@@ -210,6 +210,17 @@ static function endsWith($str, $search)
 }
 
 /**
+ * Preserve only specified characters in $str.
+ *
+ * @param string $str Source string
+ * @param string $preserve Which characters should be preserved (regex) e.g. "\w"
+ */
+static function filter($str, $preserve)
+{
+	return Str::replace($str, '~[^'.$preserve.']+~', '');
+}
+
+/**
  * Return true if $str contains $search.
  *
  * @param string $str
@@ -241,7 +252,8 @@ static function webalize($str)
 }
 
 /**
- * Remove diacriticts and non-alphanum characters from $str, convert to lower-case and replace spaces with '_'.
+ * Remove diacriticts and non-alphanum characters from $str and replace spaces with '_'.
+ * Result can be used as identificator: filename, database tablename etc.
  *
  * @param string $str Source string
  * @param string $preserve Which characters should be preserved (regex)
@@ -251,7 +263,7 @@ static function id($str, $preserve = '\w', $separator = '_')
 {
 	$str = Str::ascii($str);
 	$words = preg_split("/\s+/", $str);
-	return Str::replace(implode($separator, $words), '~[^'.$preserve.']+~', '');
+	return Str::filter(implode($separator, $words), $preserve);
 }
 
 /**

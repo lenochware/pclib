@@ -158,3 +158,16 @@
 - Template variables such as {@baseurl}
 - Tpl->setAttr(), Tpl->htmlTag() clean-up
 - Added javascript function pclib.initLinks() which enable ajax links
+
+3.0.0
+- Logger: optimized, list of user agents updated
+- Added Tree->auth, Tree->map()
+- AuthConsole messages improved, added role +right command
+- Added Router->index and '/self' route
+- Debugbar (App->debugMode) rewritten
+- Added column AUTHOR_ID into tables AUTH_USERS, AUTH_ROLES
+- Added class Str - string utilities (PHP extension 'mbstring' is required)
+- Configuration: changed pclib.errors config parameters to boolean
+- possibility disable pclib error handler with 'pclib.errors' => ['display' => 'php'] in config
+- fixed PHP 8.2 support
+

@@ -7,3 +7,10 @@ Poznámky ke kompatibilitě s předchozí verzí PCLIB
 - Funkce Tpl->setAttr() změna signatury: $form->setAttr('noedit', true) - vypne editaci pro celý formulář, $form->setAttr('block_id' noedit', true) - pouze pro blok block_id
 - Nová metoda outputJson() v controlleru může kolidovat, pokud máte metodu se stejným názvem
 - Třída App: Prostředí je automaticky přednastavené na 'develop' pokud vyvíjíte na localhostu, jinde 'production' (nevypisuje při chybě debugovací detaily). Nastavení prostředí viz dokumentace $app->environment, $app->environmentIp()
+
+3.0.0
+
+- Přidáno pole AUTHOR_ID (int) do tabulek AUTH_USERS, AUTH_ROLES
+- Stringové funkce jako paramStr() nebo extractPath() přesunuty do nové třídy Str
+- Je vyžadováno PHP rozšíření 'mbstring'
+- Konfigurační parametr pclib.errors nově používá boolean parametry: 'pclib.errors' => ['display' => true, 'develop' => true ... atd.
