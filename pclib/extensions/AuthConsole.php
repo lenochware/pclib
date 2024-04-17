@@ -449,7 +449,7 @@ protected function executeCmd($cmd)
 		break;
 
 		case '+right':
-			$rval = isset($annot)? $annot : '1';
+			$rval = $annot? $annot : '1';
 			if ($m_ty == 'user') $ok = $this->mng->uGrant($m_name, $name, $rval);
 			elseif ($m_ty == 'role') $ok = $this->mng->rGrant($m_name, $name, $rval);
 			else $this->setError('Runtime error in `%s`', $cmd[0]);
