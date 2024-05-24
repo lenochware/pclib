@@ -368,6 +368,19 @@ class Tree extends system\BaseObject
     {
       if (!$node['ACTIVE']) {
         $i = $this->nextSibling($i - 1);
+
+        $next = array_get($this->nodes, $i);
+  
+        if (!$next) {
+          $next['LEVEL'] = 0;
+        }
+  
+        if ($next['LEVEL'] < $node['LEVEL']) {
+          $n = $node['LEVEL'] - $next['LEVEL'];
+          $closeHtml = $this->getHtmlTplStrip($this->tpl, 'folderEnd', $node);
+          $html .= str_repeat($closeHtml, $n);
+        }
+
         continue;
       }
 
