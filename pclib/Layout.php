@@ -151,7 +151,7 @@ function print_Head($id, $sub, $value)
 {
 	$scripts = [];
 
-	if ($this->elements[$id]['scripts']) {
+	if (!empty($this->elements[$id]['scripts'])) {
 		$scripts = array_merge($scripts, explode(',', $this->elements[$id]['scripts']));
 	}
 

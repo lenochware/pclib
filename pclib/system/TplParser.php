@@ -238,7 +238,9 @@ class TplParser extends BaseObject
 			}
 
 			if ($strip != self::TPL_BLOCK) continue;
-			list($name,$type) = explode(':',$document[$key+1]);
+			$exploded = explode(':',$document[$key+1]);
+			$name = $exploded[0];
+			$type = array_get($exploded, 1, '');
 
 			$type = strtoupper($type);
 			$section = strtoupper($name);

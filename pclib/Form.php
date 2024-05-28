@@ -452,7 +452,7 @@ function print_Class($id, $sub, $value)
 	print ($printFunc == 'trPrintElement')? "<tr><td colspan=\"3\">" : '<div class="form-group buttons">';
 	foreach($this->elements as $id => $elem) {
 		if ($id == 'pcl_document') continue;
-		if ($elem['noprint'] or $elem['skip'] or $elem['type'] != 'button') continue;
+		if ($elem['noprint'] or !empty($elem['skip']) or $elem['type'] != 'button') continue;
 		$this->print_Button($id, '', $this->getValue($id));
 		print ' ';
 	}
@@ -833,7 +833,7 @@ function preparedValues($skipEmpty = false)
 
 	$values = array();
 	foreach ($this->values as $id=>$value) {
-		$elem = $this->elements[$id];
+		$elem = array_get($this->elements, $id, []);
 		if ($id == '' or ($value == '' and $skipEmpty)
 		or $this->getAttr($id, 'nosave')
 		/*or $elem['noprint']*/) {
