@@ -409,10 +409,29 @@ function errorDump($message, $e = null)
  */
 function simpleDump($var)
 {
-	ob_start(); // var_export can cause infinity recursion
-	var_dump($var);
-	$vs = ob_get_contents();
-	ob_end_clean();
+	$vs = '';
+
+	if (is_object($var)) {
+		$output = [];
+		$reflection = new \ReflectionClass($var);
+		foreach ($reflection->getProperties() as $property) {
+			$property->setAccessible(true);
+			$value = $property->getValue($var);
+			$vs .=  $property->getName().': '.$this->stringify($value, false)."\n";
+		}
+	} elseif (is_array($var)) {
+		$output = [];
+		$i = 0;
+		foreach ($var as $key => $value) {
+			if ($i++ > 30) {
+				$vs .= "...\n";
+				break;
+			}
+
+			$vs .= $key.': '.$this->stringify($value, false)."\n";
+		}
+	}
+
 	return htmlspecialchars($vs, ENT_QUOTES);
 }
 
