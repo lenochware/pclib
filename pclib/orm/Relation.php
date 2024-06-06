@@ -52,10 +52,10 @@ function __construct(Model $model, $name)
 
 function getType()
 {
-	if ($this->params['many']) return 'many';
-	if ($this->params['owner']) return 'owner';
-	if ($this->params['many_to_many']) return 'many_to_many';
-	if ($this->params['one']) return 'one';
+	if (!empty($this->params['many'])) return 'many';
+	if (!empty($this->params['owner'])) return 'owner';
+	if (!empty($this->params['many_to_many'])) return 'many_to_many';
+	if (!empty($this->params['one'])) return 'one';
 
 	throw new Exception("Unknown relation type.");
 }

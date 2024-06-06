@@ -367,7 +367,7 @@ function getValue($id)
 	}
 
 	if (!isset($value)) $value = isset($this->values[$id])? $this->values[$id] : null;
-	return (is_numeric($value) or $value)? $value : $elem['default'];
+	return (is_numeric($value) or $value)? $value : array_get($elem, 'default');
 }
 
 /** Get template variable _tvar_... */
@@ -1020,6 +1020,9 @@ protected function formatDate($dtstr, $fmt = '')
  */
 protected function formatStr($s, $fmt)
 {
+	$s = (string)$s;
+	$fmt = (string)$fmt;
+	
 	$len = strlen($fmt);
 	for($i = 0; $i < $len; $i++) {
 		switch ($fmt[$i]) {

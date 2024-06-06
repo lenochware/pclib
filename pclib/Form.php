@@ -333,10 +333,10 @@ protected function getTag($id, $ignoreHtmlAttr = false)
 /** Return form value. */
 function getValue($id)
 {
-	$elem = $this->elements[$id];
+	$elem = array_get($this->elements, $id);
 
 	$value = parent::getValue($id);
-	if ($elem['type'] == 'check') return $this->checkboxToArray($value);
+	if (isset($elem) and $elem['type'] == 'check') return $this->checkboxToArray($value);
 	return $value;
 }
 

@@ -255,6 +255,7 @@ class ValidatorBase extends BaseObject
 		);
 
 		foreach ($keys as $key) {
+			if (empty($elements[$key])) continue;
 			if (in_array($elements[$key]['type'], $this->ignoredElements)) continue;
 			if (!$this->validateElement(array_get($values, $key), (array)array_get($elements, $key))) $ok = false;
 		}

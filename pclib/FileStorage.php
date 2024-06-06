@@ -232,7 +232,7 @@ protected function insertFile(array $loc, array $data)
 		$file['MIMETYPE'] = mimetype($path);
 	}
 	
-	if ($data['IS_FORM_POST'])
+	if (!empty($data['IS_FORM_POST']))
 		$ok = move_uploaded_file($path, $this->rootDir.$file['FILEPATH']);
 	else
 	  $ok = copy($path, $this->rootDir.$file['FILEPATH']); //move?

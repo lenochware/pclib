@@ -132,7 +132,7 @@ private function u_type($type, $size)
 	'text' => 'string','mediumblob' => 'binary','mediumtext' => 'string',
 	'longblob' => 'binary','longtext' => 'string','bool'=>'bool','boolean'=>'bool',
 	);
-	$type = $native[$type];
+	$type = isset($native[$type])? $native[$type] : null;
 	if (!$type) return array(null, $size);
 	$type = explode(':', $type);
 	if (empty($type[1])) $type[1] = $size;

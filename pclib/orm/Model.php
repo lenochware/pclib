@@ -244,12 +244,13 @@ protected function prepareTemplate(Tpl $t)
 			$calculated[$id] = $id;
 		}
 
-		if (!$prepare[$el['type']]) continue;
+		if (empty($prepare[$el['type']])) continue;
 		foreach ($prepare[$el['type']] as $k) {
-			$t->elements[$id][$k.'_array'] = $el[$k]? explode(',', $el[$k]) : array();
+			$t->elements[$id][$k.'_array'] = !empty($el[$k])? explode(',', $el[$k]) : array();
 		}
 	}
 
+	$t->elements['model']['type'] = 'model';
 	$t->elements['model']['calculated'] = $calculated;
 }
 
@@ -352,7 +353,7 @@ public function __set($name, $value)
  */
 function related($name)
 {
-	if ($this->relationsCache[$name]) {
+	if (isset($this->relationsCache[$name])) {
 		return $this->relationsCache[$name];
 	}
 
@@ -413,7 +414,7 @@ protected function getValuesForSave()
 	$elem = $this->getTemplate()->elements;
 
 	foreach ($this->modified as $name) {
-		if ($elem[$name]['nosave']) continue;
+		if (isset($elem[$name]) and $elem[$name]['nosave']) continue;
 		$values[$name] = $this->values[$name];
 	}
 	
