@@ -137,6 +137,9 @@ class ErrorHandler extends BaseObject
 	 */	
 	function _onWarning($e)
 	{
+		$event = $this->trigger('php-warning', ['Exception' => $e]);
+		if ($event and !$event->propagate) return;
+
 		if (array_get($this->options, 'log')) $this->logError($e);
 		if (!array_get($this->options, 'develop')) return;
 		if (!array_get($this->options, 'display')) return;

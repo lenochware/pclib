@@ -403,6 +403,17 @@ function errorDump($message, $e = null)
 	print $s;
 }
 
+function getHtmlErrorDump($e)
+{
+	global $pclib;
+
+	return $this->spanBox($this->uniqId(), $this->tracePath(2,$e),
+			$this->getTrace($e), false, 'cursor:pointer;border-bottom:1px dotted black;'
+	);
+
+}
+
+
 /**
  * Do default php var_dump(). Helper for strargs().
  * @return string variable dump

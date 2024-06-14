@@ -19,6 +19,7 @@ protected $queryTimeSum;
 protected $positionDefault = 'position:fixed;bottom:10px;right:10px;';
 
 public $registered = false;
+public $hideErrors = true;
 
 private static $instance;
 
@@ -34,6 +35,7 @@ private function __construct()
 	if (!$this->isDebugBarRequest()) {
 		if (isset($_SESSION['pclib.debuglog.viewed'])) $_SESSION['pclib.debuglog'] = [];
 		$_SESSION['pclib.debuglog.viewed'] = null;
+		$_SESSION['pclib.debuglog.errors'] = 0;
 	}	
 
 	$this->logUrl();
@@ -60,6 +62,7 @@ public static function register()
 		'app.before-run' => [$that, 'onBeforeRun'],
 		'app.error' => [$that, 'onError'],
 		'php-exception'   => [$that, 'onPhpException'],
+		'php-warning'   => [$that, 'onPhpWarning'],
 		'db.before-query' => [$that, 'onBeforeQuery'],
 		'db.after-query'  => [$that, 'onAfterQuery'],
 		'router.redirect' => [$that, 'onRedirect'],
@@ -93,6 +96,7 @@ function html()
 	$t->values['VERSION'] = PCLIB_VERSION;
 	$t->values['TIME'] = $this->getTime($this->startTime);
 	$t->values['MEMORY'] = round(memory_get_peak_usage()/1048576,2);
+	$t->values['ERRORS'] = $_SESSION['pclib.debuglog.errors'];
 	
 	return $t->html();
 }
@@ -144,7 +148,15 @@ function onError($event)
 
 function onPhpException($event)
 {
-	$this->log('error', $event->Exception->getMessage() . $this->app->debugger->getTrace($event->Exception));
+	$_SESSION['pclib.debuglog.errors']++;
+	$this->log('error', $event->Exception->getMessage()  . ' ' . $this->app->debugger->getHtmlErrorDump($event->Exception));
+}
+
+function onPhpWarning($event)
+{
+	$_SESSION['pclib.debuglog.errors']++;
+	$this->log('warning', $event->Exception->getMessage()  . ' ' . $this->app->debugger->getHtmlErrorDump($event->Exception));
+	if ($this->hideErrors) $event->stopPropagation();
 }
 
 function onRedirect($event)

@@ -5,7 +5,7 @@ string message noescape
 string time
 pager pager pglen "1000"
 ?>
-<table>
+<table class="pc-debuglog">
 	{block items}
 	<tr class="{category}">
 		<td>{category}</td>

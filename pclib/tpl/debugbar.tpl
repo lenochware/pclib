@@ -39,6 +39,8 @@ string POSITION
 .pc-debugbar-window table td {
   padding: 2px;
   border-top: 1px solid #ddd;
+  font-family: monospace;
+  font-size: 12px;
 }
 
 .pc-debugbar-window table tr.url {
@@ -47,6 +49,18 @@ string POSITION
 
 .pc-debugbar-window table tr.url td {
   padding: 10px 2px;
+}
+
+.pc-debugbar-errors {
+  padding: 0px 4px;
+  background-color: #d70022;
+  color: white;
+  border-radius: 8px;
+  float:right;
+  margin-left: 5px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  margin-top: 2px; 
 }
 
 .redirect {
@@ -58,6 +72,10 @@ string POSITION
   background-color: #f4f5f7; 
   width: calc(100vw - 50px);
   padding: 10px 0px;
+}
+
+.pc-debuglog tr.warning td:first-child, .pc-debuglog tr.error td:first-child {
+  color:red;
 }
 </style>
 
@@ -90,6 +108,6 @@ window.addEventListener('load', function () {
 
 <div id="pc-debugbar" onclick="pclibShowModal('pcwin0','?r=pclib_debugbar/show');event.stopPropagation()">
   <a href="#" onclick="document.getElementById('pc-debugbar').style.display='none';event.stopPropagation()">×</a>
-  pclib {VERSION}|{TIME} ms|{MEMORY} MB
+  pclib {VERSION}|{TIME} ms|{MEMORY} MB {if ERRORS}<div class="pc-debugbar-errors" title="Errors...">{ERRORS}</div>{/if}
 </div>
 <div id="pcwin0" class="pc-debugbar-window"></div>
