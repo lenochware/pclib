@@ -28,14 +28,21 @@ private function __construct()
 	global $pclib;
 	$this->app = $pclib->app;
 
-	if (!isset($_SESSION['pclib.debuglog'])) {
-		$_SESSION['pclib.debuglog'] = [];
+	if (!isset($_SESSION['pclib.debugbar'])) {
+		$_SESSION['pclib.debugbar'] = [
+			'records' => [],
+			'input' => '',
+			'action' => null,
+			'viewed' => null,
+			'errors' => 0,
+			'window' => '',
+		];
 	}
 
 	if (!$this->isDebugBarRequest()) {
-		if (isset($_SESSION['pclib.debuglog.viewed'])) $_SESSION['pclib.debuglog'] = [];
-		$_SESSION['pclib.debuglog.viewed'] = null;
-		$_SESSION['pclib.debuglog.errors'] = 0;
+		if (isset($_SESSION['pclib.debugbar']['viewed'])) $_SESSION['pclib.debugbar']['records'] = [];
+		$_SESSION['pclib.debugbar']['viewed'] = null;
+		$_SESSION['pclib.debugbar']['errors'] = 0;
 	}	
 
 	$this->logUrl();
@@ -86,17 +93,17 @@ protected function addEvents($events)
 protected function log($category, $message)
 {
 	if ($this->isDebugBarRequest()) return;
-	$_SESSION['pclib.debuglog'][] = ['category' => $category, 'message' => $message];
+	$_SESSION['pclib.debugbar']['records'][] = ['category' => $category, 'message' => $message];
 }
 
 function html()
 {
-	$t = new PCTpl(PCLIB_DIR.'tpl/debugbar.tpl');
+	$t = new PCTpl(PCLIB_DIR.'tpl/debugbar/main.tpl');
 	$t->values['POSITION'] = array_get($this->app->config, 'pclib.debugbar.position', $this->positionDefault);
 	$t->values['VERSION'] = PCLIB_VERSION;
 	$t->values['TIME'] = $this->getTime($this->startTime);
 	$t->values['MEMORY'] = round(memory_get_peak_usage()/1048576,2);
-	$t->values['ERRORS'] = $_SESSION['pclib.debuglog.errors'];
+	$t->values['ERRORS'] = $_SESSION['pclib.debugbar']['errors'];
 	
 	return $t->html();
 }
@@ -117,13 +124,25 @@ function onAfterOut($event)
 
 function onBeforeRun($event)
 {
-	if (!$this->isDebugBarRequest()) return;
+
+	if (!$this->isDebugBarRequest()) {
+		$_SESSION['pclib.debugbar']['action'] = $event->action;
+		return;
+	}
 
 	switch ($event->action->method) {
-		case 'show': $this->printLogWindow(); break;
+		case 'show':  
+			if ($_SESSION['pclib.debugbar']['window'] == 'console') $this->printConsoleWindow();
+			else  $this->printLogWindow(); break;
+		case 'log': $this->printLogWindow(); break;
 		case 'variables': $this->printInfoWindow(); break;
-		case 'clear': $_SESSION['pclib.debuglog.viewed'] = true; break;
-		case 'cshow': $_SESSION['pclib.debuglog'] = []; $this->printLogWindow(); break;
+		case 'clear': $_SESSION['pclib.debugbar']['viewed'] = true; break;
+		case 'cshow': $_SESSION['pclib.debugbar']['records'] = []; $this->printLogWindow(); break;
+		case 'console': $this->printConsoleWindow(); break;
+		case 'execute': 
+  		$post = json_decode(file_get_contents('php://input'), true);
+			$this->executePHP($post); 
+			break;
 	}
 
 	$event->propagate = false;
@@ -148,13 +167,13 @@ function onError($event)
 
 function onPhpException($event)
 {
-	$_SESSION['pclib.debuglog.errors']++;
+	$_SESSION['pclib.debugbar']['errors']++;
 	$this->log('error', $event->Exception->getMessage()  . ' ' . $this->app->debugger->getHtmlErrorDump($event->Exception));
 }
 
 function onPhpWarning($event)
 {
-	$_SESSION['pclib.debuglog.errors']++;
+	$_SESSION['pclib.debugbar']['errors']++;
 	$this->log('warning', $event->Exception->getMessage()  . ' ' . $this->app->debugger->getHtmlErrorDump($event->Exception));
 	if ($this->hideErrors) $event->stopPropagation();
 }
@@ -182,21 +201,44 @@ protected function logUrl()
 
 protected function printLogWindow()
 {
-	print file_get_contents(PCLIB_DIR.'tpl/debugmenu.tpl');
-	//print '<h4>Debug Log</h4>';
-	$grid = new PCGrid(PCLIB_DIR.'tpl/debuglog.tpl');
-	$grid->setArray($_SESSION['pclib.debuglog']);
+	$_SESSION['pclib.debugbar']['window'] = 'log';
+	print file_get_contents(PCLIB_DIR.'tpl/debugbar/menu.tpl');
+	$grid = new PCGrid(PCLIB_DIR.'tpl/debugbar/list.tpl');
+	$grid->setArray($_SESSION['pclib.debugbar']['records']);
 	print $grid;	
+	die();
+}
+
+protected function printConsoleWindow()
+{
+	$_SESSION['pclib.debugbar']['window'] = 'console';
+	print file_get_contents(PCLIB_DIR.'tpl/debugbar/menu.tpl');
+	$tpl = new PCTpl(PCLIB_DIR.'tpl/debugbar/console.tpl');
+	$tpl->values['code'] = $_SESSION['pclib.debugbar']['input'];
+	print $tpl;
 	die();
 }
 
 protected function printInfoWindow()
 {
-	print file_get_contents(PCLIB_DIR.'tpl/debugmenu.tpl');
+	print file_get_contents(PCLIB_DIR.'tpl/debugbar/menu.tpl');
 	print '<h4>_SESSION</h4>';
 	print $this->getDump($_SESSION);
 	print '<h4>_COOKIE</h4>';
 	print $this->getDump($_COOKIE);
+	die();
+}
+
+protected function executePHP($post)
+{
+	if ($this->app->request->serverIp !== '127.0.0.1') die('This function is for localhost only.');
+
+	$_SESSION['pclib.debugbar']['input'] = $post['code'];
+
+	$app = $this->app;
+	$action = $_SESSION['pclib.debugbar']['action'];
+	$c = $app->newController($action->controller, $action->module);
+	eval($post['code']);
 	die();
 }
 

@@ -3,17 +3,20 @@ string VERSION
 string TIME
 string MEMORY
 string POSITION
+string ERRORS
 ?>
 <style>
 #pc-debugbar {
   {POSITION}
   background:white;
   border:1px solid blue;
-  padding: 2px;
+  padding: 4px 2px;
   cursor:pointer;
   border-radius: 2px;
   opacity: 0.8;
   z-index: 2100;
+  font-family: verdana;
+  font-size: 12px;  
 }
 
 .pc-debugbar-window {
@@ -58,9 +61,7 @@ string POSITION
   border-radius: 8px;
   float:right;
   margin-left: 5px;
-  font-size: 0.8rem;
   font-weight: bold;
-  margin-top: 2px; 
 }
 
 .redirect {
@@ -77,6 +78,20 @@ string POSITION
 .pc-debuglog tr.warning td:first-child, .pc-debuglog tr.error td:first-child {
   color:red;
 }
+
+.pc-debugbar-console {
+  display: flex;
+}
+
+#pc-debugbar-input {
+  width: 50%;
+  margin: 20px 5px;
+}
+
+#pc-debugbar-results {
+  max-width: 50%;
+  margin: 20px 5px;
+}
 </style>
 
 <script>
@@ -85,6 +100,23 @@ function pc_debugbar_resize(top, height)
   var elem = document.getElementById('pcwin0');
   elem.style.top = top;
   elem.style.height = height;
+}
+
+async function pc_debugbar_exec()
+{
+  const data = {code: document.getElementById('pc-debugbar-input').value};
+  
+  const response = await fetch('?r=pclib_debugbar/execute', {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  const result = await response.text();
+
+  document.getElementById('pc-debugbar-results').innerHTML = result;
 }
 
 async function pclibShowModal(id, url)
@@ -101,12 +133,19 @@ function pclibHideModal()
   pclibDebugWin.style.display='none';
 }
 
+function pc_debugbar_open()
+{
+  pclibDebugWin = document.getElementById('pcwin0');
+  if (pclibDebugWin.style.display == 'block') pclibHideModal();
+  else pclibShowModal('pcwin0', '?r=pclib_debugbar/show');
+}
+
 window.addEventListener('load', function () {
   fetch('?r=pclib_debugbar/clear');
 })
 </script>
 
-<div id="pc-debugbar" onclick="pclibShowModal('pcwin0','?r=pclib_debugbar/show');event.stopPropagation()">
+<div id="pc-debugbar" onclick="pc_debugbar_open();event.stopPropagation()">
   <a href="#" onclick="document.getElementById('pc-debugbar').style.display='none';event.stopPropagation()">×</a>
   pclib {VERSION}|{TIME} ms|{MEMORY} MB {if ERRORS}<div class="pc-debugbar-errors" title="Errors...">{ERRORS}</div>{/if}
 </div>
