@@ -373,7 +373,7 @@ function getValue($id)
 /** Get template variable _tvar_... */
 protected function getVariable($id)
 {
-
+	$value = '';
 	if (strpos($id, '_tvar_') === 0) {
 		$id = '@'.substr($id, 6);
 	}
