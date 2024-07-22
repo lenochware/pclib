@@ -141,6 +141,8 @@ function getLog($rowCount, array $filter = null)
 		~ AND L.CATEGORY in ({#CATEGORY})
 		~ AND L.USER_ID in ({#USERNAME})
 		~ AND L.ACTION in ({#ACTIONNAME})
+		~ AND L.ITEM_ID='{#ITEM_ID}'
+		~ AND L.DT like '{LOGGED_AT}%'
 		order by L.ID desc", $filter
 	);
 
