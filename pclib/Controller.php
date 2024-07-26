@@ -138,9 +138,22 @@ function action($rs)
  */
 public function template($path, $data = [])
 {
-  $templ = new pclib\Tpl($path);
-  $templ->values = $data;
-  return $templ;
+	$s = substr(basename($path, '.tpl'), -5);
+	
+	switch($s) {
+		case '-form': case '_form':  case 'form':
+			$t = new pclib\Form($path); 
+		break;
+		case '-grid': case '_grid':  case 'grid':
+			$t = new pclib\Grid($path); 
+		break;
+		default:
+			$t = new pclib\Tpl($path);
+		break;
+	}
+
+	$t->values = $data;
+	return $t;
 }
 
 /**
