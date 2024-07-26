@@ -122,12 +122,12 @@ public function defaultAction($action)
  */
 function action($rs)
 {
-  $action = new pclib\Action($rs);
-  $ct = $this->app->newController($action->controller);
+	$action = new pclib\Action($rs);
+	$ct = $this->app->newController($action->controller);
 
-  if (!$ct) throw new Exception('Build of '.$action->controller.' failed.');
+	if (!$ct) throw new Exception('Build of '.$action->controller.' failed.');
 
-  return $ct->run($action);
+	return $ct->run($action);
 }
 
 /**
@@ -209,12 +209,12 @@ function authorize($perm = '')
  **/
 public function outputJson(array $data, $code = '')
 {
-  if ($code) {
-    http_response_code($code);
-  }
+	if ($code) {
+		http_response_code($code);
+	}
 
-  header('Content-Type: application/json; charset=utf-8');
-  die(json_encode($data, JSON_UNESCAPED_UNICODE));
+	header('Content-Type: application/json; charset=utf-8');
+	die(json_encode($data, JSON_UNESCAPED_UNICODE));
 }
 
 

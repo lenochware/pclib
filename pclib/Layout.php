@@ -259,8 +259,8 @@ protected function _init()
 {
 	parent::_init();
 	$typelist = $this->elements['pcl_document']['typelist'];
-	$this->headTag = $typelist['head'];
-	$this->messagesTag = $typelist['messages'];
+	$this->headTag = array_get($typelist, 'head');
+	$this->messagesTag = array_get($typelist, 'messages');
 }
 
 protected function _out($block = null)
