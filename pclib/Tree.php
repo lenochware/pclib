@@ -188,6 +188,27 @@ class Tree extends system\BaseObject
   }
 
   /**
+   * Add %Tree node.
+   * @param int $nodeId Add new node after/before this node
+   * @param array $data Data of node to be added.
+   */
+  function add($nodeId, $data, $options = ['before' => false, 'child' => false])
+  {
+    if (!isset($this->index[$nodeId])) throw new Exception("Node not found.");
+    $target = $this->get($nodeId);
+    $key = $this->index[$nodeId] + 1;
+
+    $data['LEVEL'] = $target['LEVEL'] + $options['child']? 1:0;
+    if (!isset($data['ACTIVE'])) $data['ACTIVE'] = 1;
+
+    if ($options['before'] and !$options['child']) $key--;
+
+    $nodes = $this->nodes;
+    array_splice($nodes, $key, 0, [$data]); // insert at position $key
+    $this->fromArray($nodes);
+  }
+
+  /**
    * Find %Tree node by node parameter.
    * @param string $key Node key
    * @param string $value Value of node key
@@ -346,7 +367,7 @@ class Tree extends system\BaseObject
 
   protected function authFilter($node)
   {
-    if ($node['RKEY'] and !$this->auth->hasRight($node['RKEY'])) {
+    if (isset($node['RKEY']) and !$this->auth->hasRight($node['RKEY'])) {
       $node['ACTIVE'] = 0;
     }
 
