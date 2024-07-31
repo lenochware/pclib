@@ -196,8 +196,8 @@ CREATE TABLE `jobs` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(50) DEFAULT NULL,
   `annotation` TEXT,
-  `job_type` VARCHAR(30) DEFAULT NULL,
-  `job_command` TEXT,
+  `job_command` VARCHAR(255) DEFAULT NULL,
+  `job_params` VARCHAR(255) DEFAULT NULL,
   `first_run_at` DATETIME DEFAULT NULL,
   `period` INT(11) DEFAULT NULL,
   `last_run_at` DATETIME DEFAULT NULL,
@@ -211,13 +211,7 @@ CREATE TABLE `jobs` (
 
 /** Fill lookups for padmin/jobs. */
 
-insert into `LOOKUPS` (`APP`, `ID`, `CNAME`, `LABEL`, `POSITION`) values('padmin','url','job-type','Url','0');
-insert into `LOOKUPS` (`APP`, `ID`, `CNAME`, `LABEL`, `POSITION`) values('padmin','shell','job-type','Shell','0');
-insert into `LOOKUPS` (`APP`, `ID`, `CNAME`, `LABEL`, `POSITION`) values('padmin','function','job-type','Function','0');
-insert into `LOOKUPS` (`APP`, `ID`, `CNAME`, `LABEL`, `POSITION`) values('padmin','class','job-type','Class','0');
-insert into `LOOKUPS` (`APP`, `ID`, `CNAME`, `LABEL`, `POSITION`) values('padmin','phpfile','job-type','Phpfile','0');
-insert into `LOOKUPS` (`APP`, `ID`, `CNAME`, `LABEL`, `POSITION`) values('padmin','batch','job-type','Batch','0');
-insert into `LOOKUPS` (`APP`, `ID`, `CNAME`, `LABEL`, `POSITION`) values('padmin','0','job-period','Jen jednou','1');
+insert into `LOOKUPS` (`APP`, `ID`, `CNAME`, `LABEL`, `POSITION`) values('padmin','0','job-period','Ruční spuštění','1');
 insert into `LOOKUPS` (`APP`, `ID`, `CNAME`, `LABEL`, `POSITION`) values('padmin','600','job-period','Jednou za 10 minut','3');
 insert into `LOOKUPS` (`APP`, `ID`, `CNAME`, `LABEL`, `POSITION`) values('padmin','3600','job-period','Jednou za hodinu','4');
 insert into `LOOKUPS` (`APP`, `ID`, `CNAME`, `LABEL`, `POSITION`) values('padmin','7200','job-period','Jednou za 2 hodiny','5');
