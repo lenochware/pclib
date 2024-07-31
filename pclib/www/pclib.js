@@ -167,6 +167,7 @@ validateForm: function(form) {
 	return {isValid: isValid, elements: elements};
 },
 
+/** @private */
 _validateFileSize: function(input, size_mb)
 {
 	for (var j in input.files) {
@@ -176,6 +177,7 @@ _validateFileSize: function(input, size_mb)
 	return true;
 },
 
+/** @private */
 _validateFileType: function(input)
 {
 	if (!input.accept) return true;
@@ -259,6 +261,7 @@ getValue: function (id) {
 	return false;
 },
 
+/** @private */
 fetchLink: async function(e) {
 	e.stopPropagation();
 	e.preventDefault();
@@ -285,6 +288,7 @@ fetch: async function(url) {
 	pclib.initLinks();
 },
 
+/** @private */
 _updateDom: function(self, data) {
 	for(id in data) {
 		let elem = (id == 'self')? self : document.getElementById(id);
@@ -339,6 +343,7 @@ hideModal: function() {
 	this.modalWin.style.display='none';
 },
 
+/** @private */
 buildQuery: function(parameters) {
 	var qs = "";
 	for(var key in parameters) {
@@ -384,6 +389,14 @@ getUrl: function(rs) {
  */
 redirect: function(rs) {
 	window.location = this.getUrl(rs);
+},
+
+/** 
+ * Init pclib.js functions
+ */
+init: function() {
+	pclib.initTree();
+	pclib.initLinks();
 },
 
 };
