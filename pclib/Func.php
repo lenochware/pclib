@@ -12,6 +12,9 @@
 # License as published by the Free Software Foundation; either
 # version 2.1 of the License, or (at your option) any later version.
 
+use pclib\Str;
+
+
 /**
  * Dump variable(s) for debugging and stop application.
  * Usage: dump($a,$b,...);

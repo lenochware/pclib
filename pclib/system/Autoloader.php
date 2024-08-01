@@ -14,7 +14,6 @@
 
 namespace pclib\system;
 
-require_once PCLIB_DIR . 'Str.php';
 use pclib\Str;
 
 /**

@@ -15,7 +15,7 @@
 /**
  * PClib version string
  */
-define('PCLIB_VERSION', '3.0.5');
+define('PCLIB_VERSION', '3.1.0');
 
 /* Find out where library reside. MUST BE an absolute path. */
 if (!defined('PCLIB_DIR')) {
@@ -29,6 +29,7 @@ if (!defined('BASE_URL')) {
 }
 
 require_once PCLIB_DIR . 'system/exceptions.php';
+require_once PCLIB_DIR . 'Str.php';
 require_once PCLIB_DIR . 'Func.php';
 require_once PCLIB_DIR . 'system/Autoloader.php';
 

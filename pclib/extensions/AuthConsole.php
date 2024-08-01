@@ -73,7 +73,7 @@ function executeScript($s)
 function execute($line)
 {
 	$line = trim($line);
-	if ($line[0] == ';' or $line == '') return true;
+	if ($line == '' or $line[0] == ';') return true;
 	if ($line[0] == '&') {
 		if (!$this->masterCmd) {
 			$this->setError('Runtime error.');
