@@ -2,10 +2,10 @@
 
 CREATE TABLE LOOKUPS (
   GUID integer primary key,
-  ID varchar(10),
-  APP varchar(10),
-  CNAME varchar(20),
-  LABEL varchar(100),
+  ID varchar(50),
+  APP varchar(50),
+  CNAME varchar(100),
+  LABEL varchar(255),
   POSITION integer DEFAULT 0
 );
 
@@ -27,7 +27,7 @@ CREATE TABLE `TRANSLATOR` (
 
 CREATE TABLE TRANSLATOR_LABELS (
   ID integer primary key,
-  LABEL varchar(80),
+  LABEL varchar(100),
   CATEGORY integer DEFAULT 0,
   DT datetime
 );
@@ -41,7 +41,7 @@ CREATE TABLE AUTH_REGISTER (
   ROLE_ID integer,
   OBJ_ID integer DEFAULT 0,
   RIGHT_ID integer,
-  RVAL varchar(20) DEFAULT 0
+  RVAL varchar(50) DEFAULT 0
 );
 
 CREATE UNIQUE INDEX I_AUTH_REGISTER_ROLE ON AUTH_REGISTER (ROLE_ID,OBJ_ID,RIGHT_ID);
@@ -53,7 +53,7 @@ CREATE UNIQUE INDEX I_AUTH_REGISTER_USER ON AUTH_REGISTER (USER_ID,OBJ_ID,RIGHT_
 CREATE TABLE AUTH_RIGHTS (
   ID integer primary key,
   SNAME varchar(100),
-  ANNOT varchar(100),
+  ANNOT varchar(255),
   RTYPE char(1) DEFAULT 'B',
   DT datetime
 );
@@ -63,7 +63,7 @@ CREATE TABLE AUTH_RIGHTS (
 CREATE TABLE AUTH_ROLES (
   ID integer primary key,
   SNAME varchar(100),
-  ANNOT varchar(100),
+  ANNOT varchar(255),
   AUTHOR_ID integer,
   LASTMOD datetime,
   DT datetime
@@ -125,7 +125,7 @@ CREATE INDEX I_LOGGER_ACTION ON LOGGER (ACTION);
 
 CREATE TABLE LOGGER_LABELS (
   ID integer primary key,
-  LABEL varchar(80),
+  LABEL varchar(100),
   CATEGORY integer DEFAULT 0,
   DT datetime
 );
@@ -145,11 +145,11 @@ CREATE TABLE LOGGER_MESSAGES (
 CREATE TABLE TREE_LOOKUPS (
   ID integer primary key,
   TREE_ID integer,
-  LABEL VARCHAR(50),
+  LABEL VARCHAR(100),
   LEVEL integer,
-  URL VARCHAR(50),
-  ROUTE VARCHAR(50),
-  RKEY varchar(50),
+  URL VARCHAR(255),
+  ROUTE VARCHAR(100),
+  RKEY varchar(100),
   NR integer,
   ACTIVE integer DEFAULT 1
 );
@@ -191,7 +191,7 @@ CREATE INDEX I_FILESTORAGE_HASH ON FILESTORAGE (HASH);
 
 CREATE TABLE jobs (
   id integer primary key,
-  name VARCHAR(50),
+  name VARCHAR(100),
   annotation ntext,
   job_command VARCHAR(255),
   job_params VARCHAR(255),
@@ -204,3 +204,16 @@ CREATE TABLE jobs (
   created_at datetime,
   author_id integer
 );
+
+-- Fill lookups for padmin/jobs.
+INSERT INTO LOOKUPS (APP, ID, CNAME, LABEL, POSITION) VALUES ('padmin', 0, 'job-period', 'Ruční spuštění', 1);
+INSERT INTO LOOKUPS (APP, ID, CNAME, LABEL, POSITION) VALUES ('padmin', 600, 'job-period', 'Jednou za 10 minut', 3);
+INSERT INTO LOOKUPS (APP, ID, CNAME, LABEL, POSITION) VALUES ('padmin', 3600, 'job-period', 'Jednou za hodinu', 4);
+INSERT INTO LOOKUPS (APP, ID, CNAME, LABEL, POSITION) VALUES ('padmin', 7200, 'job-period', 'Jednou za 2 hodiny', 5);
+INSERT INTO LOOKUPS (APP, ID, CNAME, LABEL, POSITION) VALUES ('padmin', 86400, 'job-period', 'Jednou za den', 6);
+INSERT INTO LOOKUPS (APP, ID, CNAME, LABEL, POSITION) VALUES ('padmin', 604800, 'job-period', 'Jednou za týden', 7);
+INSERT INTO LOOKUPS (APP, ID, CNAME, LABEL, POSITION) VALUES ('padmin', 2592000, 'job-period', 'Jednou za měsíc', 8);
+INSERT INTO LOOKUPS (APP, ID, CNAME, LABEL, POSITION) VALUES ('padmin', 60, 'job-period', 'Jednou za minutu', 2);
+
+-- Version of PCLIB database structures.
+INSERT INTO APP_PARAMS (PARAM_NAME, PARAM_VALUE, TITLE, CREATED_AT) VALUES ('PCLIB_VERSION', '3.1.0', 'Version of PCLIB database structures', datetime('now'));

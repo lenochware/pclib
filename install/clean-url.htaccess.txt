@@ -1,0 +1,13 @@
+# PClib Clean URL support.
+# Rename to .htaccess and copy into root directory of your application.
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # RewriteBase /path/to/app
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond $1 !^(index\.php)
+    RewriteRule ^(.*)$ index.php?r=$1&%{QUERY_STRING} [L]
+</IfModule>

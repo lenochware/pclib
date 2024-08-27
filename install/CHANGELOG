@@ -171,3 +171,10 @@
 - possibility disable pclib error handler with 'pclib.errors' => ['display' => 'php'] in config
 - fixed PHP 8.2 support
 
+3.1.0
+- Improved debugbar (show errors, added eval window)
+- Various small improvements (logger filter, pclib.init() function, added job_params)
+- Controller->template() return form or grid object for templates with name *_form.tpl or *_grid.tpl
+- Tree->add() - add tree node into Tree
+- Extend size of some database fields
+- Bugfixes
