@@ -232,6 +232,7 @@ class TplParser extends BaseObject
 
 				if (empty($elements[$id])) {
 					$elements[$id] = ElementsDef::getElement($id, ($id[0] == '@')? 'variable' : 'string');
+					$elements[$id]['skip'] = 1;
 				}
 
 				if (isset($elements[$id]) and !$elements[$id]['block'])
