@@ -163,6 +163,17 @@ function changePassword($password)
 	$am->setPassw($this->values['USERNAME'], $password);
 }
 
+/**
+ * Find and return user object or null if not exists.
+ * @param string $userName
+ * @return AuthUser $user
+ */
+static function find($userName)
+{
+	$storage = new system\storage\AuthDbStorage;
+	return $storage->getUser($userName);
+}
+
 }
 
 ?>
