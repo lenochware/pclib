@@ -93,8 +93,10 @@ function useFile($fileName)
 /** Translate string $s to selected language. */
 function translate($s, array $params = null)
 {
-	if ($this->autoUpdate and !array_key_exists($s, $this->cache))
+	if ($this->autoUpdate and !array_key_exists($s, $this->cache)) {
+		if (!$this->pageName) throw new Exception("Cannot save text. Text page is not selected (call usePage).");
 		$this->getStorage()->saveDefault($this->pageName, $s);
+	}
 
 	$ts = array_get($this->cache, $s);
 	if (!$ts) $ts = $s;

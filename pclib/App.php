@@ -309,7 +309,7 @@ function redirect($route, $code = null)
  */
 function setLanguage($language)
 {
-	$trans = new Translator($this->name);
+	$trans = new Translator('App');
 	$trans->language = $language;
 	
 	if ($language == 'source') {

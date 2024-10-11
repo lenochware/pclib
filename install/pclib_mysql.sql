@@ -209,7 +209,7 @@ CREATE TABLE `jobs` (
   PRIMARY KEY (`id`)
 ) ENGINE=MYISAM DEFAULT CHARSET=utf8;
 
-/** Fill lookups for padmin/jobs. */
+/** Fill lookups. */
 
 insert into `LOOKUPS` (`APP`, `ID`, `CNAME`, `LABEL`, `POSITION`) values('padmin','0','job-period','Ruční spuštění','1');
 insert into `LOOKUPS` (`APP`, `ID`, `CNAME`, `LABEL`, `POSITION`) values('padmin','600','job-period','Jednou za 10 minut','3');
@@ -219,6 +219,8 @@ insert into `LOOKUPS` (`APP`, `ID`, `CNAME`, `LABEL`, `POSITION`) values('padmin
 insert into `LOOKUPS` (`APP`, `ID`, `CNAME`, `LABEL`, `POSITION`) values('padmin','604800','job-period','Jednou za týden','7');
 insert into `LOOKUPS` (`APP`, `ID`, `CNAME`, `LABEL`, `POSITION`) values('padmin','2592000','job-period','Jednou za měsíc','8');
 insert into `LOOKUPS` (`APP`, `ID`, `CNAME`, `LABEL`, `POSITION`) values('padmin','60','job-period','Jednou za minutu','2');
+
+insert into `TRANSLATOR_LABELS` (`ID`, `LABEL`, `CATEGORY`) values(1,'App',1);
 
 /** Version of PCLIB database structures. */  
 INSERT INTO `APP_PARAMS` (`PARAM_NAME`, `PARAM_VALUE`, `TITLE`, `CREATED_AT`) VALUES('PCLIB_VERSION', '3.1.0', 'Version of PCLIB database structures', NOW());

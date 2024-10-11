@@ -205,7 +205,7 @@ CREATE TABLE jobs (
   author_id integer
 );
 
--- Fill lookups for padmin/jobs.
+-- Fill lookups
 INSERT INTO LOOKUPS (APP, ID, CNAME, LABEL, POSITION) VALUES ('padmin', 0, 'job-period', 'Ruční spuštění', 1);
 INSERT INTO LOOKUPS (APP, ID, CNAME, LABEL, POSITION) VALUES ('padmin', 600, 'job-period', 'Jednou za 10 minut', 3);
 INSERT INTO LOOKUPS (APP, ID, CNAME, LABEL, POSITION) VALUES ('padmin', 3600, 'job-period', 'Jednou za hodinu', 4);
@@ -214,6 +214,8 @@ INSERT INTO LOOKUPS (APP, ID, CNAME, LABEL, POSITION) VALUES ('padmin', 86400, '
 INSERT INTO LOOKUPS (APP, ID, CNAME, LABEL, POSITION) VALUES ('padmin', 604800, 'job-period', 'Jednou za týden', 7);
 INSERT INTO LOOKUPS (APP, ID, CNAME, LABEL, POSITION) VALUES ('padmin', 2592000, 'job-period', 'Jednou za měsíc', 8);
 INSERT INTO LOOKUPS (APP, ID, CNAME, LABEL, POSITION) VALUES ('padmin', 60, 'job-period', 'Jednou za minutu', 2);
+
+insert into TRANSLATOR_LABELS (ID, LABEL, CATEGORY) values(1,'App',1);
 
 -- Version of PCLIB database structures.
 INSERT INTO APP_PARAMS (PARAM_NAME, PARAM_VALUE, TITLE, CREATED_AT) VALUES ('PCLIB_VERSION', '3.1.0', 'Version of PCLIB database structures', datetime('now'));

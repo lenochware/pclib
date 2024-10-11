@@ -1055,7 +1055,7 @@ protected function toString($value) {
 protected function getItems($id)
 {
 	$elem = $this->elements[$id];
-	if (!empty($elem['items'])) {
+	if (isset($elem['items'])) {
 		return $elem['items'];
 	}
 
