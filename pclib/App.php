@@ -31,7 +31,7 @@ class App extends system\BaseObject
 public $name;
 
 /** Application configuration. */
-public $config = array();
+public $config = [];
 
 /** application base paths (webroot, basedir, baseurl and pclib) */
 public $paths;
@@ -40,7 +40,7 @@ public $paths;
 public $layout;
 
 /** Storage of the global services - Db, Auth, Logger etc. */
-public $services = array();
+public $services = [];
 
 /** Current environment (such as 'develop','test','production'). */
 public $environment = '';
@@ -52,6 +52,8 @@ public $debugMode = false;
 public $errorHandler;
 
 public $plugins;
+
+public $translatorName = 'App';
 
 /**
  * Load config and sessions, read route.
@@ -110,7 +112,7 @@ function __set($name, $value)
 		$this->setService($name, $value);
 	}
 	else {
-		throw new Exception("Cannot assign '%s' to App->%s property.", array(gettype($value), $name));
+		throw new Exception("Cannot assign '%s' to App->%s property.", [gettype($value), $name]);
 	}
 }
 
@@ -161,7 +163,7 @@ protected function createDefaultService($serviceName)
 		return new pclib\EventManager;
 	}
 
-	$canBeDefault = array('logger', 'debugger', 'request', 'router');
+	$canBeDefault = ['logger', 'debugger', 'request', 'router'];
 	if (in_array($serviceName, $canBeDefault)) {
 		$className = '\\pclib\\'.ucfirst($serviceName);
 
@@ -228,7 +230,7 @@ function addConfig($source)
 
 function addPlugins($dir)
 {
-	$this->plugins[] = array();
+	$this->plugins[] = [];
   foreach (glob($dir.'/*.php') as $fileName) {
     require_once($fileName);
     $pluginName = basename($fileName, '.php');
@@ -309,7 +311,7 @@ function redirect($route, $code = null)
  */
 function setLanguage($language)
 {
-	$trans = new Translator('App');
+	$trans = new Translator($this->translatorName);
 	$trans->language = $language;
 	
 	if ($language == 'source') {
@@ -348,14 +350,14 @@ function getPaths()
 	//$webroot = str_replace($_SERVER['SCRIPT_NAME'], '', $_SERVER['SCRIPT_FILENAME']);
 	$webroot = $_SERVER['DOCUMENT_ROOT'];
 
-	return array(
+	return [
 		'webroot' => $this->normalizeDir($webroot),
 		'baseurl' => $this->normalizeDir(dirname($_SERVER['SCRIPT_NAME'])),
 		'basedir' => $this->normalizeDir(dirname($_SERVER['SCRIPT_FILENAME'])),
 		'pclib' => $this->normalizeDir(substr(PCLIB_DIR, strlen($webroot))),
 		'controllers' => 'controllers',
 		'modules' => 'modules',
-	);
+	];
 }
 
 /** Replace path variables e.g. {basedir} */
@@ -519,7 +521,7 @@ function newController($name, $module = '')
 
 function newModel($name)
 {
-	return orm\Model::create($name, array(), false);
+	return orm\Model::create($name, [], false);
 }
 
 /**
