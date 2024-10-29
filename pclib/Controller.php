@@ -58,11 +58,11 @@ function getArgs($actionMethod, array $params)
 	$args = array();
 	$rm = new \ReflectionMethod($this, $actionMethod);
 	foreach($rm->getParameters() as $param)  {
-		$param_value = array_get($params, $param->name);
-		if (empty($param_value) and !$param->isOptional()) {
+		$param_value = array_get($params, $param->name, '');
+		if (!strlen($param_value) and !$param->isOptional()) {
 			$this->app->error('Required parameter "%s" for page "%s" missing.', null, $param->name, get_class($this) .'/'.$this->action);
 		}
-		$args[] = isset($param_value)? $param_value : $param->getDefaultValue();
+		$args[] = strlen($param_value)? $param_value : $param->getDefaultValue();
 	}
 
 	return $args;
@@ -122,12 +122,12 @@ public function defaultAction($action)
  */
 function action($rs)
 {
-	$action = new pclib\Action($rs);
-	$ct = $this->app->newController($action->controller);
+  $action = new pclib\Action($rs);
+  $ct = $this->app->newController($action->controller);
 
-	if (!$ct) throw new Exception('Build of '.$action->controller.' failed.');
+  if (!$ct) throw new Exception('Build of '.$action->controller.' failed.');
 
-	return $ct->run($action);
+  return $ct->run($action);
 }
 
 /**
@@ -138,22 +138,9 @@ function action($rs)
  */
 public function template($path, $data = [])
 {
-	$s = substr(basename($path, '.tpl'), -5);
-	
-	switch($s) {
-		case '-form': case '_form':  case 'form':
-			$t = new pclib\Form($path); 
-		break;
-		case '-grid': case '_grid':  case 'grid':
-			$t = new pclib\Grid($path); 
-		break;
-		default:
-			$t = new pclib\Tpl($path);
-		break;
-	}
-
-	$t->values = $data;
-	return $t;
+  $templ = new pclib\Tpl($path);
+  $templ->values = $data;
+  return $templ;
 }
 
 /**
@@ -222,12 +209,12 @@ function authorize($perm = '')
  **/
 public function outputJson(array $data, $code = '')
 {
-	if ($code) {
-		http_response_code($code);
-	}
+  if ($code) {
+    http_response_code($code);
+  }
 
-	header('Content-Type: application/json; charset=utf-8');
-	die(json_encode($data, JSON_UNESCAPED_UNICODE));
+  header('Content-Type: application/json; charset=utf-8');
+  die(json_encode($data, JSON_UNESCAPED_UNICODE));
 }
 
 
