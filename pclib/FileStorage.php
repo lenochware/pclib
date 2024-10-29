@@ -141,7 +141,8 @@ function setFile($loc, $data)
 		$data = $this->insertFile($loc, $data);
 	}
 	else {
-		if ($data['FILEPATH_SRC']) {
+		/* Upload new file or just update info? */
+		if ($data['FILEPATH_SRC'] or $data['CONTENT']) {
 			$oldFile = $this->deleteFile($loc);
 			$data['HASH'] = $oldFile['HASH'];
 			$data = $this->insertFile($loc, $data);
@@ -196,6 +197,12 @@ function deleteFile($loc)
 /** Upload new file into filesystem and create db record. */
 protected function insertFile(array $loc, array $data)
 {
+	if ($data['CONTENT']) {
+		$data['FILEPATH_SRC'] = $this->createTempFile($data);
+		unset($data['CONTENT']);
+		$data['IS_TEMP'] = true;
+	}
+
 	$path = $data['FILEPATH_SRC'];
 	if (!file_exists($path)) throw new FileNotFoundException("File '$path' not found.");
 
@@ -232,10 +239,15 @@ protected function insertFile(array $loc, array $data)
 		$file['MIMETYPE'] = mimetype($path);
 	}
 	
-	if (!empty($data['IS_FORM_POST']))
+	if (!empty($data['IS_FORM_POST'])) {
 		$ok = move_uploaded_file($path, $this->rootDir.$file['FILEPATH']);
-	else
+	}
+	elseif(!empty($data['IS_TEMP'])) {
+	  $ok = rename($path, $this->rootDir.$file['FILEPATH']);
+	}
+	else {
 	  $ok = copy($path, $this->rootDir.$file['FILEPATH']); //move?
+	}
 
 	if (!$ok) throw new IOException("Uploading '".$file['ORIGNAME']."' failed.");
 
@@ -248,6 +260,15 @@ protected function insertFile(array $loc, array $data)
 	$file['ID'] = $this->db->insert($this->TABLE, $file, $filter);
 
 	return $file;
+}
+
+protected function createTempFile($file)
+{
+	$ext = pathinfo($file['ORIGNAME'], PATHINFO_EXTENSION) ?: 'tmp';
+	$dir = $this->getDir($this->dirNameFormat, $file);
+	$path = $this->rootDir.$dir.'_tmp_'.Str::random(11).'.'.$ext;
+	file_put_contents($path, $file['CONTENT']);
+	return $path;
 }
 
 protected function newFileId($loc)

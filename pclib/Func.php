@@ -113,7 +113,7 @@ function mimetype($path)
 {
 	global $app;
 	$ext = strtolower(Str::extractPath($path,'%e'));
-	if ($app and $app->config['pclib.mimetypes'][$ext])
+	if ($app and isset($app->config['pclib.mimetypes'][$ext]))
 		$ret = $app->config['pclib.mimetypes'][$ext];
 	else
 		$ret = @exec("file -bi " . escapeshellarg($path));
