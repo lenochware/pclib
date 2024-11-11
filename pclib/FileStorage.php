@@ -197,7 +197,7 @@ function deleteFile($loc)
 /** Upload new file into filesystem and create db record. */
 protected function insertFile(array $loc, array $data)
 {
-	if ($data['CONTENT']) {
+	if (isset($data['CONTENT'])) {
 		$data['FILEPATH_SRC'] = $this->createTempFile($data);
 		unset($data['CONTENT']);
 		$data['IS_TEMP'] = true;

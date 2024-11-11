@@ -691,7 +691,7 @@ function print_Link($id, $sub, $value)
 function print_Env($id, $sub, $value)
 {
 	/* if (!$sub) print $_SERVER['QUERY_STRING'];	else */
-	print $this->escapeHtmlFunction($_GET[$sub]);
+	print $this->escapeHtmlFunction($_GET[$sub] ?? '');
 }
 
 /**

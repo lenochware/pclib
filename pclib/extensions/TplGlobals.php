@@ -118,11 +118,11 @@ class TplGlobals extends BaseObject implements IService
 
 			$id = $var['id'];
 
-			if (isset($t->elements[$id])) {
-				throw new \pclib\Exception("Name conflict: global '$id'");
-			}
+			// if (isset($t->elements[$id])) {
+			// 	throw new \pclib\Exception("Name conflict: global '$id'");
+			// }
 
-			$t->addTag("global $id skip");
+			// $t->addTag("global $id skip");
 
 			$t->elements[$id]['onprint'] = function($o, $id, $sub, $value) use($module) {
 

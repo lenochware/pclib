@@ -95,7 +95,7 @@ protected static function getElements($options, $columns)
 	$elements = array();
 
 	$getter = 'get'.ucfirst($options['create']).'Element';
-	if (!method_exists(get_class(), $getter)) {
+	if (!method_exists(static::class, $getter)) {
 		throw new Exception("Unknown method %s", array('TemplateFactory::'.$getter));
 	}
 
