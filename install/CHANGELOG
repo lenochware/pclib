@@ -178,3 +178,9 @@
 - Tree->add() - add tree node into Tree
 - Extend size of some database fields
 - Bugfixes
+
+3.1.1
+- Default db engine changed to InnoDB
+- Added AuthUser::find()
+- Added FileStorage->setFile() with $file['CONTENT']
+- Bugfixes
