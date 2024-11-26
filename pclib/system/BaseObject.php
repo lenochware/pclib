@@ -119,7 +119,7 @@ class BaseObject
 				$result = $this->serviceLocator($service);
 			}
 
-			if (!$result) {
+			if (empty($result)) {
 				if (isset($default)) {
 					$result = is_string($default)? $this->service($default) : $default;
 				}

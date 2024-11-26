@@ -249,6 +249,7 @@ protected function query(array $terms)
 			$user = $this->db->select($this->mng->USERS_TAB, "USERNAME like '{0}'", $name);
 			if ($pgsql) $pgsql->ucase--;
 			if ($user['PASSW']) $user['PASSW'] = '########';
+			$msg = '';
 			foreach($user as $k => $v) {
 				$msg .= strtolower($k). ': '.$this->addHtmlClass($v, 'console-value').'<br>';
 			}

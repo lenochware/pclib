@@ -157,7 +157,7 @@ class ValidatorBase extends BaseObject
 	 */
 	protected function validateRule($value, $rule, $param = null)
 	{
-		$func = $this->rules[$rule];
+		$func = $this->rules[$rule] ?? null;
 
 		if (is_callable($func)) {
 			return call_user_func($func, $value, $param);

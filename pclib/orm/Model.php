@@ -529,8 +529,8 @@ function delete()
  */
 protected function validateRelated()
 {
-	$el = $this->getTemplate()->elements['ondelete'];
-	if ($el['type'] != 'event') return;
+	$el = $this->getTemplate()->elements['ondelete'] ?? [];
+	if (empty($el) or $el['type'] != 'event') return;
 
 	foreach ($el['cancel_when_array'] as $relationId) {
 		$found = $this->related($relationId);
@@ -546,8 +546,8 @@ protected function validateRelated()
  */
 protected function deleteRelated()
 {
-	$el = $this->getTemplate()->elements['ondelete'];
-	if ($el['type'] != 'event') return;
+	$el = $this->getTemplate()->elements['ondelete'] ?? [];
+	if (empty($el) or $el['type'] != 'event') return;
 
 	foreach ($el['delete_array']  as $relationId) {
 		$found = $this->related($relationId);
@@ -634,7 +634,7 @@ function setValue($name, $value)
 		throw new MemberAccessException("Cannot write to an undeclared property $class->$name.");    
 	}
 
-	if (array_get($this->values, $name) === $value) return;
+	if (isset($this->values[$name]) and $this->values[$name] === $value) return;
 	if ( !$this->testRight(array('write', $name)) ) return false;
 
 	$this->values[$name] = $value;
@@ -656,7 +656,7 @@ function getValue($name)
 	}
 
 	if ( !$this->testRight(array('read', $name)) ) return false;
-	return $this->values[$name];
+	return $this->values[$name] ?? null;
 }
 
 protected function getCalculated($name)

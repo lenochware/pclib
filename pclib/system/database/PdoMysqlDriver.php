@@ -66,6 +66,7 @@ function dbName()
 
 function indexes($table)
 {
+	$dbname = '';
 	if (strpos($table, '.')) list($dbname, $table) = explode('.', $table);
 	if (!$dbname) $dbname = $this->dbName();
 
@@ -76,7 +77,8 @@ function indexes($table)
 	ORDER BY INDEX_NAME,SEQ_IN_INDEX"
 	);
 
-	$indexes = array();
+	$name = '';
+	$indexes = [];
 	while ($row = $this->fetch($q, 'o')) {
 		if ($row->INDEX_NAME != $name) {
 			$name = $row->INDEX_NAME;

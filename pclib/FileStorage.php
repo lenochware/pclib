@@ -142,7 +142,7 @@ function setFile($loc, $data)
 	}
 	else {
 		/* Upload new file or just update info? */
-		if ($data['FILEPATH_SRC'] or $data['CONTENT']) {
+		if (isset($data['FILEPATH_SRC']) or isset($data['CONTENT'])) {
 			$oldFile = $this->deleteFile($loc);
 			$data['HASH'] = $oldFile['HASH'];
 			$data = $this->insertFile($loc, $data);
@@ -390,7 +390,7 @@ function postedFiles($input_id = null)
 		];
 	}
 	
-	return $input_id? $files[0] : $files;
+	return $input_id? ($files? $files[0] : []) : $files;
 }
 
 /**

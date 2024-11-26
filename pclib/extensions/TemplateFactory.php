@@ -129,7 +129,7 @@ protected static function getTplElement($el, $col, $options)
 
 protected static function getGridElement($el, $col, $options)
 {
-	if ($options['sort']) $el['sort'] = '1';
+	if (isset($options['sort'])) $el['sort'] = '1';
 	if ($col['type'] == 'date') $el['date'] = '1';
 	return $el;
 }

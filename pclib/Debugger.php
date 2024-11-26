@@ -48,7 +48,9 @@ function __construct()
 //More unique uniqid()
 protected function uniqId()
 {
-	return 'd-'.substr(md5(uniqid('',true)),0,10);
+	static $id = 1;
+
+	return 'd-'.($id++);
 }
 
 //VARDUMP

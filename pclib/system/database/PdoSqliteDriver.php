@@ -90,6 +90,8 @@ function columns($table)
 
 private function u_type($type)
 {
+	$size = null;
+	
 	if (strpos($type,'('))
 		list($type,$size) = sscanf($type, "%s(%d)");
 	
@@ -100,7 +102,7 @@ private function u_type($type)
 	'money' => 'float:8','integer' => 'int:4','int' => 'int:4',
 	'smallint' => 'int:2','ntext' => 'string:65535','image' => 'binary',
 	);
-	$type = $native[$type];
+	$type = $native[$type] ?? null;
 	if (!$type) return array(null, $size);
 	$type = explode(':', $type);
 	if (!$type[1]) $type[1] = $size;
