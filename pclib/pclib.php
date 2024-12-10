@@ -65,6 +65,7 @@ class Pclib
 			'PCValidator' => '\pclib\Validator',
 			'PCSelection' => '\pclib\orm\Selection',
 			'PCFileStorage' => '\pclib\FileStorage',
+			'PCMailer' => '\pclib\Mailer',
 		);
 
 		$this->version = PCLIB_VERSION;

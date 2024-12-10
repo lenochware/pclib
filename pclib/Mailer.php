@@ -1,11 +1,25 @@
 <?php 
+/**
+ * @file
+ * Creating, sending, logging, scheduling e-mail messages.
+ * Requires PHPMailer library for sending e-mails.
+ * @author -dk- <lenochware@gmail.com>
+ * @link http://pclib.brambor.net/
+ */
 
-use pclib\orm\Model;
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+
+namespace pclib;
+use pclib;
+use orm\Model;
 
 //jak vyresit osetreni chyb? parametr throwsException?
 //uppercase tabulky?
 
-class Mailer extends pclib\system\BaseObject
+class Mailer extends system\BaseObject implements IService
 {
 
 public $sender;
@@ -48,7 +62,7 @@ function __construct(array $options)
 
     $this->options = array_replace_recursive($defaults, $options);
 
-    $className = /*'\\pclib\\system\\database\\'.*/ucfirst($this->options['sender']['driver']).'Driver';
+    $className = '\\pclib\\system\\mail\\'.ucfirst($this->options['sender']['driver']).'Driver';
 
     if (!class_exists($className)) {
         throw new Exception("Mailer driver '".$this->options['sender']['driver']."' not found.");

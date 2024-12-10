@@ -1,9 +1,27 @@
 <?php 
+/**
+ * @file
+ * PClib mailer driver.
+ * Mailer drivers are stored in pclib/system/mail/ directory and loaded by class Mailer automatically.
+ *
+ * @author -dk- <lenochware@gmail.com>
+ * @link http://pclib.brambor.net/
+ */
 
+namespace pclib\system\mail;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\DSNConfigurator;
 
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+
+/**
+ * PHPMailer driver.
+ * Implements support of PHPMailer library. PHMailer library is required for this driver.
+ */
 class PhpMailerDriver
 {
     protected $options;
