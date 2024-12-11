@@ -20,6 +20,7 @@ $config = [
 	'pclib.directories' => [
 		'assets' => '{pclib}/www/',
 		'localization' => '{webroot}{pclib}/localization/',
+		'default_templates' => '{webroot}{pclib}/tpl/',
 	],
 
 	'pclib.security' => ['tpl-escape' => true, 'csrf' => false, 'form-prevent-mass' => false],

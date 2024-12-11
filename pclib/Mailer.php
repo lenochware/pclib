@@ -14,7 +14,7 @@
 
 namespace pclib;
 use pclib;
-use orm\Model;
+use pclib\orm\Model;
 
 //jak vyresit osetreni chyb? parametr throwsException?
 //uppercase tabulky?
@@ -96,9 +96,8 @@ public function send($id, $data = [])
 
     $this->trigger('mailer.after-send', ['message' => $message]);
 
-    if ($message->status == Message::STATUS_SUBMITTED) {
+    if ($message->status == MailMessage::STATUS_SUBMITTED) {
         $action = 'mail/send';
-        $message->sendAt = date("Y-m-d H:i:s");
     }
     else {
         $action = 'mail/failed';
@@ -109,7 +108,7 @@ public function send($id, $data = [])
         $this->clearMessages();
     }
 
-    $itemId = ($id instanceof Message)? $message->subject : $id;
+    $itemId = ($id instanceof MailMessage)? $message->subject : $id;
     $to = $message->to[0];
 
     $this->app->log('mailer', $action, $to, $itemId);
@@ -117,7 +116,7 @@ public function send($id, $data = [])
 
 public function create($id, $data = [])
 {
-    if ($id instanceof Message) {
+    if ($id instanceof MailMessage) {
         return $id;
     }
 
@@ -129,7 +128,7 @@ public function create($id, $data = [])
 	$data['to'] = $t->getValue('to');
 	$data['subject'] = $t->getValue('subject');
 
-	$message = new Message($data);
+	$message = new MailMessage($data);
     $message->from = $this->options['sender']['from'];
 	return $message;
 }
@@ -168,7 +167,7 @@ public function get($id)
     
     if(!$data) return null;
 
-    $message = new Message;
+    $message = new MailMessage;
     $message->load($data);
     return $message;
 }
@@ -176,7 +175,7 @@ public function get($id)
 public function schedule($id, $data = [])
 {
     $message = $this->create($id, $data, $options);
-    $message->setStatus(Message::STATUS_SCHEDULED);
+    $message->setStatus(MailMessage::STATUS_SCHEDULED);
     return $this->save($message);
 }
 
@@ -187,7 +186,7 @@ public function dispatch($n = null)
     $mails = $this->db->selectAll(
         "select * from {table} where status='{status}' order by created_at
         ~ limit {n}",  
-        ['table' => $this->table, 'status' => Message::STATUS_SCHEDULED, 'n' => $n]
+        ['table' => $this->table, 'status' => MailMessage::STATUS_SCHEDULED, 'n' => $n]
     );
 
     foreach ($mails as $mail) {
@@ -195,8 +194,8 @@ public function dispatch($n = null)
         $this->send($message);
         $this->save($message);
 
-        if ($message->status == Message::STATUS_SUBMITTED) $ok++;
-        if ($message->status == Message::STATUS_FAILED) $failed++;
+        if ($message->status == MailMessage::STATUS_SUBMITTED) $ok++;
+        if ($message->status == MailMessage::STATUS_FAILED) $failed++;
     }
 
     return ['ok' => $ok, 'failed' => $failed];
@@ -247,7 +246,7 @@ function load($id)
     $recipients = json_decode($model->recipients, true);
     $attachments = json_decode($model->attachments, true);
 
-    $message = new Message([
+    $message = new MailMessage([
         'from' => $model->from,
         'to' => $recipients['to'],
         'cc' => $recipients['cc'],
@@ -277,8 +276,8 @@ protected function clearMessages()
     $oldest = $this->db->select("select id, created_at FROM {0} where status > 1 ORDER BY id", $this->table);
 
     if ($oldest) {
-        $createdAt = new DateTime($oldest['created_at']);
-        $now = new DateTime();
+        $createdAt = new \DateTime($oldest['created_at']);
+        $now = new \DateTime();
         $interval = $now->diff($createdAt);
 
         if ($interval->days > $keepDays) {
@@ -292,6 +291,6 @@ function setDeveloperOnlyMode($email)
     $this->options['developer_only_mode_email'] = $email;
 }
 
-} //End Mailer
+}
 
 ?>

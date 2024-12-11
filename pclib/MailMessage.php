@@ -14,7 +14,7 @@
 namespace pclib;
 use pclib;
 
-class Message
+class MailMessage
 {
     const STATUS_NEW = 0;
     const STATUS_SCHEDULED = 1;
@@ -120,9 +120,15 @@ class Message
 		}
 
     /* pouzit pclib/tpl/ path */
-    public function preview()
+    public function preview($templatePath = null)
     {
-        $t = new PCTpl('tpl/mails/preview.tpl');
+        global $pclib;
+
+        if (!$templatePath) {
+            $templatePath = $pclib->app->config['pclib.directories']['default_templates'] . 'mail-preview.tpl';
+        }
+        
+        $t = new PCTpl($templatePath);
         $t->values['to'] = implode('; ', $this->to);
         $t->values['cc'] = implode('; ', $this->cc);
         $t->values['bcc'] = implode('; ', $this->bcc);

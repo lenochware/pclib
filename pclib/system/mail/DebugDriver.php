@@ -10,6 +10,8 @@
 
 namespace pclib\system\mail;
 
+use pclib\MailMessage;
+
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
 # License as published by the Free Software Foundation; either
@@ -22,12 +24,12 @@ class DebugDriver
 {
     protected $options;
 
-    function __construct(array $options) //pouzit dsn - smtp:// ?
+    function __construct(array $options)
     {
         $this->options = $options;
     }
 
-    public function send(Message $message)
+    public function send(MailMessage $message)
     {
         print ($message->preview());
     }

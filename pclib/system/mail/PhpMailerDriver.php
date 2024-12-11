@@ -9,6 +9,8 @@
  */
 
 namespace pclib\system\mail;
+
+use pclib\MailMessage;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\DSNConfigurator;
@@ -31,7 +33,7 @@ class PhpMailerDriver
         $this->options = $options;
     }
 
-    public function send(Message $message)
+    public function send(MailMessage $message)
     {
         $mail = $this->createMailer();
 
@@ -60,7 +62,12 @@ class PhpMailerDriver
 
         $mail->msgHTML($message->body);
 
-        return $mail->send();
+        $ok = $mail->send();
+
+        $message->status = $ok? MailMessage::STATUS_SUBMITTED : MailMessage::STATUS_FAILED;
+        $message->sendAt = date("Y-m-d H:i:s");
+
+        return $ok;
     }
 
     protected function createMailer()
