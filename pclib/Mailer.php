@@ -75,9 +75,9 @@ function __construct(array $options)
     $this->table = $this->options['save']['table'];
 }
 
-public function send($id, $data = [])
+public function send($id, $data = [], $mailFields = [])
 {
-	$message = $this->create($id, $data);
+	$message = $this->create($id, $data, $mailFields);
 
     $this->trigger('mailer.before-send', ['message' => $message]);
 
@@ -114,22 +114,37 @@ public function send($id, $data = [])
     $this->app->log('mailer', $action, $to, $itemId);
 }
 
-public function create($id, $data = [])
+public function create($id, $data = [], $mailFields = [])
 {
     if ($id instanceof MailMessage) {
         return $id;
     }
 
+    if (!$data) $data = [];
+
+    $attachments = $mailFields['attachments'] ?? [];
+    unset($mailFields['attachments']);
+
 	$t = $this->template($id, $data);
-	$t->values = $data;
+	$t->values = array_merge($data, $mailFields);
 
-	$data['body'] = $t->html();
+    $fields = ['to', 'cc', 'bcc', 'replyTo', 'subject'];
 
-	$data['to'] = $t->getValue('to');
-	$data['subject'] = $t->getValue('subject');
+    foreach ($fields as $name) {
+        if (isset($data[$name])) throw new Exception("Field name mismatch: " . $name);
+        $value = $t->getValue($name);
+        if ($value) $mailFields[$name] = $value;
+    }
 
-	$message = new MailMessage($data);
+    $mailFields['body'] = $t->html();
+
+	$message = new MailMessage($mailFields);
     $message->from = $this->options['sender']['from'];
+
+    foreach ($attachments as $value) {
+        $message->setAttachment($value);
+    }
+
 	return $message;
 }
 
@@ -281,7 +296,7 @@ protected function clearMessages()
         $interval = $now->diff($createdAt);
 
         if ($interval->days > $keepDays) {
-            $this->db->delete($this->table, "created_at < NOW() - INTERVAL {0} DAY", $keepDays);
+            $this->db->delete($this->table, "status > 1 and (created_at < NOW() - INTERVAL {0} DAY)", $keepDays);
         }
     }    
 }
