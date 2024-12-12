@@ -33,6 +33,8 @@ protected $table;
 
 protected $options;
 
+protected $layout;
+
 function __construct(array $options)
 {
     global $pclib;
@@ -45,6 +47,7 @@ function __construct(array $options)
         'templates' => [
             'table' => 'pages',
             'path' => 'tpl/mails/',
+            'layout' => '',
         ],
 
         'save' => [
@@ -73,6 +76,10 @@ function __construct(array $options)
     $this->trigger('mailer.create', ['sender' => $this->sender]);
 
     $this->table = $this->options['save']['table'];
+
+    if (!empty($this->options['templates']['layout'])) {
+        $this->layout = new Layout($this->options['templates']['layout']);
+    }
 }
 
 public function send($id, $data = [], $mailFields = [])
@@ -136,7 +143,13 @@ public function create($id, $data = [], $mailFields = [])
         if ($value) $mailFields[$name] = $value;
     }
 
-    $mailFields['body'] = $t->html();
+    if ($this->layout) {
+        $this->layout->values['CONTENT'] = $t;
+        $mailFields['body'] = $this->layout->html();
+    }
+    else {
+        $mailFields['body'] = $t->html();
+    }
 
 	$message = new MailMessage($mailFields);
     $message->from = $this->options['sender']['from'];

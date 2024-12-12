@@ -80,7 +80,8 @@ class TplParser extends BaseObject
 
 		$elms['pcl_document'] = array(
 			'type' => 'block',
-			'begin'=> 0, 'end' => 0, 'else' => null
+			'begin'=> 0, 'end' => 0, 'else' => null,
+			'typelist' => [],
 		);
 
 		if (trim($s) == '') return $elms;
