@@ -269,9 +269,12 @@ public function configure()
 	global $pclib;
 	$this->errorHandler->options = $this->config['pclib.errors'];
 
-	foreach ($this->config['pclib.directories'] as $k => $dir) {
-		$this->config['pclib.directories'][$k] = Str::format($dir, $this->paths);
+	$paths = [];
+	foreach ($this->config['pclib.paths'] as $k => $dir) {
+		$paths[$k] = Str::format($dir, $this->paths);
 	}
+
+	$this->paths = array_merge($this->paths, $paths);
 
 	$c = $this->config['pclib.app'];
 
@@ -318,7 +321,7 @@ function setLanguage($language)
 		$trans->autoUpdate = true;
 	}
 	else {
-		$transFile = $this->config['pclib.directories']['localization'].$language.'.php';
+		$transFile = $this->paths['localization'].$language.'.php';
 		if (file_exists($transFile)) $trans->useFile($transFile);
 	}
 
@@ -345,9 +348,8 @@ private function normalizeDir($s)
 	return rtrim(strtr($s, "\\", "/"),"/");
 }
 
-function getPaths()
+protected function getPaths()
 {
-	//$webroot = str_replace($_SERVER['SCRIPT_NAME'], '', $_SERVER['SCRIPT_FILENAME']);
 	$webroot = $_SERVER['DOCUMENT_ROOT'];
 
 	return [

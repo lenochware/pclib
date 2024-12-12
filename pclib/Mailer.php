@@ -16,9 +16,10 @@ namespace pclib;
 use pclib;
 use pclib\orm\Model;
 
-//jak vyresit osetreni chyb? parametr throwsException?
-//uppercase tabulky?
-
+/**
+ * Creating, sending, logging, scheduling e-mail messages.
+ * Requires PHPMailer library for sending e-mails. 
+ */
 class Mailer extends system\BaseObject implements IService
 {
 
@@ -33,7 +34,7 @@ protected $table;
 
 protected $options;
 
-protected $layout;
+public $layout;
 
 function __construct(array $options)
 {
@@ -82,7 +83,7 @@ function __construct(array $options)
     }
 }
 
-public function send($id, $data = [], $mailFields = [])
+public function send($id, array $data = [], array $mailFields = [])
 {
 	$message = $this->create($id, $data, $mailFields);
 
@@ -121,7 +122,7 @@ public function send($id, $data = [], $mailFields = [])
     $this->app->log('mailer', $action, $to, $itemId);
 }
 
-public function create($id, $data = [], $mailFields = [])
+public function create($id, array $data = [], array $mailFields = [])
 {
     if ($id instanceof MailMessage) {
         return $id;
@@ -161,7 +162,7 @@ public function create($id, $data = [], $mailFields = [])
 	return $message;
 }
 
-protected function template($id, $data)
+protected function template($id, array $data)
 {
     $table = $this->options['templates']['table'];
     $path = $this->options['templates']['path'];
@@ -292,6 +293,11 @@ function load($id)
     $message->setAttachments($attachments);
 
     return $message;
+}
+
+function setLayout($path)
+{
+    $this->layout = new Layout($path);
 }
 
 protected function clearMessages()

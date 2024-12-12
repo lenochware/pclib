@@ -17,10 +17,10 @@ $config = [
 	'pclib.errors' => ['display' => true, 'develop' => true, 'log' => false, 'template'=> PCLIB_DIR.'tpl/error.tpl' ],
 	'pclib.locale' => ['date' => 'd. m. Y', 'datetime' => 'd.m.Y H:i:s'],
 
-	'pclib.directories' => [
+	'pclib.paths' => [
 		'assets' => '{pclib}/www/',
 		'localization' => '{webroot}{pclib}/localization/',
-		'default_templates' => '{webroot}{pclib}/tpl/',
+		'templates' => '{webroot}{pclib}/tpl/',
 	],
 
 	'pclib.security' => ['tpl-escape' => true, 'csrf' => false, 'form-prevent-mass' => false],

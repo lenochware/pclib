@@ -385,7 +385,7 @@ function print_Sort($id, $sub)
 	print "</a>";
 
 	if (!$this->renderSortIcons) return;
-	$imageDir = $this->config['pclib.directories']['assets'];
+	$imageDir = $this->app->paths['assets'];
 	if (!$curId) $dir = 'no';
 	print "<img src=\"$imageDir/sort_$dir.gif\">";
 }

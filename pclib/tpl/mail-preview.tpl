@@ -2,6 +2,7 @@
 class tpl
 bind status list "0,new,1,scheduled,2,submitted,3,failed"
 string created_at
+string body noescape
 ?>
 From: {from}<br>
 To: {to}<br>

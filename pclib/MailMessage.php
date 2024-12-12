@@ -14,6 +14,9 @@
 namespace pclib;
 use pclib;
 
+/**
+ * Email message - used by Mailer class.
+ */
 class MailMessage
 {
     const STATUS_NEW = 0;
@@ -125,7 +128,7 @@ class MailMessage
         global $pclib;
 
         if (!$templatePath) {
-            $templatePath = $pclib->app->config['pclib.directories']['default_templates'] . 'mail-preview.tpl';
+            $templatePath = $pclib->app->paths['templates'] . 'mail-preview.tpl';
         }
         
         $t = new PCTpl($templatePath);
