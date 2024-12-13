@@ -45,41 +45,33 @@ function __construct(array $options)
     $this->app = $pclib->app;
 
     $defaults = [
-        'templates' => [
-            'table' => 'pages',
-            'path' => 'tpl/mails/',
-            'layout' => '',
-        ],
-
-        'save' => [
-            'table' => 'mails',
-            'keep_days' => 10,
-        ],
-
-        'sender' => [
-            'driver' => 'PhpMailer',
-            'from' => 'noreply@mailer.com',
-        ],
-
+        'templates_table' => 'PCLIB_TEMPLATES',
+        'templates_path' => 'tpl/mails/',
+        'layout' => '',
+        'table' => 'PCLIB_MAILS',
+        'keep_days' => 10,
+        'driver' => 'PhpMailer',
+        'from' => 'noreply@mailer.com',
+        'dsn' => '',
         'developer_only_mode_email' => false,
     ];
 
     $this->options = array_replace_recursive($defaults, $options);
 
-    $className = '\\pclib\\system\\mail\\'.ucfirst($this->options['sender']['driver']).'Driver';
+    $className = '\\pclib\\system\\mail\\'.ucfirst($this->options['driver']).'Driver';
 
     if (!class_exists($className)) {
-        throw new Exception("Mailer driver '".$this->options['sender']['driver']."' not found.");
+        throw new Exception("Mailer driver '".$this->options['driver']."' not found.");
     }    
 
     $this->sender = new $className($options);
     
     $this->trigger('mailer.create', ['sender' => $this->sender]);
 
-    $this->table = $this->options['save']['table'];
+    $this->table = $this->options['table'];
 
-    if (!empty($this->options['templates']['layout'])) {
-        $this->layout = new Layout($this->options['templates']['layout']);
+    if (!empty($this->options['layout'])) {
+        $this->layout = new Layout($this->options['layout']);
     }
 }
 
@@ -111,7 +103,7 @@ public function send($id, array $data = [], array $mailFields = [])
         $action = 'mail/failed';
     }
 
-    if ($this->options['save']['keep_days']) {
+    if ($this->options['keep_days']) {
         $this->save($message);
         $this->clearMessages();
     }
@@ -153,10 +145,16 @@ public function create($id, array $data = [], array $mailFields = [])
     }
 
 	$message = new MailMessage($mailFields);
-    $message->from = $this->options['sender']['from'];
+    $message->from = $this->options['from'];
 
     foreach ($attachments as $value) {
-        $message->setAttachment($value);
+        $message->setAttachment($this->app->path($value));
+    }
+
+    foreach ($t->elements as $name => $elem) {
+        if ($elem['type'] == 'attachment') {
+            $message->setAttachment($this->app->path($t->getValue($name)));
+        }
     }
 
 	return $message;
@@ -164,8 +162,8 @@ public function create($id, array $data = [], array $mailFields = [])
 
 protected function template($id, array $data)
 {
-    $table = $this->options['templates']['table'];
-    $path = $this->options['templates']['path'];
+    $table = $this->options['templates_table'];
+    $path = $this->options['templates_path'];
 
     if ($table) {
         $this->service('db');
@@ -192,7 +190,7 @@ protected function template($id, array $data)
 public function get($id)
 {
     $this->service('db');
-    $data = $this->db->select($this->table, ['id' => $id]);
+    $data = $this->db->select($this->table, ['ID' => $id]);
     
     if(!$data) return null;
 
@@ -201,9 +199,9 @@ public function get($id)
     return $message;
 }
 
-public function schedule($id, $data = [])
+public function schedule($id, array $data = [], array $mailFields = [])
 {
-    $message = $this->create($id, $data, $options);
+    $message = $this->create($id, $data, $mailFields);
     $message->setStatus(MailMessage::STATUS_SCHEDULED);
     return $this->save($message);
 }
@@ -246,22 +244,22 @@ public function save($message)
     $recipients = $message->getRecipients();
 
 	$data = [
-        'from' => $message->from,
-        'to' => $recipients['to'][0],
-		'recipients' => json_encode($recipients),
-		'subject' => $message->subject,
-        'body' => $message->body,
-        'body_text' => $message->text,
-		'status' => $message->status,
-		'attachments' => json_encode($message->getAttachments()),
-        'send_at' => $message->sendAt,
-		'created_at' => date("Y-m-d H:i:s"),
+        'FROM' => $message->from,
+        'TO' => $recipients['to'][0],
+		'RECIPIENTS' => json_encode($recipients),
+		'SUBJECT' => $message->subject,
+        'BODY' => $message->body,
+        'BODY_TEXT' => $message->text,
+		'STATUS' => $message->status,
+		'ATTACHMENTS' => json_encode($message->getAttachments()),
+        'SEND_AT' => $message->sendAt,
+		'CREATED_AT' => date("Y-m-d H:i:s"),
 	];
 
     $model->setValues($data);
     $model->save();
 
-	return $model->id;
+	return $model->ID;
 }
 
 function load($id)
@@ -272,39 +270,34 @@ function load($id)
     $found = $model->find($id);
     if (!$found) throw new Exception('Message not found.');
 
-    $recipients = json_decode($model->recipients, true);
-    $attachments = json_decode($model->attachments, true);
+    $recipients = json_decode($model->RECIPIENTS, true);
+    $attachments = json_decode($model->ATTACHMENTS, true);
 
     $message = new MailMessage([
-        'from' => $model->from,
+        'from' => $model->FROM,
         'to' => $recipients['to'],
         'cc' => $recipients['cc'],
         'bcc' => $recipients['bcc'],
         'replyTo' => $recipients['replyTo'],
-        'subject' => $model->subject,
-        'body' => $model->body,
-        'text' => (string)$model->body_text,
+        'subject' => $model->SUBJECT,
+        'body' => $model->BODY,
+        'text' => (string)$model->BODY_TEXT,
     ]);
 
-    $message->id = $model->id;
-    $message->status = $model->status;
-    $message->sendAt = $model->send_at;
-    $message->createdAt = $model->created_at;
+    $message->id = $model->ID;
+    $message->status = $model->STATUS;
+    $message->sendAt = $model->SEND_AT;
+    $message->createdAt = $model->CREATED_AT;
     $message->setAttachments($attachments);
 
     return $message;
-}
-
-function setLayout($path)
-{
-    $this->layout = new Layout($path);
 }
 
 protected function clearMessages()
 {
     $this->service('db');
 
-    $keepDays = $this->options['save']['keep_days'];
+    $keepDays = $this->options['keep_days'];
     if ($keepDays < 0) return;
 
     $oldest = $this->db->select("select id, created_at FROM {0} where status > 1 ORDER BY id", $this->table);
@@ -318,6 +311,11 @@ protected function clearMessages()
             $this->db->delete($this->table, "status > 1 and (created_at < NOW() - INTERVAL {0} DAY)", $keepDays);
         }
     }    
+}
+
+function setLayout($path)
+{
+    $this->layout = new Layout($path);
 }
 
 function setDeveloperOnlyMode($email)

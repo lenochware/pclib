@@ -81,17 +81,11 @@ class PhpMailerDriver
         $mailer->isHTML(true);
 
         $configurator = new DSNConfigurator();
-        $configurator->configure($mailer, $this->options['sender']['dsn']);
+        $configurator->configure($mailer, $this->options['dsn']);
 
-        // $sender = $this->options['sender'];
-
-        // $mailer->Host = $sender['host'];
         // $mailer->SMTPAuth = true;
-        // $mailer->Username = $sender['username'];
-        // $mailer->Password = $sender['password'];
         // $mailer->SMTPSecure = 'tls';
         // $mailer->Port = 587;
-        // //$mailer->setFrom($sender['from']);
 
         return $mailer;
     }
