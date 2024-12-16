@@ -41,6 +41,8 @@ public $slowQueryLog = 1.0;
 
 public $LOOKUP_TAB = 'LOOKUPS';
 
+public $TEMPLATES_TAB = 'PCLIB_CONTENT';
+
 public $info = [];
 
 /** var AbstractDriver Database driver */
@@ -710,6 +712,32 @@ function getLookup($lkpName)
 	$items = $this->selectPair($sql);
 
 	return $items;
+}
+
+function template($id, $data = [])
+{
+	$template = $this->select($this->TEMPLATES_TAB, ['NAME' => $id]);
+	if (!$template) return null;
+
+	$s = substr($id, -5);
+
+	switch($s) {
+		case '-form': case '_form':  case 'form':
+			$t = new pclib\Form; 
+		break;
+		case '-grid': case '_grid':  case 'grid':
+			$t = new pclib\Grid; 
+		break;
+		default:
+			$t = new pclib\Tpl;
+		break;
+	}
+
+	$t->loadString($template['BODY']);
+	$t->init();
+	$t->values = $data;
+
+	return $t;	
 }
 
 /**

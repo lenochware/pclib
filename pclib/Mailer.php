@@ -45,7 +45,7 @@ function __construct(array $options)
     $this->app = $pclib->app;
 
     $defaults = [
-        'templates_table' => 'PCLIB_TEMPLATES',
+        'db_templates' => true,
         'templates_path' => 'tpl/mails/',
         'layout' => '',
         'table' => 'PCLIB_MAILS',
@@ -162,18 +162,12 @@ public function create($id, array $data = [], array $mailFields = [])
 
 protected function template($id, array $data)
 {
-    $table = $this->options['templates_table'];
     $path = $this->options['templates_path'];
 
-    if ($table) {
+    if ($this->options['db_templates']) {
         $this->service('db');
-        $page = $this->db->select($table, ['name' => $id]);
-        if ($page) {
-            $t = new PCTpl;
-            $t->loadString($page['body']);
-            $t->values = $data;
-            return $t;
-        }
+        $t = $this->db->template($id, $data);
+        if ($t) return $t;
     }
 
     $filePath = $path . $id;
