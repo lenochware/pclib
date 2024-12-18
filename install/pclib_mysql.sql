@@ -192,6 +192,40 @@ CREATE TABLE `FILESTORAGE` (
   UNIQUE KEY `i_hash` (`HASH`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+/*Table structure for table `PCLIB_MAILS` */
+
+CREATE TABLE `PCLIB_MAILS` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `FROM` varchar(100) DEFAULT NULL,
+  `TO` varchar(100) DEFAULT NULL,
+  `RECIPIENTS` text,
+  `SUBJECT` varchar(255) DEFAULT NULL,
+  `BODY` text,
+  `BODY_TEXT` text,
+  `STATUS` tinyint(4) DEFAULT NULL,
+  `ATTACHMENTS` text,
+  `TEMPLATE_NAME` varchar(100) DEFAULT NULL,
+  `SEND_AT` datetime DEFAULT NULL,
+  `CREATED_AT` datetime DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*Table structure for table `PCLIB_CONTENT` */
+
+CREATE TABLE `PCLIB_CONTENT` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `NAME` varchar(50) DEFAULT NULL,
+  `CATEGORY` varchar(50) DEFAULT NULL,
+  `TITLE` varchar(100) DEFAULT NULL,
+  `BODY` text,
+  `CREATED_AT` datetime DEFAULT NULL,
+  `UPDATED_AT` datetime DEFAULT NULL,
+  `AUTHOR_ID` int(11) DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*Table structure for table `jobs` (padmin) */
+
 CREATE TABLE `jobs` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(100) DEFAULT NULL,
@@ -223,4 +257,4 @@ insert into `LOOKUPS` (`APP`, `ID`, `CNAME`, `LABEL`, `POSITION`) values('padmin
 insert into `TRANSLATOR_LABELS` (`ID`, `LABEL`, `CATEGORY`) values(1,'App',1);
 
 /** Version of PCLIB database structures. */  
-INSERT INTO `APP_PARAMS` (`PARAM_NAME`, `PARAM_VALUE`, `TITLE`, `CREATED_AT`) VALUES('PCLIB_VERSION', '3.1.1', 'Version of PCLIB database structures', NOW());
+INSERT INTO `APP_PARAMS` (`PARAM_NAME`, `PARAM_VALUE`, `TITLE`, `CREATED_AT`) VALUES('PCLIB_VERSION', '3.2.0', 'Version of PCLIB database structures', NOW());

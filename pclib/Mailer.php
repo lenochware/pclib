@@ -1,8 +1,8 @@
 <?php 
 /**
  * @file
- * Creating, sending, logging, scheduling e-mail messages.
- * Requires PHPMailer library for sending e-mails.
+ * Email management and sending.
+ * Requires PHPMailer library for sending emails.
  * @author -dk- <lenochware@gmail.com>
  * @link http://pclib.brambor.net/
  */
@@ -23,19 +23,27 @@ use pclib\orm\Model;
 class Mailer extends system\BaseObject implements IService
 {
 
+/** Mailer driver used for actual sending emails */
 public $sender;
 
 /** var App */
 protected $app;
 
+/** var Db */
 public $db;
 
 protected $table;
 
+/** Mailer configuration */
 protected $options;
 
+/** Layout template. @see setLayout() */
 public $layout;
 
+/**
+ * Create mailer service.
+ * @param $options Mailer configuration - see setOptions() for configuration keys.
+ */
 function __construct(array $options = [])
 {
     global $pclib;
@@ -88,6 +96,13 @@ public function setOptions(array $options)
     }
 }
 
+/**
+ * Send email using template $id.
+ * You can use also with MailMessage class: $mailer->send($message);
+ * @param string $id Template path or database id
+ * @param array $data Template values
+ * @param array $mailFields Mail fields (from, to, cc, bcc, subject, replyTo)
+ */
 public function send($id, array $data = [], array $mailFields = [])
 {
 	$message = $this->create($id, $data, $mailFields);
@@ -127,6 +142,13 @@ public function send($id, array $data = [], array $mailFields = [])
     $this->app->log('mailer', $action, $to, $itemId);
 }
 
+/**
+ * Create mail message from template $id.
+ * @param string $id Template path or database id
+ * @param array $data Template values
+ * @param array $mailFields Mail fields (from, to, cc, bcc, subject, replyTo)
+ * @return MailMessage $message
+ */
 public function create($id, array $data = [], array $mailFields = [])
 {
     if ($id instanceof MailMessage) {
@@ -173,6 +195,12 @@ public function create($id, array $data = [], array $mailFields = [])
 	return $message;
 }
 
+/**
+ * Create and return mail template.
+ * @param string $id Template path or database id
+ * @param array $data Template values
+ * @return Tpl $template
+ */
 protected function template($id, array $data)
 {
     $path = $this->options['templates_path'];
@@ -194,18 +222,13 @@ protected function template($id, array $data)
     return $t;
 }
 
-public function get($id)
-{
-    $this->service('db');
-    $data = $this->db->select($this->table, ['ID' => $id]);
-    
-    if(!$data) return null;
-
-    $message = new MailMessage;
-    $message->load($data);
-    return $message;
-}
-
+/**
+ * Create and save message to be sent later.
+ * @param string $id Template path or database id
+ * @param array $data Template values
+ * @param array $mailFields Mail fields (from, to, cc, bcc, subject, replyTo)
+ * @return int $id Database id
+ */
 public function schedule($id, array $data = [], array $mailFields = [])
 {
     $message = $this->create($id, $data, $mailFields);
@@ -213,6 +236,11 @@ public function schedule($id, array $data = [], array $mailFields = [])
     return $this->save($message);
 }
 
+/**
+ * Dispatch (send) scheduled messages.
+ * @param int $n Send max $n messages in this run
+ * @return array $results
+ */
 public function dispatch($n = null)
 {
     $ok = $failed = 0;
@@ -235,6 +263,11 @@ public function dispatch($n = null)
     return ['ok' => $ok, 'failed' => $failed];
 }
 
+/**
+ * Save message into database.
+ * @param MailMessage $message
+ * @return int $id Database id
+ */
 public function save($message)
 {
     if (!$message->isValid()) throw new Exception('Invalid email message.');
@@ -269,6 +302,11 @@ public function save($message)
 	return $model->ID;
 }
 
+/**
+ * Load mail message from database.
+ * @param int $id Database id
+ * @return MailMessage $message
+ */
 function load($id)
 {
     $this->service('db');
@@ -300,6 +338,9 @@ function load($id)
     return $message;
 }
 
+/**
+ * Remove submitted messages older than 'keep_days' from database.
+ **/
 protected function clearMessages()
 {
     $this->service('db');
@@ -320,11 +361,21 @@ protected function clearMessages()
     }    
 }
 
+/**
+ * Set template layout used by all messages.
+ * It works same way as application layout. You can set this by config parameter 'layout' too.
+ * @param string $path Path to template.
+ **/
 function setLayout($path)
 {
     $this->layout = new Layout($path);
 }
 
+/**
+ * When enabled, all messages (preview) are sent not to real address, but to developer $email.
+ * You can set this by config parameter 'developer_only_mode_email' too.
+ * @param string $email
+ **/
 function setDeveloperOnlyMode($email)
 {
     $this->options['developer_only_mode_email'] = $email;

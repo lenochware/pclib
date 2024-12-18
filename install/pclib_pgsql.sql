@@ -199,6 +199,38 @@ CREATE TABLE filestorage (
 CREATE INDEX i_filestorage_entity ON filestorage USING btree (entity_type, entity_id);
 CREATE INDEX i_filestorage_hash ON filestorage USING btree (hash);
 
+-- Table structure for table `PCLIB_MAILS`
+
+CREATE TABLE pclib_mails (
+  id SERIAL PRIMARY KEY,
+  "from" VARCHAR(100),
+  "to" VARCHAR(100),
+  recipients TEXT,
+  subject VARCHAR(255),
+  body TEXT,
+  body_text TEXT,
+  status SMALLINT,
+  attachments TEXT,
+  template_name VARCHAR(100),
+  send_at TIMESTAMP,
+  created_at TIMESTAMP
+);
+
+-- Table structure for table `PCLIB_CONTENT`
+
+CREATE TABLE pclib_content (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(50),
+  category VARCHAR(50),
+  title VARCHAR(100),
+  body TEXT,
+  created_at TIMESTAMP,
+  updated_at TIMESTAMP,
+  author_id INT
+);
+
+-- Table structure for table `jobs` (padmin)
+
 CREATE TABLE jobs (
   id serial NOT NULL,
   name character varying(100) DEFAULT NULL,
@@ -229,4 +261,4 @@ INSERT INTO lookups (app, id, cname, label, position) VALUES ('padmin', 60, 'job
 insert into translator_labels (id, label, category) values(1,'App',1);
 
 -- Version of PCLIB database structures.
-INSERT INTO app_params (param_name, param_value, title, created_at) VALUES ('PCLIB_VERSION', '3.1.0', 'Version of PCLIB database structures', NOW());
+INSERT INTO app_params (param_name, param_value, title, created_at) VALUES ('PCLIB_VERSION', '3.2.0', 'Version of PCLIB database structures', NOW());
