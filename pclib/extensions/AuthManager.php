@@ -40,7 +40,18 @@ public $USERS_TAB = 'AUTH_USERS',
 function __construct($db = null)
 {
 	parent::__construct();
+	$this->setOptions($this->app->config['pclib.auth']);
 	$this->db = $db ?: $this->service('db');
+}
+
+/*
+ * Setup this service from configuration file.
+ */
+public function setOptions(array $options)
+{
+	$this->passwordAlgo = $options['algo'];
+	$this->secret = $options['secret'];	
+	if (isset($options['dsn'])) $this->getStorage()->db = new \pclib\Db($options['dsn']);
 }
 
 /**

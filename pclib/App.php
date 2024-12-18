@@ -200,24 +200,26 @@ function getService($serviceName)
 
 /**
  * Load application configuration.
- * $source must be valid php-file which containing array $config or $config array itself.
+ * $source must be valid php-file which containing array $config.
  * Can be called more than once - configurations will be merged.
  * Set #$config variable.
- * @param string|array $source Path to configuration file or array of config-parameters.
+ * @param string $path Path to configuration file or array of config-parameters.
  */
-function addConfig($source)
+function addConfig($path)
 {
-	if (is_array($source)) {
-		$config = $source;
-	}
-	else {
-		if (!file_exists($source))
-			throw new FileNotFoundException("Configuration file '$source' not found.");
-		else
-			require $source;
+	if (!file_exists($path)) {
+		throw new FileNotFoundException("Configuration file '$path' not found.");
 	}
 
-	$this->config = array_replace_recursive($this->config, (array)$config);
+	require $path;
+
+	if (isset($config)) {
+		$this->config = array_replace_recursive($this->config, $config);
+	}
+
+	if (isset($this->config['pclib.environment'])) {
+		$this->environmentIp($this->config['pclib.environment']);
+	}
 
 	$_env = $this->environment;
 
@@ -225,19 +227,49 @@ function addConfig($source)
 		$this->config = array_replace_recursive($this->config, $$_env);
 	}
 
-	$this->configure();
+	$this->errorHandler->setOptions($this->config['pclib.errors']);
+
+	$paths = [];
+	foreach ($this->config['pclib.paths'] as $k => $dir) {
+		$paths[$k] = Str::format($dir, $this->paths);
+	}
+
+	$this->paths = array_merge($this->paths, $paths);
+
+
+	$this->setOptions($this->config['pclib.app']);
 }
 
-function addPlugins($dir)
+/*
+ * Setup application according to its configuration.
+ * Called when app->config changed.
+ */
+public function setOptions(array $options)
 {
-	$this->plugins[] = [];
-  foreach (glob($dir.'/*.php') as $fileName) {
-    require_once($fileName);
-    $pluginName = basename($fileName, '.php');
-    $plugin = new $pluginName($this);
-    $plugin->init();
-   	$this->plugins[] = $plugin;
-  }
+	if (!empty($options['language'])) $this->setLanguage($options['language']);
+	if (!empty($options['debugmode'])) $this->debugMode = true;
+	if (!empty($options['friendly-url'])) $this->router->friendlyUrl = true;
+	if (!empty($options['layout'])) $this->setLayout($options['layout']);
+	//if (!empty($options['default-route'])) ... ;
+
+	if (empty($options['autostart'])) return;
+
+	//Start services...
+	foreach ($options['autostart'] as $serviceName)
+	{
+		switch ($serviceName) {
+			case 'db': $service = new pclib\Db; break;
+			case 'auth': $service = new pclib\Auth; break;
+			case 'mailer': $service = new pclib\Mailer; break;
+			case 'logger': $service = new pclib\Logger; break;
+			case 'fileStorage': $service = new pclib\FileStorage(''); break;
+
+			default: throw new Exception("Service not found: " . $serviceName);
+		}
+
+		$this->setService($serviceName, $service);
+	}
+
 }
 
 /**
@@ -255,44 +287,21 @@ function environmentIp(array $env)
 	}
 }
 
+function addPlugins($dir)
+{
+	$this->plugins[] = [];
+  foreach (glob($dir.'/*.php') as $fileName) {
+    require_once($fileName);
+    $pluginName = basename($fileName, '.php');
+    $plugin = new $pluginName($this);
+    $plugin->init();
+   	$this->plugins[] = $plugin;
+  }
+}
+
 protected function registerDebugBar()
 {
 	extensions\DebugBar::register();
-}
-
-/*
- * Setup application according to its configuration.
- * Called when app->config changed.
- */
-public function configure()
-{
-	global $pclib;
-	$this->errorHandler->options = $this->config['pclib.errors'];
-
-	$paths = [];
-	foreach ($this->config['pclib.paths'] as $k => $dir) {
-		$paths[$k] = Str::format($dir, $this->paths);
-	}
-
-	$this->paths = array_merge($this->paths, $paths);
-
-	$c = $this->config['pclib.app'];
-
-	if (!empty($c['db'])) $this->db = new pclib\Db($c['db']);
-	if (!empty($c['logger'])) $this->logger = new pclib\Logger();
-	if (!empty($c['file-storage'])) $this->fileStorage = new pclib\FileStorage($c['file-storage']);
-	if (!empty($c['language'])) $this->setLanguage($c['language']);
-	if (!empty($c['debugbar'])) $this->debugMode = true;
-	if (!empty($c['friendly-url'])) $this->router->friendlyUrl = true;
-	if (!empty($c['layout'])) $this->setLayout($c['layout']);
-
-	if (!empty($c['auth'])) {
-		if (is_string($c['auth'])) {
-			$this->auth = new pclib\Auth(new pclib\Db($c['auth']));
-		} else {
-			$this->auth = new pclib\Auth();
-		}
-	}
 }
 
 /**

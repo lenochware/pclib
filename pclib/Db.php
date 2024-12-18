@@ -51,8 +51,6 @@ public $drv;
 /** var App */
 protected $app;
 
-protected $config;
-
 protected $SQL_PARAM_PATTERN = "/{([#\?\!]?)([a-z0-9_]+)}/i";
 
 private $dataSource;
@@ -69,9 +67,19 @@ function __construct($dataSource = null)
 	parent::__construct();
 	
 	$this->app = $pclib->app;
-	$this->config = $this->app->config;
+
+	$options = $this->app->config['pclib.db'] ?? [];
+	if ($options) $this->setOptions($options);
 
 	if (isset($dataSource)) $this->connect($dataSource);
+}
+
+/*
+ * Setup this service from configuration file.
+ */
+public function setOptions(array $options)
+{
+	$this->connect($options['dsn']);
 }
 
 //parse connection string to array
@@ -155,7 +163,7 @@ function connect($dataSource)
 	}
 
 	$this->drv = new $className;
-	$this->drv->verboseErrors = in_array('develop', $this->config['pclib.errors']);
+	$this->drv->verboseErrors = in_array('develop', $this->app->config['pclib.errors']);
 	$this->drv->forceReconnect = $this->forceReconnect;
 	$this->drv->connect($dsarray);
 	if (isset($dsarray['options']['charset'])) $this->drv->codePage($dsarray['options']['charset']);
@@ -177,7 +185,6 @@ function __clone()
 {
 	$this->connect($this->dataSource);
 }
-
 
 /**
  * Set connection character set.
@@ -227,6 +234,7 @@ function query($_sql, $param = null)
 	$tm = microtime(true);
 
 	if (!$this->disabled) {
+		if (!isset($this->drv)) throw new DatabaseException("Database is not initialized.");
 		$res = $this->drv->query($sql);
 	}
 		

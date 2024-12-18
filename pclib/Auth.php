@@ -109,9 +109,20 @@ function __construct(Db $db = null)
 
 	if (!session_id()) throw new RuntimeException('Session is not initialized. Perhaps missing session_start()?');
 
-	$this->realm = $this->app->config['pclib.auth']['realm'] ?: $this->app->name;
+	$this->setOptions($this->app->config['pclib.auth']);
 	$this->loggedUser = $this->getSessionUser();
 	if ($db) $this->getStorage()->db = $db;
+}
+
+/*
+ * Setup this service from configuration file.
+ */
+public function setOptions(array $options)
+{
+	$this->passwordAlgo = $options['algo'];
+	$this->secret = $options['secret'];	
+	$this->realm = $options['realm'] ?: $this->app->name;
+	if (isset($options['dsn'])) $this->getStorage()->db = new pclib\Db($options['dsn']);
 }
 
 /** Return storage object - if not exists, create one. */

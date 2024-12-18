@@ -31,15 +31,6 @@ class Logger extends system\BaseObject implements IService
 /** Name of the logger */
 public $name = 'LOGGER';
 
-/** If you set disabled to true, nothing will be written into log. */
-public $disabled = false;
-
-/**
- * Only messages with following categories will be logged.
- * By default, all categories are logged.
- */
-public $categories = array('ALL');
-
 /** var App */
 protected $app;
 
@@ -58,7 +49,19 @@ function __construct($name = null)
 	parent::__construct();
 
 	$this->app = $pclib->app;
-	$this->name = $name? $name : $this->app->name;
+
+	$options = $this->app->config['pclib.logger'] ?? [];
+	if ($options) $this->setOptions($options);
+
+	if (isset($name)) $this->name = $name;
+}
+
+/*
+ * Setup this service from configuration file.
+ */
+public function setOptions(array $options)
+{
+	$this->name = $options['name'];	
 }
 
 /** Return storage object - if not exists, create one. */
@@ -69,9 +72,7 @@ protected function getStorage()
 }
 
 /**
- * Store message to the log, if it has allowed category.
- * Only categories in logger->categories will be logged.
- * You can use your own categories too.
+ * Store message to the log.
  * @param string $category Message category such as AUTH_WARNING or PHP_ERROR.
  * @param string $message_id For logging repeated events such as 'user/delete'
  * @param string $message Fill it if you need log full text message
@@ -80,10 +81,6 @@ protected function getStorage()
  */
 function log($category, $message_id, $message = null, $item_id = null)
 {
-	if ($this->disabled) return false;
-	if (!in_array('ALL', $this->categories)
-		and !in_array($category, $this->categories)) return false;
-
 	$ua = $this->app->request->userAgent;
 
 	$message = array(

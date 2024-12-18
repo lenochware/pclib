@@ -46,12 +46,9 @@ function __construct()
 	global $pclib;
 	
 	parent::__construct();
-
 	$this->app = $pclib->app;
-
-	$this->passwordAlgo = $this->app->config['pclib.auth']['algo'];
-	$this->secret = $this->app->config['pclib.auth']['secret'];
 }
+
 
 /**
  * Return password hash.

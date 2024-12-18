@@ -58,6 +58,14 @@ class ErrorHandler extends BaseObject
 		restore_exception_handler();
 	}
 
+	/*
+	 * Setup this service from configuration file.
+	 */
+	public function setOptions(array $options)
+	{
+		$this->options = $options;
+	}
+
 	/**
 	 * Callback for exception handling.
 	 */	

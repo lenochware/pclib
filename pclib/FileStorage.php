@@ -43,21 +43,34 @@ class FileStorage extends system\BaseObject implements IService
 	public $db;
 
 	/** Path to your writable storage directory. */
-	protected $rootDir;
+	protected $rootDir = '';
 
 /**
  * \param $rootDir Path to your writable storage directory.
  */
 function __construct($rootDir)
 {
+	global $pclib;
+
 	parent::__construct();
 
-	if (!is_dir($rootDir)) throw new IOException("Directory '$rootDir' does not exists.");
-	$this->rootDir = $rootDir;
+	$options = $pclib->app->config['pclib.filestorage'] ?? [];
+	if ($options) $this->setOptions($options);
+
+	if ($rootDir) $this->rootDir = $rootDir;
+
+	if (!is_dir($this->rootDir)) throw new IOException("Directory '$this->rootDir' does not exists.");
 
 	$this->service('db');
 }
 
+/*
+ * Setup this service from configuration file.
+ */
+public function setOptions(array $options)
+{
+	$this->rootDir = $options['rootdir'];	
+}
 
 /**
  * Return file from location $loc.

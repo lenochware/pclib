@@ -27,13 +27,10 @@ $config = [
 	'pclib.auth' => ['algo' => 'md5', 'secret' => 'write any random string!', 'realm' => ''],
 
 	'pclib.app' => [
-		'db' => '',
-		'auth' => false,
-		'logger' => false,
-		'file-storage' => '',
 		'language' => 'cs',
 		'default-route' => '',
 		'layout' => '',
+		'autostart' => [],
 	],
 ];
 

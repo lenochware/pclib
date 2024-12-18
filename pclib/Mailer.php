@@ -36,7 +36,7 @@ protected $options;
 
 public $layout;
 
-function __construct(array $options)
+function __construct(array $options = [])
 {
     global $pclib;
 
@@ -44,6 +44,21 @@ function __construct(array $options)
 
     $this->app = $pclib->app;
 
+    if ($options) {
+        $this->setOptions($options);
+    }
+    else {
+        $this->setOptions($this->app->config['pclib.mailer']);
+    }
+
+    $this->trigger('mailer.create', ['sender' => $this->sender]);
+}
+
+/*
+ * Setup this service from configuration file.
+ */
+public function setOptions(array $options)
+{
     $defaults = [
         'db_templates' => true,
         'templates_path' => 'tpl/mails/',
@@ -66,8 +81,6 @@ function __construct(array $options)
 
     $this->sender = new $className($options);
     
-    $this->trigger('mailer.create', ['sender' => $this->sender]);
-
     $this->table = $this->options['table'];
 
     if (!empty($this->options['layout'])) {

@@ -8,7 +8,6 @@ use pclib\Str;
  * Execute auth console commands, see execute() method.
  */
 class AuthConsole extends AuthBase
-
 {
 
 /** var Db */
