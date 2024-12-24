@@ -367,7 +367,7 @@ protected function getPaths()
 		'basedir' => $this->normalizeDir(dirname($_SERVER['SCRIPT_FILENAME'])),
 		'pclib' => $this->normalizeDir(substr(PCLIB_DIR, strlen($webroot))),
 		'controllers' => 'controllers',
-		'modules' => 'modules',
+		'modules' => 'plugins',
 	];
 }
 
@@ -514,12 +514,20 @@ function deleteSession($name = null, $ns = null)
 function newController($name, $module = '')
 {
 	$className = ucfirst($name).'Controller';
-	$moduleDir = $module? "{modules}/$module/" : '';
-	$namespace = $module? "\\$module\\" : '';
-	$fullClassName = $namespace.$className;
 
-	$path = $this->path("$moduleDir{controllers}/$className.php");
-	
+	if ($module) {
+		$fullClassName = "\\$module\\".$className;
+
+		if (!defined('PLUGIN_DIR')) {
+			define('PLUGIN_DIR', $this->paths['modules'] . "/$module/");
+		}
+		
+		$path = PLUGIN_DIR . $this->paths['controllers'] . "/$className.php";
+	} else {
+		$fullClassName = $className;
+		$path = $this->paths['controllers'] . "/$className.php";
+	}
+
 	if (file_exists($path)) {
 		require_once($path);
 	}

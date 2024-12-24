@@ -53,8 +53,7 @@ function getAction()
 
 	//%form button has been pressed, set route accordingly.
 	if (!empty($_REQUEST['pcl_form_submit'])) {
-		$action->method = $_REQUEST['pcl_form_submit'];
-		$action->setPath($action->controller.'/'.$action->method);
+		$action->method = Str::filter($_REQUEST['pcl_form_submit'], "\w-");
 	}
 
 	return $action;
@@ -149,12 +148,9 @@ protected function buildQuery($query_data)
  * It encapsulates call of the controller's action: $controller->method($params).
  * It Can be mapped to URL.
  */
-class Action 
+class Action
 {
-	/** Complete path such as 'products/edit', 'admin/products/edit'. */
-	public $path;
-
-	/** Name of the module which owns controller. */
+	/** Name of the plugin module. */
 	public $module;
 
 	/** Name of the controller. */
@@ -176,9 +172,25 @@ class Action
 		}
 	}
 
-	function setPath($path)
+	function getPath()
 	{
-		$this->path = preg_replace("/[^a-z0-9_:,;@ \-\.\/]/i","", $path);
+		$pa = [];
+
+		if ($this->module) $pa[] = '-'.$this->module;
+		if ($this->controller) $pa[] = $this->controller;
+		if ($this->method) $pa[] = $this->method;
+
+		return implode('/', $pa);
+	}
+
+	protected function getParamsString()
+	{
+		$params = [];
+		foreach ($this->params as $key => $value) {
+			$params[] = $key.':'.$value;
+		}
+
+		return $params? '/'.implode('/',$params) : '';
 	}
 
 	/**
@@ -187,15 +199,20 @@ class Action
 	 */
 	function toString()
 	{
-		$params = array();
-		foreach ($this->params as $key => $value) {
-			$params[] = $key.':'.$value;
-		}
-		return $this->path.($params? '/'.implode('/',$params) : '');
+		return $this->getPath().$this->getParamsString();
 	}
 
 	function __toString() {
 		return $this->toString();
+	}
+
+	public function __get($name)
+	{
+		if ($name != 'path') {
+			throw new Exception("Invalid field name: '$name'.");
+		}
+
+		return $this->getPath();
 	}
 
 	/**
@@ -204,28 +221,31 @@ class Action
 	 */
 	function fromString($s)
 	{
-		$ra = explode('/', $this->replaceParams($s, null));
+		$this->module = $this->controller = $this->method = '';
 
-		$params = $path = array();
+		$allowedChars = "a-z0-9_:,;@ \-\.\/";	
+		$parts = $s? explode('/', preg_replace("/[^$allowedChars]/i","", $s)) : [];
 
-		foreach($ra as $section) {
-			if ($section == '__GET__') { $params += $_GET; continue; }
+		$params = [];
 
-			$exploded = explode(':', $section);
-			$name = $exploded[0];
-			$value = array_get($exploded, 1);
-						
-			if (isset($value)) $params[$name] = $value;
-			else $path[] = $section;
+		foreach($parts as $part)
+		{
+			if (strpos($part, ':')) {
+				list($name, $value) = explode(':', $part);
+				$params[$name] = $value;
+				continue;
+			}
+
+			if ($part == '__GET__') { $params += $_GET; continue; }
+
+			if ($this->method) continue;
+			if ($part[0] == '-') $this->module = substr($part, 1);
+			elseif ($this->controller) $this->method = $part;
+			else $this->controller = $part;
+
 		}
 
-		$this->setPath(implode('/', $path));
-		$path = explode('/', $this->path);
-
 		$this->params = $params;
-
-		$this->controller = $path[0];
-		$this->method = array_get($path, 1);
 	}
 
 	/**
@@ -234,35 +254,9 @@ class Action
 	 */
 	function fromArray($get)
 	{
-		$this->setPath(array_get($get, 'r', ''));
-		$path = explode('/', $this->path);
-		
-		//if (!empty($path[2])) $this->module = array_shift($path);
-		
-		$this->controller = $path[0];
-		$this->method = isset($path[1])? $path[1] : '';
-				
+		$this->fromString($get['r'] ?? '');	
 		unset($get['r']);
 		$this->params = $get;
 	}
 
-	protected function replaceParams($s, $params)
-	{
-		preg_match_all("/{([a-z0-9_.]+)}/i", $s, $found);
-		
-		if ($found[0]) {
-			$values = array();
-			foreach ($found[1] as $name) {
-				if ($name == 'GET') $value = '__GET__';
-				elseif (substr($name,0,4) == 'GET.') $value = $_GET[substr($name,4)];
-				elseif($params) $value = $params[$name]; 
-				else $value = '';
-				$values[] = $value;
-			}
-			return str_replace($found[0], $values, $s);
-		}
-		else {
-			return $s;
-		}
-	}
 } //Action
