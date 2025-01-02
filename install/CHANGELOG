@@ -188,7 +188,8 @@
 3.2.0
 - Added service Mailer (sending mails /using phpmailer by default/)
 - Modified configuration of services
-- Modified configuration of pclib.app, pclib.paths
+- Modified configuration of pclib.app, pclib.paths (added config key pclib.app:autostart)
+- Plugin support, added config key pclib.app:plugins
 - Added Db->template() /and "cms" modul in padmin/
 - Removed some unused features - logger disabled and categories filter, App->addConfig() with array parameter
 - PHP8 bugfixes

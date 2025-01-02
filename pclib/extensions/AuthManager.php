@@ -40,7 +40,7 @@ public $USERS_TAB = 'AUTH_USERS',
 function __construct($db = null)
 {
 	parent::__construct();
-	$this->setOptions($this->app->config['pclib.auth']);
+	$this->setOptions($this->app->config['service.auth'] ?? $this->app->config['pclib.auth']);
 	$this->db = $db ?: $this->service('db');
 }
 

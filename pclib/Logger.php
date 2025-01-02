@@ -50,7 +50,7 @@ function __construct($name = null)
 
 	$this->app = $pclib->app;
 
-	$options = $this->app->config['pclib.logger'] ?? [];
+	$options = $this->app->config['service.logger'] ?? [];
 	if ($options) $this->setOptions($options);
 
 	if (isset($name)) $this->name = $name;

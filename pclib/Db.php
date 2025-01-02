@@ -68,7 +68,7 @@ function __construct($dataSource = null)
 	
 	$this->app = $pclib->app;
 
-	$options = $this->app->config['pclib.db'] ?? [];
+	$options = $this->app->config['service.db'] ?? [];
 	if ($options) $this->setOptions($options);
 
 	if (isset($dataSource)) $this->connect($dataSource);

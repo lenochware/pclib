@@ -252,24 +252,26 @@ public function setOptions(array $options)
 	if (!empty($options['layout'])) $this->setLayout($options['layout']);
 	//if (!empty($options['default-route'])) ... ;
 
-	if (empty($options['autostart'])) return;
-
 	//Start services...
-	foreach ($options['autostart'] as $serviceName)
+	if (!empty($options['autostart']))
 	{
-		switch ($serviceName) {
-			case 'db': $service = new pclib\Db; break;
-			case 'auth': $service = new pclib\Auth; break;
-			case 'mailer': $service = new pclib\Mailer; break;
-			case 'logger': $service = new pclib\Logger; break;
-			case 'fileStorage': $service = new pclib\FileStorage(''); break;
+		foreach ($options['autostart'] as $serviceName)
+		{
+			switch ($serviceName) {
+				case 'db': $service = new pclib\Db; break;
+				case 'auth': $service = new pclib\Auth; break;
+				case 'mailer': $service = new pclib\Mailer; break;
+				case 'logger': $service = new pclib\Logger; break;
+				case 'fileStorage': $service = new pclib\FileStorage(''); break;
 
-			default: throw new Exception("Service not found: " . $serviceName);
+				default: throw new Exception("Service not found: " . $serviceName);
+			}
+
+			$this->setService($serviceName, $service);
 		}
+	};
 
-		$this->setService($serviceName, $service);
-	}
-
+	if (!empty($options['plugins'])) $this->addPlugins($options['plugins']);
 }
 
 /**
@@ -287,14 +289,30 @@ function environmentIp(array $env)
 	}
 }
 
-function addPlugins($dir)
+function addPlugins(array $plugins)
 {
 	$this->plugins[] = [];
-  foreach (glob($dir.'/*.php') as $fileName) {
-    require_once($fileName);
-    $pluginName = basename($fileName, '.php');
-    $plugin = new $pluginName($this);
-    $plugin->init();
+
+  foreach ($plugins as $name)
+  {
+		$path = $this->paths['modules'] . "/$name/Plugin.php";
+		
+		if (!file_exists($path)) {
+			throw new Exception("Plugin '$name' not found.");
+		}
+
+    require_once($path);
+
+  	$className = "\\$name\\Plugin";
+
+    $plugin = new $className;
+
+    if (isset($this->config['plugin.' . $name])) {
+    	$plugin->setOptions($this->config['plugin.' . $name]);
+    }
+
+    $plugin->start($this);
+
    	$this->plugins[] = $plugin;
   }
 }

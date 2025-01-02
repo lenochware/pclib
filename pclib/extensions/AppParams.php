@@ -1,7 +1,9 @@
 <?php 
 
 namespace pclib\extensions;
+
 use pclib;
+use pclib\Exception;
 
 /**
  * Can by used as $app->params service, for user editable configuration parameters stored in database.

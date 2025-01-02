@@ -109,7 +109,9 @@ function __construct(Db $db = null)
 
 	if (!session_id()) throw new RuntimeException('Session is not initialized. Perhaps missing session_start()?');
 
-	$this->setOptions($this->app->config['pclib.auth']);
+	$cfg = $this->app->config;
+	$this->setOptions($cfg['service.auth'] ?? $cfg['pclib.auth']);
+
 	$this->loggedUser = $this->getSessionUser();
 	if ($db) $this->getStorage()->db = $db;
 }
