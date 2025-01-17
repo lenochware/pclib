@@ -52,7 +52,7 @@ function getAction()
 	$action = new Action($_GET);
 
 	//%form button has been pressed, set route accordingly.
-	if (!empty($_REQUEST['pcl_form_submit'])) {
+	if (!empty($_REQUEST['pcl_form_submit']) and !$action->method) {
 		$action->method = Str::filter($_REQUEST['pcl_form_submit'], "\w-");
 	}
 
