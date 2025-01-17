@@ -787,7 +787,7 @@ function print_Block($block)
 	if ($b['repeat']) $count = $b['repeat'];
 	else $count = isset($this->values[$block][0])? count($this->values[$block]):0;
 
-	if ($count) {
+	if ($count and empty($b['noprint'])) {
 		for ($rowno = 0; $rowno < $count; $rowno++) {
 			$this->print_BlockRow($block, $rowno);
 		}
@@ -810,13 +810,14 @@ protected function print_BlockRow($block, $rowno = null)
 		return;
 	}
 
-	if ($bval) {
-		$begin = $b['begin'];
-		$end = $b['else']? $b['else'] : $b['end'];
+	if (!empty($b['noprint']) or (is_array($bval) and !$bval)) {
+		if (!$b['else']) return;
+		$begin = $b['else'];
+		$end = $b['end'];
 	}
 	else {
-		$begin = $b['else']? $b['else'] : $b['begin'];
-		$end = $b['end'];
+		$begin = $b['begin'];
+		$end = $b['else']? $b['else'] : $b['end'];
 	}
 
 	$this->elements[$block]['rowno'] = $rowno;
@@ -840,7 +841,7 @@ protected function print_BlockRow($block, $rowno = null)
 		elseif ($strip == TplParser::TPL_BLOCK) {
 			$subblock = $this->document[++$i];
 			if (!$this->elements[$subblock]) throw new \pclib\Exception('Template broken.');
-			if (!$this->elements[$subblock]['noprint']) $this->print_Block($subblock);
+			$this->print_Block($subblock);
 			$i = $this->elements[$subblock]['end'] + 1;
 		}
 		else print $strip;

@@ -744,7 +744,9 @@ protected function print_BlockRow($block, $rowno = null)
 			}
 			if ($this->sumFieldEquals($sum)) continue;
 			$this->values[$sumblock][0] = $this->getSummary($sumblock);
+			$this->elements[$sumblock]['noprint'] = 0;
 			$this->print_Block($sumblock);
+			$this->elements[$sumblock]['noprint'] = 1;
 		}
 	}
 	else {
