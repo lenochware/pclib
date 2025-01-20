@@ -70,6 +70,8 @@ class ElementsDef extends BaseObject
 			'hint' => null,
 			'hidden' => null,
 			'multiple' => null,
+			'nosave' => null,
+			'noedit' => null,
 		],
 
 		'link' => [
@@ -100,6 +102,8 @@ class ElementsDef extends BaseObject
 			'range' => null,
 			'hint' => null,
 			'hidden' => null,
+			'nosave' => null,
+			'noedit' => null,
 		],
 	];
 

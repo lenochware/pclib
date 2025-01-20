@@ -54,7 +54,7 @@ function __construct($rootDir)
 
 	parent::__construct();
 
-	$options = $pclib->app->config['service.filestorage'] ?? [];
+	$options = $pclib->app->config['service.fileStorage'] ?? [];
 	if ($options) $this->setOptions($options);
 
 	if ($rootDir) $this->rootDir = $rootDir;

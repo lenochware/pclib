@@ -902,17 +902,18 @@ protected function uploadFs($tableName, $id)
 
 protected function uploadBasic($old = [])
 {
-	foreach ($_FILES as $id => $aFile) {
+	foreach ($_FILES as $id => $aFile)
+	{
 		$elem = $this->elements[$id];
 		if (!$elem) continue;
 		if ($aFile['error']) $this->invalid[$id] = 'Upload error ('.$aFile['error'].')';
 
 		if ($elem['nosave'] or !$aFile['size'] or $aFile['error']) continue;
 		if ($this->fileInBlackList($this->values[$id])) throw new RuntimeException("Illegal file type.");
-		if (!$elem['into']) throw new NoValueException("Missing 'into \"directory\"' attribute for input file.");
+		if (empty($elem['into'])) throw new NoValueException("Missing 'into \"directory\"' attribute for input file.");
 		$path = realpath($elem['into']);
 		if (!is_dir($path)) throw new IOException("Path '$path' not found.");
-		if ($old[$id]) @unlink($path.'/'.$old[$id]);
+		if (isset($old[$id])) @unlink($path.'/'.$old[$id]);
 		$filename = $this->fileName($id);
 		$tmpname = $aFile['tmp_name'];
 		$ok = @move_uploaded_file ($tmpname, "$path/$filename");
@@ -1216,7 +1217,7 @@ protected function fileName($id)
 
 	while (true) {
 		$fileName = $baseName.'-'.Str::random(8).$ext;
-		if (!file_exists(realpath($elem['path']).'/'.$fileName)) break;
+		if (!file_exists(realpath($elem['into']).'/'.$fileName)) break;
 	}
 
 	return $fileName;
