@@ -68,10 +68,21 @@ function __construct($dataSource = null)
 	
 	$this->app = $pclib->app;
 
-	$options = $this->app->config['service.db'] ?? [];
-	if ($options) $this->setOptions($options);
+	if (isset($dataSource)) {
+		$this->connect($dataSource);
+	}
+	else {
+		$options = $this->app->config['service.db'] ?? [];
+		if ($options) $this->setOptions($options);
+	}
 
-	if (isset($dataSource)) $this->connect($dataSource);
+	if (!$this->drv) {
+		$this->drv = new class() {
+			function __call($name, $args) {
+				throw new DatabaseException("Database is not initialized.");
+			}
+		};
+	}
 }
 
 /*
@@ -94,10 +105,15 @@ protected function parseDsn($dsn)
 	}
 	
 	$dsa = parse_url($dsn);
-	if (!isset($dsa['scheme'])) return [];
+
+	if (!isset($dsa['scheme']) 
+		or !isset($dsa['host']) 
+		or !isset($dsa['user'])
+		or !isset($dsa['path'])
+	) return [];
 
 	$path = explode('/', $dsa['path']);
-	if (!$path[0]) array_shift($path);
+	if (empty($path[0])) array_shift($path);
 
 	$dsarray = array(
 	 'driver' => $dsa['scheme'],

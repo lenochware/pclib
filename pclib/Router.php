@@ -239,10 +239,9 @@ class Action
 			if ($part == '__GET__') { $params += $_GET; continue; }
 
 			if ($this->method) continue;
-			if ($part[0] == '-') $this->module = substr($part, 1);
+			if (strlen($part) and $part[0] == '-') $this->module = substr($part, 1);
 			elseif ($this->controller) $this->method = $part;
 			else $this->controller = $part;
-
 		}
 
 		$this->params = $params;
