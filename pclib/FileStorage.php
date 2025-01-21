@@ -69,7 +69,7 @@ function __construct($rootDir)
  */
 public function setOptions(array $options)
 {
-	$this->rootDir = $options['rootdir'];	
+	$this->rootDir = $options['rootDir'];	
 }
 
 /**

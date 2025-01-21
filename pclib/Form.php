@@ -1303,12 +1303,19 @@ protected function head()
 			parse_str ($params, $hidden);
 		}
 	}
-	else
+	else {
 		$tag['method'] = 'post';
+	}
 
 	if (!empty($this->header['csrf'])) $hidden['csrf_token'] = $this->getCsrfToken();
 	$hidden['submitted'] = $this->name;
-	if ($action) $tag['action'] = $this->header['action'] = $action;
+
+	if ($action) {
+		$tag['action'] = $this->header['action'] = $action;
+	}
+	else {
+		$hidden['no_action'] = 1;
+	}
 
 	if ($jsvalid = $this->header['jsvalid']) {
 		 $tag['onsubmit'] = "return pclib.validate(this);";
@@ -1319,7 +1326,7 @@ protected function head()
 
 	$html = $this->htmlTag('form', $tag)."\n";
 
-	$hidden = (array)$hidden + $this->extraHidden; 
+	$hidden = (array)$hidden + $this->extraHidden;
 	foreach ($hidden as $k => $v) {
 		$html .= "<input type=\"hidden\" name=\"$k\" value=\"$v\">\n";
 	}
