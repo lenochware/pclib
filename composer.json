@@ -1,9 +1,9 @@
 {
 	"name": "lenochware/pclib",
-	"description": "Pclib framework",
+	"description": "PClib PHP framework",
 	"keywords": ["framework", "pclib"],
 	"homepage": "http://pclib.brambor.net",
-	"license": ["LGPL-2.1+"],
+	"license": ["MIT"],
 	"authors": [
 		{
 			"name": "lenochware",

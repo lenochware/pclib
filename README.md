@@ -16,7 +16,7 @@ Lightweight PHP framework without boilerplate of big frameworks.
 * Logger, Tree view and more...
 
 ### Installation
-1. [Download **pclib**](http://pclib.brambor.net/?r=download)
+1. [Download **pclib**](http://pclib.brambor.net/?r=home/install)
 2. Copy directory `pclib` somewhere at your webroot.
 3. Some parts of the library need a few database tables. You can
 found sql-dump in `install/pclib_*.sql`. Import this sql-dump into your database.
@@ -48,13 +48,11 @@ $grid->setQuery('SELECT * FROM products');
 print $grid;
 ```
 
-For more examples see http://pclib.brambor.net/demo
+For more examples see http://pclib.brambor.net/
 
 ### Links
 * [PClib homepage](http://pclib.brambor.net/)
 
 ### License
-This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
- License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
+This source code is licensed under the MIT license found in the LICENSE file
+in the root directory of this source tree.

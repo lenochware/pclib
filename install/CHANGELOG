@@ -1,17 +1,165 @@
-2.0.0
-- Added namespaces: Most used classes (App, Grid, Form, Auth,...) are in namespace pclib
-  i.e. pclib\App, pclib\Grid, ...
-- Added aliases: As alternative, you can use non-namespaced version of class name 
-  with 'PC' prefix: $app = new PCApp()
-- It is possible use legacy classnames (i.e. App) by setting pclib.compatibility config param 
-'legacy_classnames' to true
-- Added 'pclib.app.make' factory configuration (used when controller objects are created)
-  It is used by App->make() function
-- Backward compatibility is disabled by default. To enable, edit pclib.compatibility config param
-- renamed: Auth_User -> pclib\User, App_Controller -> pclib\Controller, App_Layout -> pclib\Layout
-- renamed: App->enviroment, App->enviromentIp -> App->environment, App->environmentIp
-- Added function App->make(), removed App->getController()
+3.2.0
+- Added service Mailer (sending mails /using phpmailer by default/)
+- Modified configuration of services
+- Modified configuration of pclib.app, pclib.paths (added config key pclib.app:autostart)
+- Plugin support, added config key pclib.app:plugins
+- Added Db->template() /and "cms" modul in padmin/
+- Removed some unused features - logger disabled and categories filter, App->addConfig() with array parameter
+- PHP8 bugfixes
+- Changed license to MIT license
+
+3.1.1
+- Default db engine changed to InnoDB
+- Added AuthUser::find()
+- Added FileStorage->setFile() with $file['CONTENT']
 - Bugfixes
+
+3.1.0
+- Improved debugbar (show errors, added eval window)
+- Various small improvements (logger filter, pclib.init() function, added job_params)
+- Controller->template() return form or grid object for templates with name *_form.tpl or *_grid.tpl
+- Tree->add() - add tree node into Tree
+- Extend size of some database fields
+- Bugfixes
+
+3.0.0
+- Logger: optimized, list of user agents updated
+- Added Tree->auth, Tree->map()
+- AuthConsole messages improved, added role +right command
+- Added Router->index and '/self' route
+- Debugbar (App->debugMode) rewritten
+- Added column AUTHOR_ID into tables AUTH_USERS, AUTH_ROLES
+- Added class Str - string utilities (PHP extension 'mbstring' is required)
+- Configuration: changed pclib.errors config parameters to boolean
+- possibility disable pclib error handler with 'pclib.errors' => ['display' => 'php'] in config
+- fixed PHP 8.2 support
+
+2.9.5
+- Assets moved to new directories pclib/www and pclib/tpl
+- Added Controller->allowDashInAction, Controller->outputJson()
+- Fixed escaping SQL identifiers
+- Added html5 input file attribute accept "allowed-file-types" (e.g. accept "image/*")
+- Validation file size and type ond client and server
+- Added FILESTORAGE.HASH
+- Added Form->loadFiles(): after loading you can access file information in template as {file."param"} e.g. {file.ORIGNAME}
+- Added template tag modifiers {field.int_value}, {field.string_value} (for escaping in javascript code)
+- Template variables such as {@baseurl}
+- Tpl->setAttr(), Tpl->htmlTag() clean-up
+- Added javascript function pclib.initLinks() which enable ajax links
+
+2.9.0
+- Default password is never stored in db
+- Errors will print debug information only on localhost by default (use $app->environmentIp(['your-ip' => 'develop']) to setup develop environment)
+
+2.8.8
+- Added template attribute 'default' for button
+- Added Model relationsCache
+- Added Model events (model.before-save, model.after-save, model.before-delete, model.after-delete)
+- Added template attribute 'notranslate' for lookup tags (do not translate lookup values)
+- Bugfixes, small updates
+
+2.8.5
+- Rewritten FileStorage API
+- Improved Layout->addScripts()
+- Added Auth->reloadLoggedUser()
+- Improved GridPager, removed pager "nohide", added {pager.visible}
+- Improved jdump(), added debug_sql_log()
+- Bugfixes
+
+2.8.0
+- Enabled config parameter tpl-escape - template variables are escaped by default
+- Form is generating &lt;button> tag for buttons by default
+- Removed XHTML support, removed Form ajaxget
+- Added template globals: TplGlobals class
+- Added application parameters: AppParams class
+- Added bcrypt-md5 password hash algo
+- Added Db->info, Db->fetchPair(), Selection->selectPair()
+- Added Grid->setFields()
+- Php 7 and 8 fixes, various small changes and improvements
+
+2.7.0
+- PHP 8.2 support
+- Date format uses date() instead of deprecated strftime()
+- Security fixes
+- Added Db->slowQueryLog
+
+2.6.5
+- Class Tree rewritten (output is fully customizable with template now)
+- Added Grid->exportExcel(), Db->insertUpdate(), Form->getFile()
+- Db: Support of array-to-list parameters
+- Added function safe_session_start()
+- Cleaning up, bugfixes
+
+2.6.0
+- Added 'size_mb' atrribute to input file (max allowed size of file in MB)
+- Improved DebugBar ($app->debugMode = true)
+- Added EventManager. Changed working with events. Example: $app->events->on('app.error', $myHandler);
+- Added function ddump(), jdump() rewritten
+- Added Controller->action(), Controller->template() - shortcuts to call action or create template
+- Added Controller->authorize() - use it before actions requiring authorization
+- Set BaseController->defaultAction() for page-not-found message
+- Added AuthUser->changePassword()
+- Removed legacy features - config key 'pclib.compatibility'
+- Added config key 'pclib.app' - quick setup of the application (databaze connection, auth, logger, default route etc.)
+- Some bugfixes, as always
+
+2.4.0
+- Removed php notices
+- Added FileStorage->copyFile(), css-class "sort active", tag "select multiple", AuthConsole->executeScript()
+- Added Tree.setQuery(), Tree.htmlTemplate()
+- Bugfixes
+
+2.3.2
+- orm: Added sum() and avg() for Selection
+- better js date validation
+- replace recursive for config parameters
+- Added calculated fields
+- bugfixes
+- PHP 5.4 is required
+
+2.3.0
+- Added pclib ORM (beta):
+- Added classes orm\Selection, orm\Model, orm\Relation
+- Added methods ->model() and ->selection() into Controller class
+- Added method Grid->setSelection(orm\Selection $sel)
+
+- Added template tag attribute confirm: link ln confirm "confirm_message"
+- Added including of templates: include INCL1 file "template.tpl"
+- Added default_print "div" into default form template
+- Tpl->addTag() will accept attribute 'after': input I10 ... after "I5"
+- Various improvements and bugfixes
+
+2.2.1
+- Added Auth->verifyRemote config param
+- Added Form->addHidden(), Form->preparedValues(), removed Form->prepare()
+- Breadcrumb navigator can be generated as UL
+- Various improvements and bugfixes
+
+ 2.2.0
+ - Added classes TplParser, parser code moved from Tpl to TplParser
+ - Added classes Validator, BaseValidator
+ - Removed class FormValidator, Form uses Validator for validation
+ - Added validation rules url, range, integer, minlength, time
+ - Added class FileStorage
+ - Added attribute 'multiple' for input file (multiple file upload support)
+ - Added template attribute 'escape' - it escapes html tags from output
+ - Template attribute 'datasource' can be callable (or route path)
+ - Added attribute 'confirm' to button tag
+ - Added composer support: use "composer require lenochware/pclib" for installation
+ - various bugfixes and small changes
+
+2.1.1
+ - Added parameters to error.tpl, better message in errorlog
+ - Added class TemplateFactory for building forms and grids from db-columns
+ - Templates assets/def_*.tpl renamed to assets/default-*.tpl and updated
+ - Tpl->create() uses TemplateFactory now
+ - Added _tvar template variables
+ - Added methods Grid->exportCsv() and Grid->getExportCsv()
+ - Removed function ifnot()
+ - Added config parameter 'pclib.security'
+ - Changed form-upload fileName format
+ - GridForm fixed and updated
+ - Bugfixes
 
 2.1.0
 - Pclib autentification and authorisation system rewritten
@@ -31,165 +179,17 @@
 - App->make() replaced with newController(), newModel()
 - Bugfixes
 
-2.1.1
- - Added parameters to error.tpl, better message in errorlog
- - Added class TemplateFactory for building forms and grids from db-columns
- - Templates assets/def_*.tpl renamed to assets/default-*.tpl and updated
- - Tpl->create() uses TemplateFactory now
- - Added _tvar template variables
- - Added methods Grid->exportCsv() and Grid->getExportCsv()
- - Removed function ifnot()
- - Added config parameter 'pclib.security'
- - Changed form-upload fileName format
- - GridForm fixed and updated
- - Bugfixes
-
- 2.2.0
- - Added classes TplParser, parser code moved from Tpl to TplParser
- - Added classes Validator, BaseValidator
- - Removed class FormValidator, Form uses Validator for validation
- - Added validation rules url, range, integer, minlength, time
- - Added class FileStorage
- - Added attribute 'multiple' for input file (multiple file upload support)
- - Added template attribute 'escape' - it escapes html tags from output
- - Template attribute 'datasource' can be callable (or route path)
- - Added attribute 'confirm' to button tag
- - Added composer support: use "composer require lenochware/pclib" for installation
- - various bugfixes and small changes
-
-2.2.1
-- Added Auth->verifyRemote config param
-- Added Form->addHidden(), Form->preparedValues(), removed Form->prepare()
-- Breadcrumb navigator can be generated as UL
-- Various improvements and bugfixes
-
-2.3.0
-- Added pclib ORM (beta):
-- Added classes orm\Selection, orm\Model, orm\Relation
-- Added methods ->model() and ->selection() into Controller class
-- Added method Grid->setSelection(orm\Selection $sel)
-
-- Added template tag attribute confirm: link ln confirm "confirm_message"
-- Added including of templates: include INCL1 file "template.tpl"
-- Added default_print "div" into default form template
-- Tpl->addTag() will accept attribute 'after': input I10 ... after "I5"
-- Various improvements and bugfixes
-
-2.3.2
-- orm: Added sum() and avg() for Selection
-- better js date validation
-- replace recursive for config parameters
-- Added calculated fields
-- bugfixes
-- PHP 5.4 is required
-
-2.4.0
-- Removed php notices
-- Added FileStorage->copyFile(), css-class "sort active", tag "select multiple", AuthConsole->executeScript()
-- Added Tree.setQuery(), Tree.htmlTemplate()
+2.0.0
+- Added namespaces: Most used classes (App, Grid, Form, Auth,...) are in namespace pclib
+  i.e. pclib\App, pclib\Grid, ...
+- Added aliases: As alternative, you can use non-namespaced version of class name 
+  with 'PC' prefix: $app = new PCApp()
+- It is possible use legacy classnames (i.e. App) by setting pclib.compatibility config param 
+'legacy_classnames' to true
+- Added 'pclib.app.make' factory configuration (used when controller objects are created)
+  It is used by App->make() function
+- Backward compatibility is disabled by default. To enable, edit pclib.compatibility config param
+- renamed: Auth_User -> pclib\User, App_Controller -> pclib\Controller, App_Layout -> pclib\Layout
+- renamed: App->enviroment, App->enviromentIp -> App->environment, App->environmentIp
+- Added function App->make(), removed App->getController()
 - Bugfixes
-
-2.6.0
-- Added 'size_mb' atrribute to input file (max allowed size of file in MB)
-- Improved DebugBar ($app->debugMode = true)
-- Added EventManager. Changed working with events. Example: $app->events->on('app.error', $myHandler);
-- Added function ddump(), jdump() rewritten
-- Added Controller->action(), Controller->template() - shortcuts to call action or create template
-- Added Controller->authorize() - use it before actions requiring authorization
-- Set BaseController->defaultAction() for page-not-found message
-- Added AuthUser->changePassword()
-- Removed legacy features - config key 'pclib.compatibility'
-- Added config key 'pclib.app' - quick setup of the application (databaze connection, auth, logger, default route etc.)
-- Some bugfixes, as always
-
-
-2.6.5
-- Class Tree rewritten (output is fully customizable with template now)
-- Added Grid->exportExcel(), Db->insertUpdate(), Form->getFile()
-- Db: Support of array-to-list parameters
-- Added function safe_session_start()
-- Cleaning up, bugfixes
-
-2.7.0
-- PHP 8.2 support
-- Date format uses date() instead of deprecated strftime()
-- Security fixes
-- Added Db->slowQueryLog
-
-2.8.0
-- Enabled config parameter tpl-escape - template variables are escaped by default
-- Form is generating &lt;button> tag for buttons by default
-- Removed XHTML support, removed Form ajaxget
-- Added template globals: TplGlobals class
-- Added application parameters: AppParams class
-- Added bcrypt-md5 password hash algo
-- Added Db->info, Db->fetchPair(), Selection->selectPair()
-- Added Grid->setFields()
-- Php 7 and 8 fixes, various small changes and improvements
-
-2.8.5
-- Rewritten FileStorage API
-- Improved Layout->addScripts()
-- Added Auth->reloadLoggedUser()
-- Improved GridPager, removed pager "nohide", added {pager.visible}
-- Improved jdump(), added debug_sql_log()
-- Bugfixes
-
-2.8.8
-- Added template attribute 'default' for button
-- Added Model relationsCache
-- Added Model events (model.before-save, model.after-save, model.before-delete, model.after-delete)
-- Added template attribute 'notranslate' for lookup tags (do not translate lookup values)
-- Bugfixes, small updates
-
-2.9.0
-- Default password is never stored in db
-- Errors will print debug information only on localhost by default (use $app->environmentIp(['your-ip' => 'develop']) to setup develop environment)
-
-2.9.5
-- Assets moved to new directories pclib/www and pclib/tpl
-- Added Controller->allowDashInAction, Controller->outputJson()
-- Fixed escaping SQL identifiers
-- Added html5 input file attribute accept "allowed-file-types" (e.g. accept "image/*")
-- Validation file size and type ond client and server
-- Added FILESTORAGE.HASH
-- Added Form->loadFiles(): after loading you can access file information in template as {file."param"} e.g. {file.ORIGNAME}
-- Added template tag modifiers {field.int_value}, {field.string_value} (for escaping in javascript code)
-- Template variables such as {@baseurl}
-- Tpl->setAttr(), Tpl->htmlTag() clean-up
-- Added javascript function pclib.initLinks() which enable ajax links
-
-3.0.0
-- Logger: optimized, list of user agents updated
-- Added Tree->auth, Tree->map()
-- AuthConsole messages improved, added role +right command
-- Added Router->index and '/self' route
-- Debugbar (App->debugMode) rewritten
-- Added column AUTHOR_ID into tables AUTH_USERS, AUTH_ROLES
-- Added class Str - string utilities (PHP extension 'mbstring' is required)
-- Configuration: changed pclib.errors config parameters to boolean
-- possibility disable pclib error handler with 'pclib.errors' => ['display' => 'php'] in config
-- fixed PHP 8.2 support
-
-3.1.0
-- Improved debugbar (show errors, added eval window)
-- Various small improvements (logger filter, pclib.init() function, added job_params)
-- Controller->template() return form or grid object for templates with name *_form.tpl or *_grid.tpl
-- Tree->add() - add tree node into Tree
-- Extend size of some database fields
-- Bugfixes
-
-3.1.1
-- Default db engine changed to InnoDB
-- Added AuthUser::find()
-- Added FileStorage->setFile() with $file['CONTENT']
-- Bugfixes
-
-3.2.0
-- Added service Mailer (sending mails /using phpmailer by default/)
-- Modified configuration of services
-- Modified configuration of pclib.app, pclib.paths (added config key pclib.app:autostart)
-- Plugin support, added config key pclib.app:plugins
-- Added Db->template() /and "cms" modul in padmin/
-- Removed some unused features - logger disabled and categories filter, App->addConfig() with array parameter
-- PHP8 bugfixes
