@@ -4,7 +4,8 @@
  * PClib database driver.
  *
  * @author -dk- <lenochware@gmail.com>
- * @link http://pclib.brambor.net/
+ * @link https://pclib.brambor.net/
+ * @license MIT (https://opensource.org/licenses/MIT)
  */
 
 namespace pclib\system\database;

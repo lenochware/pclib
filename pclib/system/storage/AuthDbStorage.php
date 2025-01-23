@@ -1,4 +1,5 @@
-<?php 
+<?php
+
 namespace pclib\system\storage;
 use pclib\system\BaseObject;
 use pclib\AuthUser;

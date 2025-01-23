@@ -4,13 +4,9 @@
  * PClib constants, global functions and variables
  *
  * @author -dk- <lenochware@gmail.com>
- * @link http://pclib.brambor.net/
+ * @link https://pclib.brambor.net/
+ * @license MIT (https://opensource.org/licenses/MIT)
  */
-
-# This library is free software; you can redistribute it and/or
-# modify it under the terms of the GNU Lesser General Public
-# License as published by the Free Software Foundation; either
-# version 2.1 of the License, or (at your option) any later version.
 
 use pclib\Str;
 
