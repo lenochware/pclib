@@ -75,3 +75,35 @@ ALTER TABLE `TREE_LOOKUPS`
 	CHANGE `ROUTE` `ROUTE` varchar(100)  COLLATE utf8_general_ci NULL after `LEVEL`, 
 	CHANGE `URL` `URL` varchar(255)  COLLATE utf8_general_ci NULL after `ROUTE`, 
 	CHANGE `RKEY` `RKEY` varchar(100)  COLLATE utf8_general_ci NULL after `URL`;
+
+
+	/* Version 3.2.0 */
+
+	CREATE TABLE `PCLIB_MAILS` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `FROM` varchar(100) DEFAULT NULL,
+  `TO` varchar(100) DEFAULT NULL,
+  `RECIPIENTS` text,
+  `SUBJECT` varchar(255) DEFAULT NULL,
+  `BODY` text,
+  `BODY_TEXT` text,
+  `STATUS` tinyint(4) DEFAULT NULL,
+  `ATTACHMENTS` text,
+  `TEMPLATE_NAME` varchar(100) DEFAULT NULL,
+  `SEND_AT` datetime DEFAULT NULL,
+  `CREATED_AT` datetime DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE `PCLIB_CONTENT` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `NAME` varchar(50) DEFAULT NULL,
+  `CATEGORY` varchar(50) DEFAULT NULL,
+  `TITLE` varchar(100) DEFAULT NULL,
+  `BODY` text,
+  `CREATED_AT` datetime DEFAULT NULL,
+  `UPDATED_AT` datetime DEFAULT NULL,
+  `AUTHOR_ID` int(11) DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
