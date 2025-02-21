@@ -104,21 +104,30 @@ class Tree extends system\BaseObject
     }
   }
   
-    /**
+  /**
    * Export current %Tree to text string.
+   * @param string $format Exported cells - list of cell names, separated by "|"
    * @return string $s %Tree as text.
    */
-  function exportText()
+  function exportText($format = "PATH|ROUTE")
   {
-    $s = "PATH|ROUTE\n";
+    $s = $format . "\n";
+
+    $cells = explode("|", $format);
 
     $branch = [];
 
     foreach($this->nodes as $node)
     {
       $branch[$node['LEVEL']] = $node['LABEL'];
-      $s .= implode('/', array_slice($branch, 0, $node['LEVEL'] + 1));
-      $s .= '|'.$node['ROUTE']."\n";
+      $node['PATH'] = implode('/', array_slice($branch, 0, $node['LEVEL'] + 1));
+
+      $line = [];
+      foreach ($cells as $id) {
+        $line[] = $node[$id];
+      }
+
+      $s .= trim(implode("|", $line), "|")."\n";
     }
 
     return $s;

@@ -1,4 +1,4 @@
-# PClib Clean URL support.
+# PClib Friendly URL support.
 # Rename to .htaccess and copy into root directory of your application.
 
 <IfModule mod_rewrite.c>

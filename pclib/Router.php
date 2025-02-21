@@ -122,12 +122,19 @@ function createUrl($s)
 
 	if (!$action->controller) return $this->baseUrl;
 
+	$anchor = '';
+
+	if (isset($action->params['@hash'])) {
+		$anchor = '#'.$action->params['@hash'];
+		unset($action->params['@hash']);
+	}
+
 	if ($this->friendlyUrl) {
 		$params = $action->params;
-		return $this->baseUrl.$action->path.($params? '?'.$this->buildQuery($params) : '');
+		return $this->baseUrl.$action->path.($params? '?'.$this->buildQuery($params) : '').$anchor;
 	} else {
 		$params = array('r' => $action->path) + $action->params;
-		return $this->baseUrl.$this->index.'?'.$this->buildQuery($params);
+		return $this->baseUrl.$this->index.'?'.$this->buildQuery($params).$anchor;
 	}
 }
 
