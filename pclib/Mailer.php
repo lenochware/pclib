@@ -53,7 +53,7 @@ function __construct(array $options = [])
         $this->setOptions($options);
     }
     else {
-        $this->setOptions($this->app->config['service.mailer']);
+        $this->setOptions($this->app->config['service.mailer'] ?? []);
     }
 
     $this->trigger('mailer.create', ['sender' => $this->sender]);

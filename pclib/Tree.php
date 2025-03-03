@@ -450,7 +450,7 @@ class Tree extends system\BaseObject
   private function nextSibling($i)
   {
     $start = $this->nodes[$i++];
-    while($node = $this->nodes[$i++]) {
+    while($node = $this->nodes[$i++] ?? null) {
       if ($node['LEVEL'] <= $start['LEVEL']) return --$i;
     }
     return $i;
