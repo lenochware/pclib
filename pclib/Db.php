@@ -250,9 +250,9 @@ function query($_sql, $param = null)
 		$res = $this->drv->query($sql);
 	}
 		
-	$this->lastQuery = $this->drv->error? $this->drv->error : $sql;
+	$this->lastQuery = $this->drv->lastQuery;
 
-  $this->trigger('db.after-query', ['sql' => $sql, 'query' => $res]);
+  $this->trigger('db.after-query', ['sql' => $this->lastQuery, 'query' => $res]);
 
   $tmEnd = microtime(true);
   if ($this->slowQueryLog and $tmEnd - $tm > $this->slowQueryLog) {

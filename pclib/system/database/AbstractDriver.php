@@ -26,6 +26,8 @@ public $connection;
  * to check if any error occurs */
 public $error;
 
+public $lastQuery;
+
 /** Store portable limit clausule */
 protected $limit;
 

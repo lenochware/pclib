@@ -93,6 +93,7 @@ function query($sql)
 		throw new DatabaseException('Query error.'.$msg);
 	}
 
+	$this->lastQuery = $sql;
 	$this->res = $res;
 	return $res;
 }

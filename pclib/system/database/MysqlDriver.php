@@ -83,6 +83,8 @@ function query($sql)
 		$msg = $this->verboseErrors? ' '.$this->error : '';
 		throw new DatabaseException('Query error.'.$msg);
 	}
+
+	$this->lastQuery = $sql;	
 	$this->res = $res;
 	return $res;
 }
