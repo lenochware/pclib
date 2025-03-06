@@ -355,7 +355,7 @@ function related($name)
 
 	$rel = new Relation($this, $name);
 
-	if ($rel->params['owner'] or $rel->params['one']) {
+	if (!empty($rel->params['owner']) or !empty($rel->params['one'])) {
 		$this->relationsCache[$name] = $rel->first();
 		return $this->relationsCache[$name];
 	}

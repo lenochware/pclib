@@ -21,7 +21,7 @@ if (!defined('PCLIB_DIR')) {
 
 if (!defined('BASE_URL')) {
 	define ('BASE_URL',
-		rtrim(dirname($_SERVER['PHP_SELF']),"/\\").'/');
+		str_replace(basename($_SERVER['SCRIPT_NAME']), '', $_SERVER['SCRIPT_NAME']));
 }
 
 require_once PCLIB_DIR . 'system/exceptions.php';

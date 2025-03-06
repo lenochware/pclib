@@ -101,7 +101,7 @@ function isConsole()
 /** Return base Url. */
 function getBaseUrl()
 {
-	return rtrim(dirname($_SERVER['PHP_SELF']),"/\\").'/';
+	return str_replace(basename($_SERVER['SCRIPT_NAME']), '', $_SERVER['SCRIPT_NAME']);
 }
 
 function getUrlComponents()
