@@ -19,6 +19,11 @@ class EventManager /*extends system\BaseObject*/ implements IService
 	/** Array of listeners - store all attached event callbacks. */
 	protected $listeners = [];
 
+	/*
+	 * Setup this service from configuration file.
+	 */
+	public function setOptions(array $options)	{}
+
 	/**
 	 * Attach function $fn to event $name.
 	 */

@@ -45,6 +45,11 @@ class AppParams implements pclib\IService {
 		);
 	}
 
+	/*
+	 * Setup this service from configuration file.
+	 */
+	public function setOptions(array $options)	{}
+
 	/**
 	 * Get parameter $name.
 	 * @param string $name Parameter name

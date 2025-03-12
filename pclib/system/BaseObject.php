@@ -92,12 +92,14 @@ class BaseObject
 	function on($name, $fn)
 	{
 		$em = $this->serviceLocator('events');
+		if (!$em) return false;
 		$em->on($name, $fn, $this);
 	}
 
 	function trigger($name, $data = [])
 	{
 		$em = $this->serviceLocator('events');
+		if (!$em) return false;
 		return $em->trigger($name, $data, $this);
 	}
 

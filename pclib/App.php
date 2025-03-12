@@ -154,12 +154,7 @@ function log($category, $message_id, $message = null, $item_id = null)
  */
 protected function createDefaultService($serviceName)
 {
-
-	if ($serviceName == 'events') {
-		return new pclib\EventManager;
-	}
-
-	$canBeDefault = ['logger', 'debugger', 'request', 'router'];
+	$canBeDefault = ['debugger', 'request', 'router'];
 	if (in_array($serviceName, $canBeDefault)) {
 		$className = '\\pclib\\'.ucfirst($serviceName);
 
@@ -258,6 +253,8 @@ public function setOptions(array $options)
 				case 'auth': $service = new pclib\Auth; break;
 				case 'mailer': $service = new pclib\Mailer; break;
 				case 'logger': $service = new pclib\Logger; break;
+				case 'events': $service = new pclib\EventManager; break;
+				case 'params': $service = new pclib\extensions\AppParams; break;
 				case 'fileStorage': $service = new pclib\FileStorage(''); break;
 
 				default: throw new Exception("Service not found: " . $serviceName);

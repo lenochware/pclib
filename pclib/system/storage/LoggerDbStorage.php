@@ -143,6 +143,7 @@ function getLog($rowCount, array $filter = null)
 		~ AND L.ACTION in ({#ACTIONNAME})
 		~ AND L.ITEM_ID='{#ITEM_ID}'
 		~ AND L.DT like '{LOGGED_AT}%'
+		~ AND L.ID between {#MIN_ID} and {#MAX_ID}
 		order by L.ID desc", $filter
 	);
 
