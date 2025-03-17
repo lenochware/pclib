@@ -4,6 +4,7 @@ namespace pclib\extensions;
 
 use pclib;
 use pclib\Exception;
+use pclib\NotImplementedException;
 
 /**
  * Can by used as $app->params service, for user editable configuration parameters stored in database.
@@ -34,15 +35,9 @@ class AppParams implements pclib\IService {
 		$this->isLoaded = true;
 	}
 
-	/**
-	 * Set and save parameter to database.
-	 */
-	function save($name, $value)
+	function save()
 	{
-		$this->set($name, $value);
-		$this->db->insertUpdate("APP_PARAMS", 
-			['PARAM_NAME' => $name, 'PARAM_VALUE' => $value, 'UPDATED_AT' => date("Y-m-d H:i:s")], ['PARAM_NAME']
-		);
+		throw new NotImplementedException;
 	}
 
 	/*
@@ -70,19 +65,6 @@ class AppParams implements pclib\IService {
 	{
 		$this->values[$name] = $value;
 	}
-
-	function add($list, $name, $value)
-	{
-		if (!isset($this->values[$list])) $this->values[$list] = [];
-		if (!is_array($this->values[$list])) throw new Exception('Not a list!');
-		$this->values[$list][$name] = $value;
-	}
-
-	function delete($list, $name)
-	{
-		unset($this->values[$list][$name]);
-	}
-
 
 	public function __get($name)
 	{
