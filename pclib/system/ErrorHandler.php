@@ -27,6 +27,7 @@ class ErrorHandler extends BaseObject
 	public $options = [];
 
 	public $MESSAGE_PATTERN = "<br><b>{severity} {code}: {exceptionClass}</b> {message}";
+	public $MESSAGE_LOG_PATTERN = "{exceptionClass}: {message} in '{file}' on line {line} processing '{route}' at {timestamp}.\n\nStack trace:\n{trace}";
 
 	/** var Logger */
 	public $logger; 
@@ -216,8 +217,11 @@ class ErrorHandler extends BaseObject
 		try {
 			$error = $this->getValues($e);
 			
-			$this->service('logger')->log('php/error', $error['severity'],
-				Str::format("{exceptionClass}: {message} in '{file}' on line {line} processing '{route}' at {timestamp}", $error)
+			$logger = $this->service('logger');
+			if (!$logger) return;
+
+			$logger->log('php/error', $error['severity'],
+				Str::format($this->MESSAGE_LOG_PATTERN, $error)
 			);
 		}
 		catch(\Exception $ex) {
