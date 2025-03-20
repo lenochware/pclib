@@ -905,7 +905,7 @@ protected function uploadBasic($old = [])
 		if ($aFile['error']) $this->invalid[$id] = 'Upload error ('.$aFile['error'].')';
 
 		if ($elem['nosave'] or !$aFile['size'] or $aFile['error']) continue;
-		if ($this->fileInBlackList($this->values[$id])) throw new RuntimeException("Illegal file type.");
+		if ($this->fileInBlackList($this->values[$id])) throw new RuntimeException("File type is not allowed.");
 		if (empty($elem['into'])) throw new NoValueException("Missing 'into \"directory\"' attribute for input file.");
 		$path = realpath($elem['into']);
 		if (!is_dir($path)) throw new IOException("Path '$path' not found.");
@@ -940,9 +940,9 @@ function upload($tableName, $id, $old = [])
  */
 function getFile($id)
 {
-	$aFile = $_FILES[$id];
-	if (!$aFile['size'] or $aFile['error']) return false;
-	if ($this->fileInBlackList($this->values[$id])) return false;
+	$aFile = $_FILES[$id] ?? null;
+	if (!$aFile or !$aFile['size'] or $aFile['error']) return false;
+	if ($this->fileInBlackList($aFile['name'])) throw new RuntimeException("File type is not allowed.");
 	return file_get_contents($aFile['tmp_name']);
 }
 

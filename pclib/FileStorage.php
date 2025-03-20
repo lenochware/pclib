@@ -10,6 +10,7 @@
 
 namespace pclib;
 use pclib;
+use pclib\Str;
 
 /**
  *  Provides file management functions. You can upload, store, list and manage files.
@@ -56,6 +57,7 @@ function __construct($rootDir)
 
 	if ($rootDir) $this->rootDir = $rootDir;
 
+	if (!$this->rootDir) throw new IOException("Filestorage directory is not set.");
 	if (!is_dir($this->rootDir)) throw new IOException("Directory '$this->rootDir' does not exists.");
 
 	$this->service('db');
@@ -179,6 +181,17 @@ function copyFile($path, $loc)
 }
 
 /**
+ * Add file $data into location $loc.
+ * @param int|array $loc File location
+ * @param array $data File data
+ */
+function addFile($loc, $data)
+{
+	unset($data['FILE_ID'], $loc[2]);
+	$this->setFile($loc, $data);
+}
+
+/**
  * Delete file into location $loc.
  * @param int|array $loc File location
  */
@@ -284,12 +297,12 @@ protected function createTempFile($file)
 protected function newFileId($loc)
 {
 	  $max = $this->db->select(
-    "select MAX(FILE_ID) N FROM $this->TABLE
-    WHERE ENTITY_TYPE='{0}' AND ENTITY_ID='{1}' AND FILE_ID LIKE 'fs_%'",
+    "select count(FILE_ID) N FROM $this->TABLE
+    WHERE ENTITY_TYPE='{0}' AND ENTITY_ID='{1}'",
     $loc
   );
 
-  return isset($max['N']) ? ++$max['N'] : 'fs_0001';
+  return isset($max['N']) ? 'fs_' . Str::lpad($max['N'] + 1, 4, '0') : 'fs_0001';
 }
 
 /**
@@ -329,6 +342,17 @@ function deleteFiles($loc)
 	}
 }
 
+/**
+ * Add all $files into file storage and assign it to entity $loc.
+ * @param int|array $loc [entity-type, entity-id]
+ * @param array $files List of files
+ */
+function addFiles($loc, $files)
+{
+	foreach ($files as $file) {
+		$this->addFile($loc, $file);
+	}
+}
 
 protected function getMultipleField($input_id, $data)
 {

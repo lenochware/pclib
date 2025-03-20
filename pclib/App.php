@@ -423,6 +423,7 @@ function message($message, $cssClass = null)
 {
 	$args = array_slice(func_get_args(), 2);
 	$this->layout->addMessage($message, $cssClass, $args);
+	return $this;
 }
 
 /**
