@@ -163,7 +163,8 @@ function urlMatch($pattern)
  */
 function getUserAgent()
 {
-	$agent = '';
+	$agent = $version = '';
+	
 	$signature = $_SERVER['HTTP_USER_AGENT'];
 	foreach ($this->userAgents as $name) {
 		if (stristr($signature, $name)) { $agent = $name; break; }

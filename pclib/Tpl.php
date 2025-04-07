@@ -244,6 +244,7 @@ function enable()
 	$val = (end($args) === false)? 1:0;
 	if (is_array($args[0])) $args = $args[0];
 	foreach($args as $name) {
+		if (!isset($this->elements[$name])) $this->elements[$name] = system\ElementsDef::getElement($name, 'string');
 		if ($name) $this->elements[$name]['noprint'] = $val;
 	}
 }
@@ -713,7 +714,7 @@ protected function forElements($callback, $sub = '')
 		if (!isset($this->elements[$id])) continue;
 		$elem = $this->elements[$id];
 	
-		if (in_array($elem['type'], $ignore_list) or $elem['noprint'] or $elem['skip']) {
+		if (!isset($elem['type']) or in_array($elem['type'], $ignore_list) or $elem['noprint'] or $elem['skip']) {
 			continue;
 		}
 

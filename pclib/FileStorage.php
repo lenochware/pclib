@@ -46,7 +46,7 @@ class FileStorage extends system\BaseObject implements IService
 /**
  * \param $rootDir Path to your writable storage directory.
  */
-function __construct($rootDir)
+function __construct($rootDir = '')
 {
 	global $pclib;
 

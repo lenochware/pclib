@@ -955,7 +955,7 @@ function loadFiles($entityName, $id)
 	foreach ($files as $file) {
 		$elemId = $file['FILE_ID'];
 		$this->values[$elemId] = $file['ORIGNAME'];
-		if ($this->elements[$elemId]) {
+		if (isset($this->elements[$elemId])) {
 			$this->elements[$elemId]['file-info'] = $file;
 		}
 	}
