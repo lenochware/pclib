@@ -93,6 +93,7 @@ CREATE TABLE `AUTH_USERS` (
   `PASSW` varchar(255) DEFAULT NULL,
   `DPASSW` varchar(50) DEFAULT NULL,
   `ANNOT` varchar(255) DEFAULT NULL,
+  `JSON_PARAMS` TEXT DEFAULT NULL,
   `LAST_LOGIN` datetime DEFAULT NULL,
   `LOGINFAIL` tinyint(4) DEFAULT '0',
   `ACTIVE` tinyint(4) DEFAULT '1',
@@ -257,4 +258,4 @@ insert into `LOOKUPS` (`APP`, `ID`, `CNAME`, `LABEL`, `POSITION`) values('padmin
 insert into `TRANSLATOR_LABELS` (`ID`, `LABEL`, `CATEGORY`) values(1,'App',1);
 
 /** Version of PCLIB database structures. */  
-INSERT INTO `APP_PARAMS` (`PARAM_NAME`, `PARAM_VALUE`, `TITLE`, `CREATED_AT`) VALUES('PCLIB_VERSION', '3.2.0', 'Version of PCLIB database structures', NOW());
+INSERT INTO `APP_PARAMS` (`PARAM_NAME`, `PARAM_VALUE`, `TITLE`, `CREATED_AT`) VALUES('PCLIB_VERSION', '3.2.1', 'Version of PCLIB database structures', NOW());

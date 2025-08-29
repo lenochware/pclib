@@ -25,6 +25,8 @@ public $values;
 /** var Auth */
 public $auth;
 
+protected $params = [];
+
 /**
  * Check if user is logged in.
  * @return bool $yes
@@ -105,6 +107,19 @@ function hasDefaultPassword()
 function getValues()
 {
 	return $this->values;
+}
+
+/**
+ * Return user config parameter $name
+ * @param string $name
+ */
+function getParam($name)
+{
+	if (!$this->params and isset($this->values['JSON_PARAMS'])) {
+		$this->params = json_decode($this->values['JSON_PARAMS'], true);
+	}
+
+	return $this->params[$name] ?? null;	
 }
 
 /**

@@ -97,6 +97,7 @@ CREATE TABLE auth_users (
   passw character varying(255) DEFAULT NULL,
   dpassw character varying(50) DEFAULT NULL,
   annot character varying(255) DEFAULT NULL,
+  json_params text DEFAULT NULL,
   last_login timestamp without time zone,
   loginfail smallint DEFAULT 0,
   active smallint DEFAULT 1,
@@ -261,4 +262,4 @@ INSERT INTO lookups (app, id, cname, label, position) VALUES ('padmin', 60, 'job
 insert into translator_labels (id, label, category) values(1,'App',1);
 
 -- Version of PCLIB database structures.
-INSERT INTO app_params (param_name, param_value, title, created_at) VALUES ('PCLIB_VERSION', '3.2.0', 'Version of PCLIB database structures', NOW());
+INSERT INTO app_params (param_name, param_value, title, created_at) VALUES ('PCLIB_VERSION', '3.2.1', 'Version of PCLIB database structures', NOW());
