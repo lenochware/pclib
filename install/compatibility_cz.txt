@@ -26,3 +26,9 @@ Poznámky ke kompatibilitě s předchozí verzí PCLIB
 - optimalizovaná práce s routami
 - pokud je v šabloně formuláře plná routa včetně akce (form route "some/action") bude zavolána tato akce bez ohledu na stisknuté tlačítko
 - oprava: {block else} funguje pro single bloky (vypíše se při nastaveném noprint), pro prázný grid se nevypíše blok items ani jednou
+
+3.2.1
+
+- Events a Logger nejsou defaultně inicializovaná služba
+- AppParams je pouze read-only: odstraněny funkce add() a delete()
+- BASE_URL se získává novým, spolehlivějším způsobem

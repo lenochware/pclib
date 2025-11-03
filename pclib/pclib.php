@@ -11,7 +11,7 @@
 /**
  * PClib version string
  */
-define('PCLIB_VERSION', '3.2.0');
+define('PCLIB_VERSION', '3.2.1');
 
 /* Find out where library reside. MUST BE an absolute path. */
 if (!defined('PCLIB_DIR')) {

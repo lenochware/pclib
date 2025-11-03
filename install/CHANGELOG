@@ -1,3 +1,9 @@
+3.2.1
+- Added user parameters: AuthUser->getParam($name)
+- Added FileStorage->addFile(), FileStorage->addFiles()
+- Added Logger::MESSAGE_LOG_PATTERN
+- PHP8 bugfixes
+
 3.2.0
 - Added service Mailer (sending mails /using phpmailer by default/)
 - Modified configuration of services
