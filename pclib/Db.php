@@ -673,47 +673,28 @@ function tableName($dsstr)
 }
 
 /**
- * Export query result to format $fmt. Only html is supported now.
- * @param string|resource $dba Resource or $dsstr string - see select() for details
- * @param string $fmt export format ('html' or 'html/vertical')
- * @return string Query result in format $fmt
- * @see select()
+ * Print query result in html table.
+ * @param string|array|PDOStatement $res Query string, statement or array of rows.
 **/
-function export($dba, $fmt = 'html')
+function dump($res)
 {
-	if (!$dba) return '';
-	if (is_resource($dba)) $dba = $this->fetchAll($dba);
-	if (is_string($dba)) $dba = $this->selectAll($dba);
-	if (is_array($dba) and !is_array(array_get($dba, 0))) $dba = array($dba);
-	
-	switch ($fmt) {
-	case 'html':
-		$html = '<TABLE class="db" border="1">';
-		$hdr = array_keys($dba[0]);
-		$str = ''; 
-		foreach ($hdr as $h) {$str .= "<th>$h</th>";}
-		$html .= "\n<tr>$str</tr>\n";
-		$str = ''; 
-		foreach($dba as $i => $row) {
-			foreach($row as $cell) {$str .= "<td>$cell</td>";}
-			$html .= "<tr>$str</tr>\n";
-			$str = '';
-		}
-		$html .= "</TABLE>";
-		return $html;
+	if ($res instanceof \PDOStatement) $rows = $this->fetchAll($res);
+	elseif (is_string($res)) $rows = $this->selectAll($res);
+	elseif (is_array($res)) $rows = $res;
+	else throw new Exception("Unknown query format.");
 
-	case 'html/vertical':
-		$html = '';
-		foreach($dba as $row) {
-			$html .= '<TABLE class="db" border="1">';
-			foreach($row as $flname => $cell) {
-				$html .= "<tr><th>$flname</th><td>$cell</td></tr>\n";
-			}
-			$html .= "</TABLE>\n\n";
-			$str = '';
+	$path = $this->app->paths['templates'] . 'db-dump.tpl';
+	$grid = new pclib\Grid($path);
+
+	if (is_array($rows)) {
+		foreach (array_keys($rows[0] ?? []) as $id) {
+			$grid->addTag("string $id sort");
 		}
-		return $html;
+
+		$grid->setArray($rows);		
 	}
+
+	print $grid;
 }
 
 /** Return lookup table as array.
@@ -842,7 +823,7 @@ protected function getSelectSql($dsstr, $args)
 {
 	array_shift($args);
 	$dsstr = trim($dsstr);
-	if(!strpos($dsstr,' ')) {
+	if(!empty($dsstr) and !strpos($dsstr,' ')) {
 		if (strpos($dsstr,':')) list($tab, $flds) = explode(':', $dsstr);
 		else {$tab = $dsstr; $flds = '*';}
 		$sql = "select $flds from $tab";
