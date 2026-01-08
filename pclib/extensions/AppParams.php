@@ -18,6 +18,8 @@ class AppParams implements pclib\IService {
 	protected $values = [];
 	public $isLoaded = false;
 
+	public $PARAMS_TAB = 'APP_PARAMS';
+
 	function __construct()
 	{
 		global $pclib;
@@ -30,7 +32,7 @@ class AppParams implements pclib\IService {
 	 */
 	function load()
 	{
-		$data = $this->db->selectPair("select PARAM_NAME,PARAM_VALUE from APP_PARAMS");
+		$data = $this->db->selectPair($this->PARAMS_TAB.':PARAM_NAME,PARAM_VALUE');
 		$this->values = array_merge($this->values, $data); 
 		$this->isLoaded = true;
 	}
