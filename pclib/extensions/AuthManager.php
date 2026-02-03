@@ -204,6 +204,11 @@ function cpUser($sname1, $sname2)
  */
 function mkRight($sname, $annot = '')
 {
+	if (!preg_match("/^\S+$/", $sname)) {
+		$this->setError('Invalid permission name.');
+		return false;
+	}
+
 	if ($this->db->exists($this->RIGHTS_TAB, "SNAME='{0}'", $sname)) {
 		$this->setError('Error: Permission "%s" already exists.', $sname);
 		return false;
@@ -272,6 +277,11 @@ function setRight($right)
  */
 function mkRole($sname, $annot = '')
 {
+	if (!preg_match("/^\S+$/", $sname)) {
+		$this->setError('Invalid role name.');
+		return false;
+	}
+
 	if ($this->db->exists($this->ROLES_TAB, "SNAME='{0}'", $sname)) {
 		$this->setError('Error: Role "%s" already exists.', $sname);
 		return false;

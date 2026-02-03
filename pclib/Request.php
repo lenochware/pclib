@@ -193,7 +193,7 @@ function getUserAgent()
 
 function __get($name)
 {
-	$getter = 'get'.$name;
+	$getter = 'get'.ucfirst($name);
 	if (method_exists($this, $getter))  return $this->$getter();
 	return parent::__get($name);
 }
