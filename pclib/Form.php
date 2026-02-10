@@ -1055,7 +1055,9 @@ protected function getVisibleIds()
 {
 	$list = [];
 
-	foreach ($this->values as $id => $value) {
+	foreach ($this->values as $id => $value)
+	{
+		if (!isset($this->elements[$id])) continue;
 		$elem = $this->elements[$id];
 		if ($elem['lb'] == '') continue;
 		if ($this->getAttr($elem['id'], 'noprint') or $elem['hidden']) continue;
@@ -1257,7 +1259,7 @@ protected function toBitField(array $bitArray)
 {
 	$value = 0;
 	foreach ($bitArray as $bit) {
-		$bit = (integer) $bit;
+		$bit = (int) $bit;
 		if ($bit > 64 or $bit < 1) throw new \OutOfBoundsException('Checkbox index out of bounds.');
 		$value += pow (2, $bit - 1);
 	}

@@ -162,6 +162,7 @@ if(!function_exists('fnmatch')) {
 
 function array_get($a, $key, $default = null)
 {
+	if (!isset($key)) return $default;
 	if (is_array($key)) {
 		return isset($a[$key[0]])? (isset($a[$key[0]][$key[1]])? $a[$key[0]][$key[1]] : $default) : $default;
 	}

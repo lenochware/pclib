@@ -114,7 +114,7 @@ protected function getObject($variable, $level)
 	foreach ($props as $prop) {
 		$private = $prop->isPrivate()? 1 : ($prop->isProtected()? 2 : 0);
 		if ($private and !$this->showPrivate) continue;
-		if ($private) $prop->setAccessible(true);
+		//if ($private) $prop->setAccessible(true);
 		
 		$node = $this->dumpArray($prop->getName(), $prop->getValue($variable), $level);
 		$node['private'] = $private;
@@ -424,7 +424,7 @@ function simpleDump($var)
 		$output = [];
 		$reflection = new \ReflectionClass($var);
 		foreach ($reflection->getProperties() as $property) {
-			$property->setAccessible(true);
+			//$property->setAccessible(true);
 			$value = $property->getValue($var);
 			$vs .=  $property->getName().': '.$this->stringify($value, false)."\n";
 		}

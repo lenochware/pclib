@@ -610,7 +610,7 @@ function print_Bind($id, $sub, $value)
 		$value = implode (', ',$checked);
 	}
 	else {
-		if(isset($items[$value])) $value = $items[$value];
+		if(isset($value,$items[$value])) $value = $items[$value];
 		elseif(isset($value,$items['*'])) $value = $items['*'];
 		else $value = array_get($items, $elem['default']);
 	}
