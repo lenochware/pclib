@@ -127,7 +127,7 @@ protected function getObject($variable, $level)
  * Return simple dump of indexed array $nodes -- [one,two,three,...].
  * @see getdump()
  */
-protected function strSimpleArray(array $nodes = null)
+protected function strSimpleArray(?array $nodes = null)
 {
 	if (!$nodes) return "\n";
 	foreach($nodes as $node) { $html[] = $node['value']; }

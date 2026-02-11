@@ -88,7 +88,7 @@ function useFile($fileName)
 }
 
 /** Translate string $s to selected language. */
-function translate($s, array $params = null)
+function translate($s, array $params = [])
 {
 	if ($this->autoUpdate and !array_key_exists($s, $this->cache)) {
 		if (!$this->pageName) throw new Exception("Cannot save text. Text page is not selected (call usePage).");
@@ -113,7 +113,7 @@ private function translateCallback(&$value, $key)
 }
 
 /** Translate plural form of string $s ($n is number of items). */
-function ntranslate($s, $n, array $params = null)
+function ntranslate($s, $n, array $params = [])
 {
 	$plural = $this->pluralFunction($n, $this->language);
 	$s = ($plural? $plural.' ' : '').$s;

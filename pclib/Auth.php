@@ -44,7 +44,7 @@ public $loggedUser;
  * Take \b $user and log him in. See also #$loggedUser.
  * @param AuthUser $user
  */
-function setLoggedUser(pclib\AuthUser $user = null)
+function setLoggedUser(?pclib\AuthUser $user = null)
 {
 	$this->loggedUser = $user;
 	$this->setSessionUser($user);
@@ -99,7 +99,7 @@ function exists($userName)
 	return (bool)$this->getUser($userName);
 }
 
-function __construct(Db $db = null)
+function __construct(?Db $db = null)
 {
 	parent::__construct();
 
@@ -215,7 +215,7 @@ protected function getSessionUser()
  * Store user to session. 
  * @param AuthUser $user; 
  */
-protected function setSessionUser(pclib\AuthUser $user = null)
+protected function setSessionUser(?pclib\AuthUser $user = null)
 {
 	if ($user) {
 		$data = $user->values;

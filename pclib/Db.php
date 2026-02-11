@@ -230,15 +230,13 @@ function setLimit($numrows, $offset = 0)
  * @param array $param query parameters.
  * @return resource $result
 **/
-function query($_sql, $param = null)
+function query($_sql, ...$params)
 {
 	$res = null;
+
+	if (isset($params[0]) and is_array($params[0])) $params = $params[0];
 	
-	if (isset($param) and !is_array($param)) {
-		$param = func_get_args();
-		array_shift($param);
-	}
-	$sql = $param? $this->setParams($_sql, $param) : $_sql;
+	$sql = $this->setParams($_sql, $params);
 	
 	$event = $this->trigger('db.before-query', ['sql' => $sql]);
 	if ($event and !$event->propagate) return;
@@ -761,14 +759,10 @@ function escape($str, $type = 'string')
  * @see query()
 **/
 function setParams($sql, $params)
-{
-	$has_params = false;
+{	
+	if (!strpos($sql, '{')) return $sql;
 	
-	$pat = $this->SQL_PARAM_PATTERN;
-	if (strpos($sql, '{')) $has_params = true;
-	if (!$has_params) return $sql;
-	
-	preg_match_all($pat, $sql, $found);
+	preg_match_all($this->SQL_PARAM_PATTERN, $sql, $found);
 
 	if (!$found[0]) return $sql;
 	$from = $to = array();
@@ -839,7 +833,7 @@ protected function getSelectSql($dsstr, $args)
 		if (is_array($args[0])) $params = $args[0]; else $params = $args;
 	}
 
-	if ($params) $sql = $this->setParams($sql, $params);
+	$sql = $this->setParams($sql, $params);
 	return $sql;
 }
 

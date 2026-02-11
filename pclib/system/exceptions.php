@@ -8,7 +8,7 @@ namespace pclib;
  */ 
 class Exception extends \Exception
 {
-	public function __construct($message, $args = null, $code = 0, \Exception $previous = null)
+	public function __construct($message, $args = null, $code = 0, ?\Exception $previous = null)
 	{
 		if (is_array($args)) {
 			$message = vsprintf($message, $args);
@@ -28,13 +28,13 @@ class MemberAccessException extends Exception {}
 class FileNotFoundException extends IOException {}
 class NoDatabaseException extends NoValueException {
 	public function __construct($message = 'Database connection required.', 
-		$code = 0, Exception $previous = null) {
+		$code = 0, ?Exception $previous = null) {
 		parent::__construct($message, $code, $previous);
 	}
 }
 class NotImplementedException extends Exception {
 	public function __construct($message = 'Feature is not implemented.', 
-		$code = 0, Exception $previous = null) {
+		$code = 0, ?Exception $previous = null) {
 		parent::__construct($message, $code, $previous);
 	}
 }

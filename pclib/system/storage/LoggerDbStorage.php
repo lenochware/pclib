@@ -107,7 +107,7 @@ function getLabelId($label, $category)
  * @param array $filter Set filter on USERNAME,ACTIONNAME,LOGGERNAME. Ex: array('USERNAME'=>'joe')
  * @return array Array of last records
  */
-function getLog($rowCount, array $filter = null)
+function getLog($rowCount, array $filter = [])
 {
 	$this->service('db');
 
