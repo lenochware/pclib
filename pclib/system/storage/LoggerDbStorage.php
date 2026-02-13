@@ -90,14 +90,16 @@ function getLabelId($label, $category)
 
 	$label = substr($label, 0, 80);
 	
-	list($id) = $this->db->select($this->LABELS_TAB.':ID',
+	$found = $this->db->select($this->LABELS_TAB.':ID',
 		"LABEL='{0}' AND CATEGORY='{1}'", $label, $category
 	);
 
-	if (!$id) {
+	if (!$found) {
 		$label = array('LABEL'=>$label,'CATEGORY'=>$category,'DT'=>date('Y-m-d H:i:s'));
 		$id = $this->db->insert($this->LABELS_TAB, $label);
 	}
+	else $id = $found['ID'];
+
 	return $id;
 }
 
@@ -107,7 +109,7 @@ function getLabelId($label, $category)
  * @param array $filter Set filter on USERNAME,ACTIONNAME,LOGGERNAME. Ex: array('USERNAME'=>'joe')
  * @return array Array of last records
  */
-function getLog($rowCount, array $filter = [])
+function getLog($rowCount, ?array $filter = [])
 {
 	$this->service('db');
 

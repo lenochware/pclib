@@ -109,7 +109,7 @@ function log($category, $message_id, $message = null, $item_id = null)
  * @param array $filter Set filter on USER,ACTION,LOGGER. Ex: array('USER'=>'joe')
  * @return array Array of records
  */
-function getLog($rowCount, array $filter = [])
+function getLog($rowCount, ?array $filter = [])
 {
 	return $this->getStorage()->getLog($rowCount, $filter);
 }
