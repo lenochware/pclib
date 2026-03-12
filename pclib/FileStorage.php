@@ -177,7 +177,7 @@ function setFile($loc, $data)
  */
 function copyFile($path, $loc)
 {
-	$this->setFile($loc, ['FILEPATH_SRC' => $path]);
+	return $this->setFile($loc, ['FILEPATH_SRC' => $path]);
 }
 
 /**
@@ -188,7 +188,7 @@ function copyFile($path, $loc)
 function addFile($loc, $data)
 {
 	unset($data['FILE_ID'], $loc[2]);
-	$this->setFile($loc, $data);
+	return $this->setFile($loc, $data);
 }
 
 /**

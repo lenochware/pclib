@@ -116,17 +116,13 @@ public static function className($tableName)
 
 protected static function canonicalName($tableName)
 {
-	$s = '';
-	if (strpos($tableName, '_') === false) {
-		return ucfirst($tableName);
-	}
+	$parts = preg_split('/[._]+/', $tableName);
 
-	$a = explode('_', $tableName);
-	foreach ($a as $part) {
-		$s .= ucfirst($part);
-	}
+	$parts = array_map(function ($part) {
+		return ucfirst(strtolower($part));
+	}, $parts);
 
-	return $s;
+	return implode('', $parts);
 }
 
 /**

@@ -324,6 +324,10 @@ protected function registerDebugBar()
  */
 function redirect($route, $code = null)
 {
+	if (is_string($route) and strpos($route, '/this') === 0) {
+		$route = $this->controller . substr($route, 5);
+	}
+	
 	$this->router->redirect($route, $code);
 }
 
