@@ -26,7 +26,10 @@ protected function authPrompt()
 	die($this->app->text('This page requires authentication.'));
 }
 
-protected function verifyCredentials(array $credentials)
+protected function verifyCredentials(
+	#[\SensitiveParameter]
+	array $credentials
+)
 {
 	return (
 		$this->loggedUser->values['USERNAME'] == $credentials[0]

@@ -422,6 +422,7 @@ function simpleDump($var)
 
 	if (is_object($var)) {
 		$output = [];
+		if ($var instanceof \SensitiveParameterValue) return '';
 		$reflection = new \ReflectionClass($var);
 		foreach ($reflection->getProperties() as $property) {
 			//$property->setAccessible(true);

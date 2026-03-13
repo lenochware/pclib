@@ -138,7 +138,11 @@ function getStorage()
  * @param string $password
  * @return bool $success
  */
-function login($userName, $password)
+function login(
+	$userName, 
+	#[\SensitiveParameter]
+	$password
+)
 {
 	if (!is_string($userName) or !is_string($password)) {
 		throw new AuthException("Invalid username or password.");

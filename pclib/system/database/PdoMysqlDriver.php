@@ -22,7 +22,10 @@ class PdoMysqlDriver extends PdoDriver
 
 public $extension = 'pdo_mysql';
 
-function connect($ds)
+function connect(
+	#[\SensitiveParameter]
+	$ds
+)
 {
 	$port = $ds['port']? ';port='.$ds['port'] : '';
 	return $this->pdoConnect('mysql:dbname='.$ds['dbname'].';host='.$ds['host'].$port, $ds['user'], $ds['passw']);

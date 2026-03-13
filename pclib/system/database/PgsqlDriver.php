@@ -29,7 +29,10 @@ public $extension = 'pgsql';
 public $ucase = 0;
 public $noquote = false;
 
-function connect($ds)
+function connect(
+	#[\SensitiveParameter]
+	$ds
+)
 {
 	if ($ds['host'] != 'socket') $host = "host=".$ds['host'];
 	$res = pg_connect(

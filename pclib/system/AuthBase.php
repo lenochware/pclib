@@ -52,7 +52,10 @@ function __construct()
  * @param string $password
  * @return string $hash
 **/
-function passwordHash($password)
+function passwordHash(
+	#[\SensitiveParameter]
+	$password
+)
 {
 	switch ($this->passwordAlgo) {
 		case 'md5': 
@@ -72,7 +75,12 @@ function passwordHash($password)
  * @param string $hash
  * @return bool $valid
 **/
-function passwordHashVerify($password, $hash)
+function passwordHashVerify(
+	#[\SensitiveParameter]
+	$password, 
+	#[\SensitiveParameter]
+	$hash
+)
 {
 	switch ($this->passwordAlgo) {
 		case 'md5': 

@@ -22,7 +22,10 @@ class MysqlDriver extends AbstractDriver
 
 public $extension = 'mysql';
 
-function connect($ds)
+function connect(
+	#[\SensitiveParameter]
+	$ds
+)
 {
 	$ok = false;
 	$port = $ds['port']? ':'.$ds['port'] : '';

@@ -57,7 +57,10 @@ private $dataSource;
  * @param string|array $dataSource Format: 'driver://user:passw@host/database'
  * @see connect()
 **/
-function __construct($dataSource = null)
+function __construct(
+	#[\SensitiveParameter]
+	$dataSource = null
+)
 {
 	global $pclib;
 	parent::__construct();
@@ -84,13 +87,19 @@ function __construct($dataSource = null)
 /*
  * Setup this service from configuration file.
  */
-public function setOptions(array $options)
+public function setOptions(
+	#[\SensitiveParameter]
+	array $options
+)
 {
 	$this->connect($options['dsn']);
 }
 
 //parse connection string to array
-protected function parseDsn($dsn)
+protected function parseDsn(
+	#[\SensitiveParameter]
+	$dsn
+)
 {
 	if (stripos($dsn,'pdo_') === 0) {
 		$pdo = true;
@@ -142,7 +151,10 @@ protected function parseDsn($dsn)
  *
  * @param string|array $dataSource
 **/
-function connect($dataSource)
+function connect(
+	#[\SensitiveParameter]
+	$dataSource
+)
 {
 	if (empty($dataSource)) {
 		throw new \InvalidArgumentException('Invalid connection parameters.');

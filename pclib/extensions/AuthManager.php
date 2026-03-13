@@ -542,7 +542,11 @@ function setUser($sname, array $user)
  * @param string $passw Password
  * @return bool $ok
  */
-function setPassw($sname, $passw)
+function setPassw(
+	$sname,
+	#[\SensitiveParameter]
+	$passw
+)
 {
 	$uid = $this->sname($sname, 'user');
 	if (!$uid) return false;

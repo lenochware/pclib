@@ -21,7 +21,12 @@ use pclib\Str;
 abstract class PdoDriver extends AbstractDriver
 {
 
-function pdoConnect($dsn, $user = null, $password = null)
+function pdoConnect(
+	$dsn, 
+	$user = null, 
+	#[\SensitiveParameter]
+	$password = null
+)
 {
 	try {
 		$pdo = new \PDO($dsn, $user, $password);

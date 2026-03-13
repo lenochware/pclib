@@ -153,7 +153,10 @@ public function __set($name, $value)
  * @param string $password
  * @return bool $valid
  */
-function passwordVerify($password)
+function passwordVerify(
+	#[\SensitiveParameter]
+	$password
+)
 {
 	if (!$password) return false;
 	$cred = $this->getCredentials();
@@ -168,7 +171,10 @@ function passwordVerify($password)
  * Change user password.
  * @param string $password
  */
-function changePassword($password)
+function changePassword(
+	#[\SensitiveParameter]
+	$password
+)
 {
 	$am = new pclib\extensions\AuthManager;
 	$am->setPassw($this->values['USERNAME'], $password);

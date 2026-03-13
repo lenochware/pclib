@@ -22,7 +22,10 @@ class PdoSqliteDriver extends PdoDriver
 
 public $extension = 'pdo_sqlite';
 
-function connect($ds)
+function connect(
+	#[\SensitiveParameter]
+	$ds
+)
 {
 	/*if (!file_exists($ds['path']))
 		throw new FileNotFoundException('File '.$ds['path'].' not found.');*/
