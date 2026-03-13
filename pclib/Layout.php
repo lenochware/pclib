@@ -106,11 +106,11 @@ function getNavig($options = array())
  * Example: $app->layout->addScripts('js/jquery.js', 'css/bootstrap.css');
  * @param array|variable_number_of_arguments List of paths to css and js files
  */
-public function addScripts()
+public function addScripts(...$scripts)
 {
 	$id = $this->headTag;
 	if (!$id) throw new NoValueException('Missing "head" tag in template.');
-	$scripts = func_get_args();
+
 	if (is_array($scripts[0])) $scripts = $scripts[0];
 	
 	if (!empty($this->values[$id])) {

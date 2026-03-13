@@ -32,9 +32,8 @@ class BaseObject
 	 * Example: Form::defaults('useButtonTag', true); or Form::defaults($options);
 	 * @param mixed Configuration parameter(s).
 	 */
-	public static function defaults()
+	public static function defaults(...$args)
 	{
-		$args = func_get_args();
 		$classDef = &self::$defaults[get_called_class()];
 
 		if (!$args) {

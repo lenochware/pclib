@@ -238,9 +238,8 @@ function __toString()
  * @param array|list of tag names
  * @param bool $val Enable? true|false
  */
-function enable()
+function enable(...$args)
 {
-	$args = func_get_args();
 	$val = (end($args) === false)? 1:0;
 	if (is_array($args[0])) $args = $args[0];
 	foreach($args as $name) {
@@ -254,9 +253,8 @@ function enable()
  *
  * @param array|list of tag names
  */
-function disable()
+function disable(...$args)
 {
-	$args = func_get_args();
 	if (is_array($args[0])) $args = $args[0];
 	$this->enable($args, false);
 }
@@ -1136,9 +1134,8 @@ private function callback_getvalue($param)
 	else return $this->getValue($param[1]);
 }
 
-protected function fireEventElem()
+protected function fireEventElem(...$args)
 {
-	$args = func_get_args();
 	$name = $args[0]; $args[0] = $this;
 	$id = $args[1];
 	$func = $this->elements[$id][$name];

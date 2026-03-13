@@ -146,17 +146,15 @@ protected function _out($block = null)
  * @param string $sql Sql query. Only SELECT-queries are allowed.
  * @see setArray()
  */
-function setQuery($sql)
+function setQuery($sql, ...$args)
 {
 	$this->service('db');
 
-	$args = func_get_args();
-	$hash = crc32(serialize(array($args, $this->filter)));
+	$hash = crc32(serialize([$sql, $args, $this->filter]));
 	if (!$this->document and $this->sql) $this->create($this->sql);
 	if ($this->hash == $hash) return;
 
 	$this->hash = $hash;
-	array_shift ($args);
 	if (is_array(array_get($args, 0))) $args = $args[0];
 
 	$sql = $this->db->setParams($sql, $args + (array)$this->filter);

@@ -330,15 +330,14 @@ class Tree extends system\BaseObject
    * @param int|array Id of nodes, which should be expanded (opened)
    * Ex: $tree->expand(1,4,20) Expand %tree to nodes 1,4,20
    */
-  function expand()
+  function expand(...$args)
   {
-    $list = func_get_args();
-    if (is_array($list[0])) $list = $list[0];
+    if (is_array($args[0])) $args = $args[0];
 
     foreach($this->nodes as $i => $node)
     {
-      if (in_array($node['ID'], $list)) $this->expandPath($i);
-      elseif (!$list) $this->nodes[$i]['OPEN'] = 'open';
+      if (in_array($node['ID'], $args)) $this->expandPath($i);
+      elseif (!$args) $this->nodes[$i]['OPEN'] = 'open';
     }
   }
 

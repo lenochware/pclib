@@ -96,9 +96,8 @@ protected function log($category, $messageId, $message = null, $itemId = null)
  * Add error message into ->errors variable.
  * @param string $message Message with %s placeholders
 **/
-function setError($message)
+function setError($message, ...$args)
 {
-	$args = array_slice(func_get_args(), 1) ;
 	$message = $this->app->text($message, $args);
 
 	if ($this->throwsExceptions) {

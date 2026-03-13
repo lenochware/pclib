@@ -308,13 +308,12 @@ function from($s)
 	return $this;
 }
 
-protected function setWhereParams($s, $args, $offset)
+protected function setWhereParams($s, $args)
 {
 	if (is_array($s)) {
 		return $this->createFieldList(' AND ', $s);
 	}
 
-	$args = array_slice($args, $offset);
 	if (!$args) return $s;
 	if (is_array($args[0])) $args = $args[0];
 	return $this->db->setParams($s, $args);
@@ -324,11 +323,11 @@ protected function setWhereParams($s, $args, $offset)
  * Set where condition. Fluent interface.
  * @return Selection $this
  */
-function where($s)
+function where($s, ...$args)
 {
 	$this->tryModify();
 	if(!isset($this->query['where'])) $this->query['where'] = array();
-	$this->query['where'][] = $this->setWhereParams($s, func_get_args(), 1);
+	$this->query['where'][] = $this->setWhereParams($s, $args);
 	return $this;
 }
 
@@ -338,13 +337,13 @@ function where($s)
  * @param $s Condition used on relation
  * @return Selection $this
  */
-function whereJoin($relName, $s)
+function whereJoin($relName, $s, ...$args)
 {
 	$this->tryModify();
 
 	$rel = new Relation($this->newModel(null), $relName);
 
-	$s = $this->setWhereParams($s, func_get_args(), 2);
+	$s = $this->setWhereParams($s, $args);
 
 	$table = $rel->params['table'];
 	$join = $rel->getJoinCondition();
@@ -365,10 +364,9 @@ function whereJoin($relName, $s)
  * Set order by clausule. Fluent interface.
  * @return Selection $this
  */
-function order($s)
+function order(...$args)
 {
 	$this->tryModify();
-	$args = func_get_args();
 	if (is_array($args[0])) $args = $args[0];
 	
 	$this->query['order'] = $args;
@@ -391,11 +389,11 @@ function group($s)
  * Set having clausule. Fluent interface.
  * @return Selection $this
  */
-function having($s)
+function having($s, ...$args)
 {
 	$this->tryModify();
 	if(!isset($this->query['having'])) $this->query['having'] = array();
-	$this->query['having'][] = $this->setWhereParams($s, func_get_args(), 1);
+	$this->query['having'][] = $this->setWhereParams($s, $args);
 	return $this;
 }
 

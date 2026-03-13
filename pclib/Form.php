@@ -987,7 +987,7 @@ function insert($tab)
  * @param string $cond where-condition of query
  * @see insert()
  */
-function update($tab, $cond)
+function update($tab, $cond, ...$args)
 {
 	$tab = $this->getTableName($tab);
 	$event = $this->trigger('form.update', ['action' => 'update', 'table' => $tab, 'where' => $cond]);
@@ -995,7 +995,7 @@ function update($tab, $cond)
 
 	$this->service('db');
 
-	$params = (func_num_args() > 2)? array_slice(func_get_args(),2) : null;
+	$params = $args;
 	if ($params and is_array($params[0])) $params = $params[0];
 
 	$old = $this->db->select($tab, $cond, $params);
@@ -1016,7 +1016,7 @@ function update($tab, $cond)
  * @param string $cond where-condition of the query
  * @see insert()
  */
-function delete($tab, $cond)
+function delete($tab, $cond, ...$args)
 {
 	$tab = $this->getTableName($tab);
 	$event = $this->trigger('form.update', ['action' => 'delete', 'table' => $tab, 'where' => $cond]);
@@ -1024,7 +1024,7 @@ function delete($tab, $cond)
 
 	$this->service('db');
 
-	$params = (func_num_args() > 2)? array_slice(func_get_args(),2) : null;
+	$params = $args;
 	if ($params and is_array($params[0])) $params = $params[0];
 
 	$data = $this->db->select($tab, $cond, $params);

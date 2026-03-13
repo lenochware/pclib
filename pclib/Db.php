@@ -267,9 +267,8 @@ function query($_sql, ...$params)
  * @copydoc shortcut-select
  * @return value $field
 **/
-function field($dsstr)
+function field($dsstr, ...$args)
 {
-	$args = func_get_args();
 	$sql = $this->getSelectSql($dsstr, $args);
 	$this->setLimit(1);
 	$res = $this->query($sql);
@@ -283,9 +282,8 @@ function field($dsstr)
  * @copydoc shortcut-select
  * @return array $row
 **/
-function select($dsstr)
+function select($dsstr, ...$args)
 {
-	$args = func_get_args();
 	$sql = $this->getSelectSql($dsstr, $args);
 	$this->setLimit(1);
 	$res = $this->query($sql);
@@ -298,9 +296,8 @@ function select($dsstr)
  * @copydoc shortcut-select
  * @return array $result = array ($row0_array, $row1_array, $row2_array, ...)
 **/
-function selectAll($dsstr)
+function selectAll($dsstr, ...$args)
 {
-	$args = func_get_args();
 	$sql = $this->getSelectSql($dsstr, $args);
 	$res = $this->query($sql);
 	return $this->fetchAll($res);
@@ -312,9 +309,8 @@ function selectAll($dsstr)
  * @return array $column. Ex: selectOne('PERSONS:NAME')
  * will return array('John', 'Jack', ...)
 **/
-function selectOne($dsstr)
+function selectOne($dsstr, ...$args)
 {
-	$args = func_get_args();
 	$sql = $this->getSelectSql($dsstr, $args);
 	$res = $this->query($sql);
 	$rows = array();
@@ -329,9 +325,8 @@ function selectOne($dsstr)
  * @return array $lookup. Ex: selectPair('PERSONS:NAME,MONEY')
  *  will return array('John' => 12000, 'Jack' => 200, ...)
 **/
-function selectPair($dsstr)
+function selectPair($dsstr, ...$args)
 {
-	$args = func_get_args();
 	$sql = $this->getSelectSql($dsstr, $args);
 	$res = $this->query($sql);
 	
@@ -472,7 +467,7 @@ function replace($tab, $data)
  * @return bool $success.
  * @see insert()
 **/
-function update($tab, $data, $cond)
+function update($tab, $data, $cond, ...$args)
 {
 	$fields = '';
 	if (is_array($data)) {
@@ -486,7 +481,6 @@ function update($tab, $data, $cond)
 	}
 	else $fields = $data;
 	
-	$args = (func_num_args() > 3)? array_slice(func_get_args(),3) : null;
 	$where = $this->getWhereSql($cond, $args);
 	$sql = "UPDATE $tab set $fields WHERE $where";
 	$res = $this->query($sql);
@@ -501,9 +495,8 @@ function update($tab, $data, $cond)
  * @return bool $success
  * @see insert()
 **/
-function delete($tab, $cond)
+function delete($tab, $cond, ...$args)
 {
-	$args = (func_num_args() > 2)? array_slice(func_get_args(),2) : null;
 	$where = $this->getWhereSql($cond, $args);
 
 	$sql = "DELETE FROM $tab WHERE $where";
@@ -526,18 +519,18 @@ function delete($tab, $cond)
  * @param string $cond where condition
  * @return int $num Number of rows
 **/
-function count($dsstr = null)
+function count($dsstr = null, ...$args)
 {
 	if (!$dsstr) return $this->drv->numRows();
 	elseif (/*is_resource*/!is_string($dsstr)) return $this->drv->numRows($dsstr);
-	elseif ($this->isSql($dsstr, 'select')) {
-		$args = func_get_args();
+	elseif ($this->isSql($dsstr, 'select'))
+	{
 		$sql = $this->getSelectSql($dsstr, $args);
 		return $this->field("select count(*) from ($sql) as Q");
 	}
-	elseif (!strpos($dsstr,' ')) {
+	elseif (!strpos($dsstr,' '))
+	{
 		$dsstr = "$dsstr:count(*)";
-		$args = func_get_args();
 		$sql = $this->getSelectSql($dsstr, $args);
 		return $this->field($sql);
 	}
@@ -555,9 +548,8 @@ function count($dsstr = null)
  * @return bool $found
  * @see select()
 **/
-function exists($dsstr)
+function exists($dsstr, ...$args)
 {
-	$args = func_get_args();
 	$sql = $this->getSelectSql($dsstr, $args);
 	$this->setLimit(1);
 	$res = $this->query($sql);
@@ -815,7 +807,6 @@ function setParams($sql, $params)
  */
 protected function getSelectSql($dsstr, $args)
 {
-	array_shift($args);
 	$dsstr = trim($dsstr);
 	if(!empty($dsstr) and !strpos($dsstr,' ')) {
 		if (strpos($dsstr,':')) list($tab, $flds) = explode(':', $dsstr);

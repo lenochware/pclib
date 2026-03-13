@@ -399,11 +399,10 @@ function path($path)
  * @param string $s String to be translated.
  * @param mixed $args Variable number of arguments.
  */
-function text($s)
+function text($s, ...$args)
 {
 	$translator = array_get($this->services, 'translator');
 	if ($translator) $s = $translator->translate($s);
-	$args = array_slice(func_get_args(), 1);
 	
 	if (!empty($args) and is_array($args[0])) $args = $args[0];
 
@@ -423,9 +422,8 @@ function text($s)
  * @param string $cssClass Css-class of the message div
  * @param mixed $args Variable number of message arguments
  */
-function message($message, $cssClass = null)
+function message($message, $cssClass = null, ...$args)
 {
-	$args = array_slice(func_get_args(), 2);
 	$this->layout->addMessage($message, $cssClass, $args);
 	return $this;
 }
@@ -434,9 +432,8 @@ function message($message, $cssClass = null)
  * Display error message and exit application.
  * @see message()
  **/
-function error($message, $cssClass = null)
+function error($message, $cssClass = null, ...$args)
 {
-	$args = array_slice(func_get_args(), 2);
 	$message = $this->text($message, $args);
 	if (!$cssClass) $cssClass = 'error';
 
@@ -452,11 +449,9 @@ function error($message, $cssClass = null)
  * Display error message with http response code header and exit application.
  * @see message()
  **/
-function httpError($code, $message, $cssClass = null)
+function httpError($code, $message, $cssClass = null, ...$args)
 {
 	http_response_code($code);
-
-	$args = array_slice(func_get_args(), 3);
 	$message = $this->text($message, $args);
 	$this->error($message, $cssClass);
 }

@@ -15,11 +15,10 @@ use pclib\Str;
  * Dump variable(s) for debugging and stop application.
  * Usage: dump($a,$b,...);
  **/
-function dump()
+function dump(...$args)
 {
 	global $pclib;
 	$debug = $pclib->app->debugger;
-	$args = func_get_args();
 	$s = $debug->getDump($args);
 	$debug->errorDump('DUMP: Application stopped at');
 	die($s);
@@ -29,20 +28,19 @@ function dump()
  * Dump variable(s) for debugging to the debug log.
  * Usage: ddump($a,$b,...);
  **/
-function ddump()
+function ddump(...$args)
 {
 	$dd = pclib\Extensions\DebugBar::getInstance();
-	$dd->dump(func_get_args());
+	$dd->dump($args);
 }
 
 /**
  * Dump variable(s) for debugging to the javascript console.
  * Usage: jdump($a,$b,...);
  **/
-function jdump()
+function jdump(...$args)
 {
 	global $pclib;
-	$args = func_get_args();
 
 	$js = $pclib->app->getSession('pclib.jdump') ?: '';
 	

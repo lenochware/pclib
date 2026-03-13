@@ -252,9 +252,9 @@ protected function isDebugBarRequest()
 	return ($this->app->controller == 'pclib_debugbar');
 }
 
-protected function getDump()
+protected function getDump(...$args)
 {
-	return $this->app->debugger->getDump(func_get_args());
+	return $this->app->debugger->getDump($args);
 }
 
 public function dump($vars)
