@@ -75,6 +75,7 @@ public function setOptions(array $options)
  * Return file from location $loc.
  * @param int|array $loc File location
  * @param bool $withContent Return content of the file too
+ * @return array|false $file File data from storage
  */
 function getFile($loc, $withContent = false)
 {
@@ -112,6 +113,7 @@ function getFile($loc, $withContent = false)
  * Store file $data into location $loc (insert or update).
  * @param int|array $loc File location
  * @param array $data File data
+ * @return int $id of file
  */
 function setFile($loc, $data)
 {
@@ -122,6 +124,7 @@ function setFile($loc, $data)
 	if (is_numeric($loc)) {
 		$filter = ['ID' => $loc + 0];
 		$file = $this->getFile($loc);
+		if (!$file) throw new FileNotFoundException("File not found.");
 		$loc = [$file['ENTITY_TYPE'], $file['ENTITY_ID'], $file['FILE_ID']];
 	}
 	elseif(is_array($loc) and (count($loc) == 3 or count($loc) == 2))
@@ -156,12 +159,16 @@ function setFile($loc, $data)
 		/* Upload new file or just update info? */
 		if (isset($data['FILEPATH_SRC']) or isset($data['CONTENT'])) {
 			$oldFile = $this->deleteFile($loc);
+			$data['ID'] = $oldFile['ID'];
 			$data['HASH'] = $oldFile['HASH'];
+			$data['ORIGNAME'] = $oldFile['ORIGNAME'];
+			$data['ANNOT'] = $oldFile['ANNOT'];
 			$data = $this->insertFile($loc, $data);
 		}
 		else {
 			$udata = array_intersect_key($data, ['ANNOT' => 1,'ORIGNAME' => 1]);
 			$this->db->update($this->TABLE, $udata, $filter);
+			$data = $this->getFile($loc);
 		}
 	}
 
@@ -174,6 +181,7 @@ function setFile($loc, $data)
  * Copy file from directory path $path into filestorage location $loc.
  * @param string $path Full source path
  * @param int|array $loc Target location
+ * @return int $id of file
  */
 function copyFile($path, $loc)
 {
@@ -184,6 +192,7 @@ function copyFile($path, $loc)
  * Add file $data into location $loc.
  * @param int|array $loc File location
  * @param array $data File data
+ * @return int $id of file
  */
 function addFile($loc, $data)
 {
@@ -194,6 +203,7 @@ function addFile($loc, $data)
 /**
  * Delete file into location $loc.
  * @param int|array $loc File location
+ * @return $file File data
  */
 function deleteFile($loc)
 {
@@ -226,8 +236,9 @@ protected function insertFile(array $loc, array $data)
 		$data['IS_TEMP'] = true;
 	}
 
-	$path = $data['FILEPATH_SRC'];
+	$path = $data['FILEPATH_SRC'] ?? '';
 	if (!file_exists($path)) throw new FileNotFoundException("File '$path' not found.");
+	if (empty($loc[0]) or empty($loc[1])) throw new Exception('Bad parameters.');
 
 	//defaults...
 	$data += [
@@ -274,20 +285,14 @@ protected function insertFile(array $loc, array $data)
 
 	if (!$ok) throw new IOException("Uploading '".$file['ORIGNAME']."' failed.");
 
-	$filter = [
-		'ENTITY_TYPE' => $loc[0],
-		'ENTITY_ID' => $loc[1],
-		'FILE_ID' => $data['FILE_ID'],
-	];
-
-	$file['ID'] = $this->db->insert($this->TABLE, $file, $filter);
+	$file['ID'] = $this->db->insert($this->TABLE, $file);
 
 	return $file;
 }
 
 protected function createTempFile($file)
 {
-	$ext = pathinfo($file['ORIGNAME'], PATHINFO_EXTENSION) ?: 'tmp';
+	$ext = pathinfo($file['ORIGNAME'] ?? '', PATHINFO_EXTENSION) ?: 'tmp';
 	$dir = $this->getDir($this->dirNameFormat, $file);
 	$path = $this->rootDir.$dir.'_tmp_'.Str::random(11).'.'.$ext;
 	file_put_contents($path, $file['CONTENT']);
@@ -308,6 +313,7 @@ protected function newFileId($loc)
 /**
  * Return array of all files assigned to entity $loc.
  * @param int|array $loc [entity-type, entity-id]
+ * @return array $files List of files 
  */
 function getFiles($loc)
 {

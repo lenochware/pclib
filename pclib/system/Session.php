@@ -59,7 +59,7 @@ public function setLifeTime($seconds)
  */
 public function start()
 {
-	session_start($this->options);
+  session_start($this->options);
   $this->id = session_id();
 
   if (!$this->id) {
@@ -72,10 +72,10 @@ public function start()
  */
 public function get($key, $default = null)
 {
-	if (!session_id()) {
-		if ($this->autoStart) $this->start();
-		else throw new RuntimeException('Session is not initialized.');
-	}
+  if (!session_id()) {
+    if ($this->autoStart) $this->start();
+    else throw new RuntimeException('Session is not initialized.');
+  }
 
   $segments = explode('.', $key);
   $value = $_SESSION;
@@ -95,10 +95,10 @@ public function get($key, $default = null)
  */
 public function set($key, $value)
 {
-	if (!session_id()) {
-		if ($this->autoStart) $this->start();
-		else throw new RuntimeException('Session is not initialized.');
-	}
+  if (!session_id()) {
+    if ($this->autoStart) $this->start();
+    else throw new RuntimeException('Session is not initialized.');
+  }
 
   $segments = explode('.', $key);
   $ref =& $_SESSION;
