@@ -2,10 +2,10 @@
 
 CREATE TABLE lookups (
   guid serial NOT NULL,
-  id character varying(50) DEFAULT NULL,
+  id character varying(50) NOT NULL,
   app character varying(50) DEFAULT NULL,
-  cname character varying(100) DEFAULT NULL,
-  label character varying(255) DEFAULT NULL,
+  cname character varying(100) NOT NULL,
+  label character varying(255) NOT NULL,
   position integer DEFAULT 0,
   CONSTRAINT pk_lookups_guid PRIMARY KEY (guid)
 );
@@ -29,7 +29,7 @@ CREATE TABLE `translator` (
 
 CREATE TABLE translator_labels (
   id serial NOT NULL,
-  label character varying(100) DEFAULT NULL,
+  label character varying(100) NOT NULL,
   category smallint DEFAULT 0,
   dt timestamp without time zone,
   CONSTRAINT pk_translator_labels_id PRIMARY KEY (id)
@@ -56,7 +56,7 @@ CREATE UNIQUE INDEX i_auth_register_user ON auth_register USING btree (user_id,o
 
 CREATE TABLE auth_rights (
   id serial NOT NULL,
-  sname character varying(100) DEFAULT NULL,
+  sname character varying(100) NOT NULL UNIQUE,
   annot character varying(255) DEFAULT NULL,
   rtype character varying(1) DEFAULT 'B',
   dt timestamp without time zone,
@@ -67,7 +67,7 @@ CREATE TABLE auth_rights (
 
 CREATE TABLE auth_roles (
   id serial NOT NULL,
-  sname character varying(100) DEFAULT NULL,
+  sname character varying(100) NOT NULL UNIQUE,
   annot character varying(255) DEFAULT NULL,
   author_id integer DEFAULT NULL,
   lastmod timestamp without time zone,
@@ -91,7 +91,7 @@ CREATE INDEX i_auth_user_role_role_id ON auth_user_role USING btree (role_id);
 
 CREATE TABLE auth_users (
   id serial NOT NULL,
-  username character varying(255) DEFAULT NULL,
+  username character varying(255) NOT NULL,
   fullname character varying(255) DEFAULT NULL,
   email character varying(255) DEFAULT NULL,
   passw character varying(255) DEFAULT NULL,
@@ -170,7 +170,7 @@ CREATE TABLE tree_lookups (
 
 CREATE TABLE app_params (
   id serial NOT NULL,
-  param_name character varying(100) DEFAULT NULL,
+  param_name character varying(100) NOT NULL UNIQUE,
   param_value character varying(255) DEFAULT NULL,
   title character varying(255) DEFAULT NULL,
   created_at timestamp without time zone,
@@ -183,7 +183,7 @@ CREATE TABLE app_params (
 
 CREATE TABLE filestorage (
   id serial NOT NULL,
-  filepath character varying(255) DEFAULT NULL,
+  filepath character varying(255) NOT NULL,
   origname character varying(255) DEFAULT NULL,
   annot character varying(255) DEFAULT NULL,
   hash character varying(16) DEFAULT NULL,
@@ -221,7 +221,7 @@ CREATE TABLE pclib_mails (
 
 CREATE TABLE pclib_content (
   id SERIAL PRIMARY KEY,
-  name VARCHAR(50),
+  name VARCHAR(50) NOT NULL UNIQUE,
   category VARCHAR(50),
   title VARCHAR(100),
   body TEXT,
@@ -234,7 +234,7 @@ CREATE TABLE pclib_content (
 
 CREATE TABLE jobs (
   id serial NOT NULL,
-  name character varying(100) DEFAULT NULL,
+  name character varying(100) NOT NULL UNIQUE,
   annotation text,
   job_command character varying(255) DEFAULT NULL,
   job_params character varying(255) DEFAULT NULL,
