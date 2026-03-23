@@ -16,24 +16,12 @@ class Session
 
 public $autoStart = false;
 public $id;
-protected $options;
+protected $options = [];
+protected $section;
 
-function __construct()
+function __construct($section = '')
 {
-  $isHttps =
-    (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-    || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
-
-	$this->options = [
-    // Cookies
-    'cookie_httponly' => true,    // JS nemůže číst session cookie
-    'cookie_secure'  => $isHttps, // cookie se posílá jen přes HTTPS
-    'cookie_samesite'=> 'Lax',    // ochrana proti CSRF
-
-    // Session chování
-    'use_strict_mode'=> true,   // odmítne cizí session ID
-    'use_only_cookies'=> true,  // zakáže SID v URL
-  ];
+  $this->section = $section;
 }
 
 /*
@@ -42,7 +30,7 @@ function __construct()
 public function setOptions(array $options)
 {
   if (session_id()) throw new RuntimeException("Cannot be set. Session is already initialized.");  
-  $this->options = $options + $this->options;
+  $this->options = $options;
 }
 
 /*
@@ -59,7 +47,22 @@ public function setLifeTime($seconds)
  */
 public function start()
 {
-  session_start($this->options);
+  $isHttps =
+    (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+    || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
+
+  $defaults = [
+    // Cookies
+    'cookie_httponly' => true,    // JS nemůže číst session cookie
+    'cookie_secure'  => $isHttps, // cookie se posílá jen přes HTTPS
+    'cookie_samesite'=> 'Lax',    // ochrana proti CSRF
+
+    // Session chování
+    'use_strict_mode'=> true,   // odmítne cizí session ID
+    'use_only_cookies'=> true,  // zakáže SID v URL
+  ];
+
+  session_start($this->options + $defaults);
   $this->id = session_id();
 
   if (!$this->id) {
@@ -74,8 +77,11 @@ public function get($key, $default = null)
 {
   if (!session_id()) {
     if ($this->autoStart) $this->start();
+    elseif(isset($default)) return $default;
     else throw new RuntimeException('Session is not initialized.');
   }
+
+  if ($this->section) $key = $this->section . '.' . $key;
 
   $segments = explode('.', $key);
   $value = $_SESSION;
@@ -100,6 +106,8 @@ public function set($key, $value)
     else throw new RuntimeException('Session is not initialized.');
   }
 
+  if ($this->section) $key = $this->section . '.' . $key;
+
   $segments = explode('.', $key);
   $ref =& $_SESSION;
 
@@ -118,6 +126,8 @@ public function set($key, $value)
  */
 public function delete($key)
 {
+  if ($this->section) $key = $this->section . '.' . $key;
+
   $segments = explode('.', $key);
   $last = array_pop($segments);
 

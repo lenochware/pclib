@@ -103,8 +103,6 @@ function __construct(?Db $db = null)
 {
 	parent::__construct();
 
-	if (!session_id()) throw new RuntimeException('Session is not initialized. Perhaps missing session_start()?');
-
 	$cfg = $this->app->config;
 	$this->setOptions($cfg['service.auth'] ?? $cfg['pclib.auth']);
 
@@ -200,7 +198,8 @@ function logout()
  */
 protected function getSessionUser()
 {
-	$data = $this->app->getSession('pclib.user', $this->realm);
+	$session = new system\Session($this->realm);
+	$data = $session->get('pclib.user', []);
 	if (!$data) return null;
 
 	if ($data['sessionHash'] != $this->sessionHash($data)) {
@@ -228,8 +227,9 @@ protected function setSessionUser(?pclib\AuthUser $user = null)
 	else {
 		$data = null;
 	}
-	
-	$this->app->setSession('pclib.user', $data, $this->realm);
+
+	$session = new system\Session($this->realm);
+	$session->set('pclib.user', $data);
 }
 
 protected function sessionHash($data)

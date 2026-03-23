@@ -51,6 +51,8 @@ public $plugins;
 
 public $translatorName = 'App';
 
+public $session;
+
 /**
  * Load config and sessions, read route.
  * @param string $name Unique name of the application.
@@ -67,6 +69,8 @@ function __construct($name)
 
 	$this->errorHandler = new system\ErrorHandler;
 	$this->errorHandler->register();
+
+	$this->session = new system\Session($name);
 
 	$this->paths = $this->getPaths();
 
@@ -458,28 +462,16 @@ function httpError($code, $message, $cssClass = null, ...$args)
 
 /**
  * Get application session variable.
- * Session variables are stored in their own namespace $ns.
- * By default it is application name, so sessions for different
- * applications does not collide.
+ * Session variables are stored in their own namespace, so sessions 
+ * for different applications does not collide.
  * Variable name can be plain: 'user' or with group: 'pclib.user'.
  * All system variables uses group 'pclib'.
  * @param string $name Variable name.
- * @param string $ns (optional) Namespace.
  * @return mixed Session variable value.
  **/
-function getSession($name, $ns = null)
+function getSession($name)
 {
-	if (!$ns) $ns = $this->name;
-	if (!isset($_SESSION[$ns])) return null;
-
-	//because of retarded "key does not exists warning"
-	if (strpos($name, '.')) {
-		list($n1,$n2) = explode('.', $name);
-		if (!isset($_SESSION[$ns][$n1])) return null;
-		return array_get($_SESSION[$ns][$n1], $n2);
-	}
-
-	return array_get($_SESSION[$ns], $name);
+	return $this->session->get($name);
 }
 
 /**
@@ -487,39 +479,20 @@ function getSession($name, $ns = null)
  * @see getSession()
  * @param string $name name of session variable
  * @param mixed $value value of variable
- * @param string $ns (optional) Namespace
  **/
-function setSession($name, $value, $ns = null)
+function setSession($name, $value)
 {
-	if (!$ns) $ns = $this->name;
-	//if (!isset($_SESSION[$ns])) return;
-	if (strpos($name, '.')) {
-		list($n1,$n2) = explode('.', $name);
-		$_SESSION[$ns][$n1][$n2] = $value;
-	}
-	else {
-		$_SESSION[$ns][$name] = $value;
-	}
+	$this->session->set($name, $value);
 }
 
 /**
  * Delete application session variable.
- * Without parameters, it will delete whole application session.
  * @see getSession()
  * @param string $name name of variable
- * @param string $ns (optional) Namespace
  **/
-function deleteSession($name = null, $ns = null)
+function deleteSession($name)
 {
-	if (!$ns) $ns = $this->name;
-	if (strpos($name, '.')) {
-		list($n1,$n2) = explode('.', $name);
-		unset($_SESSION[$ns][$n1][$n2]);
-	}
-	elseif ($name)
-		unset($_SESSION[$ns][$name]);
-	else
-		unset($_SESSION[$ns]);
+	$this->session->delete($name);
 }
 
 function newController($name, $module = '')

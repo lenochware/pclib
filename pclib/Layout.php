@@ -21,6 +21,7 @@ public $MESSAGE_PATTERN = '<div class="%s">%s</div>';
 /** Load application state from session. */
 function loadSession()
 {
+	if (!session_id()) return;
 	$this->bookmarks = $this->app->getSession('pclib.bookmarks');
 	if (!isset($this->bookmarks[-1])) $this->bookmarks[-1]['maxlevel'] = -1;
 }
@@ -28,6 +29,7 @@ function loadSession()
 /** Save application state to session. */
 function saveSession()
 {
+	if (!session_id()) return;
 	if (isset($this->bookmarks))
 		$this->app->setSession('pclib.bookmarks', $this->bookmarks);
 }
@@ -135,7 +137,6 @@ function addHeadText($s)
  */
 public function addMessage($message, $cssClass = null, $params = array())
 {
-	if (!session_id()) throw new RuntimeException('Session is required.');
 	if (!$this->messagesTag) throw new NoValueException('Missing "messages" tag in template.');
 	if (!$cssClass) $cssClass = 'message';
 	$flash = $this->app->getSession('pclib.flash');
@@ -210,6 +211,7 @@ private function isLocalFile($src)
  */
 function print_Messages($id, $sub, $value)
 {
+	if (!session_id()) return;
 	$flash = $this->app->getSession('pclib.flash');
 	if (!$flash) return;
 	foreach ($flash as $cssClass => $messages) {
@@ -220,6 +222,7 @@ function print_Messages($id, $sub, $value)
 
 protected function addJdump()
 {
+	if (!session_id()) return;
 	$js = $this->app->getSession('pclib.jdump');
 	if ($js) {
 		$this->addHeadText("<script>$js</script>");
