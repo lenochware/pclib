@@ -460,7 +460,7 @@ protected function trPrintElement($elem)
 {
 	$id = $elem['id'];
 	if (!empty($elem['hidden'])) return;
-	print "<tr><td class=\"$id\">";
+	print "<tr class=\"$id\"><td>";
 	$this->print_Element($id, 'lb', null);
 	print '</td><td>';
 	$value = $this->getValue($id);

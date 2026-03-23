@@ -729,7 +729,7 @@ protected function trPrintElement($elem)
 {
 	$id = $elem['id'];
 
-	print "<tr><td class=\"$id\">";
+	print "<tr class=\"$id\"><td>";
 	$this->print_Element($id, 'lb', null);
 	print '</td><td>';
 	$value = $this->getValue($id);

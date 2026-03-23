@@ -395,7 +395,7 @@ protected function trPrintElement($elem)
 	$sub = $elem['sub'];
 
 	if ($sub == 'labels') {
-		print '<th>';
+		print "<th class=\"$id\">";
 		$this->print_Element($id, 'lb', null);
 		print '</th>';
 	}
