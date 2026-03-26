@@ -124,7 +124,10 @@ function __set($name, $value)
  */
 function setContent($content)
 {
-	if (!$this->layout) throw new NoValueException('Cannot set content: app->layout does not exists.');
+	if (!$this->layout) {
+		$this->setLayout(PCLIB_DIR.'tpl/default-layout.tpl');
+	}
+
 	$this->layout->values['CONTENT'] = (string)$content;
 }
 
