@@ -11,14 +11,26 @@
 namespace pclib\system;
 use RuntimeException;
 
+/**
+ * Get or set application session variables.
+ * Example: $key = $app->session->get('some.key'); $app->session->set('some.key', 'value');
+ */
 class Session
 {
 
+/** Start session at first use. */
 public $autoStart = false;
+
+/** Session id. */
 public $id;
+
 protected $options = [];
 protected $section;
 
+/**
+ * Create sesion object.
+ * @param string $section All variables will be stored in $_SESSION[$section].
+ */
 function __construct($section = '')
 {
   $this->section = $section;
@@ -26,6 +38,7 @@ function __construct($section = '')
 
 /*
  * Setup session options ie. session_start() parameters.
+ * @param array $options See session_start()
  */
 public function setOptions(array $options)
 {
@@ -35,6 +48,7 @@ public function setOptions(array $options)
 
 /*
  * Set session lifetime in seconds.
+ * @param int $seconds
  */
 public function setLifeTime($seconds)
 {
@@ -43,7 +57,7 @@ public function setLifeTime($seconds)
 }
 
 /*
- * Start session with security presets.
+ * Start session with security aware presets.
  */
 public function start()
 {
@@ -71,7 +85,11 @@ public function start()
 }
 
 /*
- * Get session variable - you can use dot notation 'group.variable' for organization.
+ * Get session variable - you can use dot notation 'group.variable'.
+ * Throws exception when session is not initialized and $default is not set.
+ * @param string $key Variable name 
+ * @param mixed $default Default value
+ * @return $value
  */
 public function get($key, $default = null)
 {
@@ -97,7 +115,10 @@ public function get($key, $default = null)
 }
 
 /*
- * Set session variable - you can use dot notation 'group.variable' for organization.
+ * Set session variable - you can use dot notation 'group.variable'.
+ * Throws exception when session is not initialized. 
+ * @param string $key Variable name  
+ * @param mixed $value Variable value  
  */
 public function set($key, $value)
 {
@@ -123,6 +144,7 @@ public function set($key, $value)
 
 /*
  * Delete session variable.
+ * @param string $key Variable name  
  */
 public function delete($key)
 {
@@ -144,7 +166,7 @@ public function delete($key)
 }
 
 /*
- * Destroy session including session cookie.
+ * Destroy whole session including session cookie.
  */
 public function destroy()
 {
