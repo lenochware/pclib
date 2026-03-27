@@ -13,6 +13,7 @@ namespace pclib\system;
 
 /**
  * Create, remove or validate token, which can be used for API autentification.
+ * Tokens are stored in database table PCLIB_TOKENS.
  */
 class AuthToken extends BaseObject
 {

@@ -126,6 +126,7 @@ function setContent($content)
 {
 	if (!$this->layout) {
 		$this->setLayout(PCLIB_DIR.'tpl/default-layout.tpl');
+		$this->layout->values['TITLE'] = $this->name;
 	}
 
 	$this->layout->values['CONTENT'] = (string)$content;
