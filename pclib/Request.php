@@ -121,23 +121,20 @@ function getWebRoot()
 */
 function getHeaders()
 {
-	if ($this->headers) return $this->headers;
-
 	if (function_exists('apache_request_headers'))
-		$headers = array_change_key_case(apache_request_headers(), CASE_LOWER);
+		$headers = apache_request_headers();
 	else {
-		$headers = array();
+		$headers = [];
 		foreach ($_SERVER as $k => $v) {
 			if (strncmp($k, 'HTTP_', 5) == 0) {
 				$k = substr($k, 5);
 			} elseif (strncmp($k, 'CONTENT_', 8)) {
 				continue;
 			}
-			$headers[ strtr(strtolower($k), '_', '-') ] = $v;
+			$headers[ strtr($k, '_', '-') ] = $v;
 		}
 	}
-	$this->headers = $headers;
-	return $this->headers;
+	return $headers;
 }
 
 /**
@@ -146,6 +143,39 @@ function getHeaders()
 function getRawBody()
 {
   return file_get_contents('php://input');
+}
+
+/**
+ * Return request json.
+ */
+function getJson()
+{
+	$rawBody = file_get_contents('php://input');
+	return json_decode($rawBody, true);
+}
+
+/**
+ * Return cookies array.
+ */
+function getCookies()
+{
+	return $_COOKIE;
+}
+
+/**
+ * Return $_GET[$key] or $default.
+ */
+function get($key, $default = null)
+{
+	return $_GET[$key] ?? $default;
+}
+
+/**
+ * Return $_POST[$key] or $default.
+ */
+function post($key, $default = null)
+{
+	return $_POST[$key] ?? $default;
 }
 
 /**

@@ -20,11 +20,15 @@ class ApiController extends Controller
 	/** Set if whole controller is public - do not use athorisation. */
 	public $publicApi = false;
 
+	/** var Request */
+	protected $request;
+
 	function __construct($app)
 	{
 		parent::__construct($app);
 		$db = $app->getService('db');
 		$this->token = new system\AuthToken;
+		$this->request = $app->request;
 	}
 
 	/**
@@ -62,7 +66,7 @@ class ApiController extends Controller
 		if (!$pathArray) $pathArray = ['index'];
 
 		$path = array_reduce($pathArray, function($ret, $item) { return $ret.ucfirst($item); });
-		$name = strtolower($_SERVER['REQUEST_METHOD']).$path.'Action';
+		$name = strtolower( $this->request->method).$path.'Action';
 		$this->action = $name;
 
 		return method_exists($this, $name)? $name : '';
@@ -74,7 +78,7 @@ class ApiController extends Controller
 	 */
 	function getToken()
 	{
-		$headers = getallheaders();
+		$headers = $this->request->getHeaders();
 		if (!isset($headers['Authorization'])) return '';
 
     if (preg_match('/Bearer\s(\S+)/', $headers['Authorization'], $matches)) {
@@ -82,28 +86,6 @@ class ApiController extends Controller
     }
 
     return '';
-	}
-
-	/**
-	 * Return request json.
-	 * @return array $json
-	 */
-	function getRequestJson()
-	{
-		$rawBody = file_get_contents('php://input');
-		return json_decode($rawBody, true);
-	}
-
-	/**
-	 * Return value from post/get request.
-	 * @param string $name Variable name
-	 * @param mixed $default Default value
-	 * @return mixed $value
-	 */
-	function getRequestValue($name, $default = null)
-	{
-		$data = $_POST? $_POST : $_GET;
-		return $data[$name] ?? $default;
 	}
 
 	/**
