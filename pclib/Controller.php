@@ -60,7 +60,7 @@ function getArgs($actionMethod, array $params)
 	foreach($rm->getParameters() as $param)  {
 		$param_value = array_get($params, $param->name, '');
 		if (!strlen($param_value) and !$param->isOptional()) {
-			$this->app->error('Required parameter "%s" for page "%s" missing.', null, $param->name, get_class($this) .'/'.$this->action);
+			$this->error('Required parameter "%s" for page "%s" missing.', 400, $param->name, get_class($this) .'/'.$this->action);
 		}
 		$args[] = strlen($param_value)? $param_value : $param->getDefaultValue();
 	}
@@ -110,9 +110,19 @@ public function run($action)
 	}
 }
 
+/**
+ * Exit with error message and http status code.
+ * @param string $message
+ * @param int $httpStatus
+ */
+function error($message, $httpStatus = 500, ...$args)
+{
+	$this->app->httpError($httpStatus, $message, null, ...$args);
+}
+
 public function defaultAction($action)
 {
-	$this->app->httpError(404, 'Page not found: "%s"', null, $action->path);
+	$this->error('Page not found: "%s"', 404, $action->path);
 }
 
 /**

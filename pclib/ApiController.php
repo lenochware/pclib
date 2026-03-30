@@ -93,7 +93,7 @@ class ApiController extends Controller
 	 * @param string $message
 	 * @param int $httpStatus
 	 */
-	function error($message, $httpStatus = 500)
+	function error($message, $httpStatus = 500, ...$args)
 	{
 		if (function_exists('http_response_code')) {
 			http_response_code($httpStatus);
@@ -102,7 +102,7 @@ class ApiController extends Controller
 		$data = [
 			'response_type' => 'error',
 			'status' => $httpStatus,
-			'message' => $message,
+			'message' => $this->app->text($message, $args),
 		];
 
 		$this->outputJson($data);
