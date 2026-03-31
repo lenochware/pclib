@@ -40,6 +40,8 @@ public $cleanDefaultPassword = true;
 /** var AuthUser User which is logged in. */
 public $loggedUser;
 
+protected $userClass;
+
 /**
  * Take \b $user and log him in. See also #$loggedUser.
  * @param AuthUser $user
@@ -119,6 +121,10 @@ public function setOptions(array $options)
 	$this->secret = $options['secret'];	
 	$this->realm = $options['realm'] ?: $this->app->name;
 	if (isset($options['dsn'])) $this->getStorage()->db = new pclib\Db($options['dsn']);
+	if (isset($options['user-class'])) {
+		$this->userClass = $options['user-class'];
+		$this->getStorage()->userClass = $options['user-class'];
+	}
 }
 
 /** Return storage object - if not exists, create one. */
@@ -208,7 +214,9 @@ protected function getSessionUser()
 		throw new AuthException("Authentication failed. Access denied.");
 	}
 
-	$user = new AuthUser;
+	$class = $this->userClass ?? AuthUser::class;
+
+	$user = new $class;
 	$user->values = $data;
 	$user->auth = $this;
 	return $user;

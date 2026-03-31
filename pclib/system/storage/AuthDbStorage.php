@@ -14,6 +14,8 @@ class AuthDbStorage extends BaseObject
 /** var Db */
 public $db;
 
+public $userClass;
+
 protected $USERS_TAB = 'AUTH_USERS',
 	$REGISTER_TAB = 'AUTH_REGISTER',
 	$ROLES_TAB    = 'AUTH_ROLES',
@@ -28,7 +30,8 @@ protected $USERS_TAB = 'AUTH_USERS',
 function getUser($userName)
 {
 	$this->service('db');
-	$user = new AuthUser;
+	$class = $this->userClass ?? AuthUser::class;
+	$user = new $class;
 	$user->values = $this->getData($userName);
 	$userId = array_get($user->values, 'ID');
 	if (!$userId) return null;

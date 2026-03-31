@@ -188,6 +188,7 @@ function changePassword(
 static function find($userName)
 {
 	$storage = new system\storage\AuthDbStorage;
+	$storage->userClass = static::class;
 	return $storage->getUser($userName);
 }
 

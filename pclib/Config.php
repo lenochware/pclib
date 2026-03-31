@@ -20,7 +20,7 @@ $config = [
 	],
 
 	'pclib.security' => ['tpl-escape' => true, 'csrf' => false, 'form-prevent-mass' => false],
-	'pclib.auth' => ['algo' => 'md5', 'secret' => 'write any random string!', 'realm' => ''],
+	'pclib.auth' => ['algo' => 'md5', 'secret' => 'write any random string!', 'realm' => '', 'user-class' => null],
 
 	'pclib.app' => [
 		'language' => 'cs',

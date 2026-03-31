@@ -2,6 +2,7 @@
 - Added class Session ($app->session)
 - Added class ApiController for building REST apis
 - Added senisitive parameters protection
+- Added config parameter pclib.auth:user-class
 - FileStorage, Request, Layout - various improvements
 - Datastructure improvements
 
