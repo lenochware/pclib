@@ -220,6 +220,14 @@ CREATE TABLE PCLIB_CONTENT (
   AUTHOR_ID INTEGER
 );
 
+-- Tokens for the REST API (class AuthToken)
+
+CREATE TABLE PCLIB_TOKENS (
+  TOKEN VARCHAR(255) PRIMARY KEY,
+  USER_ID INTEGER DEFAULT NULL,
+  EXPIRE DATETIME NOT NULL,
+);
+
 -- Table structure for table `jobs` (padmin)
 
 CREATE TABLE jobs (
@@ -251,4 +259,4 @@ INSERT INTO LOOKUPS (APP, ID, CNAME, LABEL, POSITION) VALUES ('padmin', 60, 'job
 insert into TRANSLATOR_LABELS (ID, LABEL, CATEGORY) values(1,'App',1);
 
 -- Version of PCLIB database structures.
-INSERT INTO APP_PARAMS (PARAM_NAME, PARAM_VALUE, TITLE, CREATED_AT) VALUES ('PCLIB_VERSION', '3.2.1', 'Version of PCLIB database structures', datetime('now'));
+INSERT INTO APP_PARAMS (PARAM_NAME, PARAM_VALUE, TITLE, CREATED_AT) VALUES ('PCLIB_VERSION', '3.3.0', 'Version of PCLIB database structures', datetime('now'));

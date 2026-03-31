@@ -1,4 +1,4 @@
-/*Table structure for table `LOOKUPS` (TPL) */
+/* Lookup tables (classes Tpl, Form, Grid) */
 
 CREATE TABLE `LOOKUPS` (
   `GUID` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -11,7 +11,7 @@ CREATE TABLE `LOOKUPS` (
   KEY `CNAME` (`CNAME`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Table structure for table `TRANSLATOR` */
+/* Class Translator */
 
 CREATE TABLE `TRANSLATOR` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
@@ -24,7 +24,7 @@ CREATE TABLE `TRANSLATOR` (
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Table structure for table `TRANSLATOR_LABELS` */
+/* Class Translator */
 
 CREATE TABLE `TRANSLATOR_LABELS` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
@@ -35,8 +35,7 @@ CREATE TABLE `TRANSLATOR_LABELS` (
   KEY `LABEL` (`LABEL`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
-/*Table structure for table `AUTH_REGISTER` */
+/* RBAC authorization (classes Auth, AuthUser, AuthManager) */
 
 CREATE TABLE `AUTH_REGISTER` (
   `USER_ID` int(11) DEFAULT NULL,
@@ -48,8 +47,7 @@ CREATE TABLE `AUTH_REGISTER` (
   UNIQUE KEY `I_USER` (`USER_ID`,`OBJ_ID`,`RIGHT_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
-/*Table structure for table `AUTH_RIGHTS` */
+/* RBAC authorization (classes Auth, AuthUser, AuthManager) */
 
 CREATE TABLE `AUTH_RIGHTS` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
@@ -60,7 +58,7 @@ CREATE TABLE `AUTH_RIGHTS` (
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Table structure for table `AUTH_ROLES` */
+/* RBAC authorization (classes Auth, AuthUser, AuthManager) */
 
 CREATE TABLE `AUTH_ROLES` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
@@ -72,7 +70,7 @@ CREATE TABLE `AUTH_ROLES` (
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Table structure for table `AUTH_USER_ROLE` */
+/* RBAC authorization (classes Auth, AuthUser, AuthManager) */
 
 CREATE TABLE `AUTH_USER_ROLE` (
   `USER_ID` int(11) DEFAULT NULL,
@@ -83,7 +81,7 @@ CREATE TABLE `AUTH_USER_ROLE` (
   KEY `ROLE_ID` (`ROLE_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Table structure for table `AUTH_USERS` */
+/* RBAC authorization (classes Auth, AuthUser, AuthManager) */
 
 CREATE TABLE `AUTH_USERS` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
@@ -104,7 +102,7 @@ CREATE TABLE `AUTH_USERS` (
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Table structure for table `LOGGER` */
+/* Class Logger */
 
 CREATE TABLE `LOGGER` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
@@ -122,7 +120,7 @@ CREATE TABLE `LOGGER` (
   KEY `ACTION` (`ACTION`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Table structure for table `LOGGER_LABELS` */
+/* Class Logger */
 
 CREATE TABLE `LOGGER_LABELS` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
@@ -133,7 +131,7 @@ CREATE TABLE `LOGGER_LABELS` (
   KEY `LABEL` (`LABEL`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Table structure for table `LOGGER_MESSAGES` */
+/* Class Logger */
 
 CREATE TABLE `LOGGER_MESSAGES` (
   `LOG_ID` int(11) NOT NULL,
@@ -143,7 +141,7 @@ CREATE TABLE `LOGGER_MESSAGES` (
   PRIMARY KEY (`LOG_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Table structure for table `TREE_LOOKUPS` */
+/* Tree data (class Tree) */
 
 CREATE TABLE `TREE_LOOKUPS` (
   `ID` INT(11) NOT NULL AUTO_INCREMENT,
@@ -159,7 +157,7 @@ CREATE TABLE `TREE_LOOKUPS` (
   KEY `I_NR` (`TREE_ID`,`NR`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Table structure for table `APP_PARAMS` */
+/* Editable configuration parameters for the application (can be set in padmin) */
 
 CREATE TABLE `APP_PARAMS` (
   `ID` INT(11) NOT NULL AUTO_INCREMENT,
@@ -172,7 +170,7 @@ CREATE TABLE `APP_PARAMS` (
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Table structure for table `FILESTORAGE` */
+/* Uploaded files. (class FileStorage) */
 
 CREATE TABLE `FILESTORAGE` (
   `ID` INT(11) NOT NULL AUTO_INCREMENT,
@@ -192,7 +190,7 @@ CREATE TABLE `FILESTORAGE` (
   UNIQUE (`HASH`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Table structure for table `PCLIB_MAILS` */
+/* Sent or scheduled mail messages (classes Mailer, MailMessage) */
 
 CREATE TABLE `PCLIB_MAILS` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
@@ -210,7 +208,7 @@ CREATE TABLE `PCLIB_MAILS` (
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Table structure for table `PCLIB_CONTENT` */
+/* Database pages and templates (Db->template()) */
 
 CREATE TABLE `PCLIB_CONTENT` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
@@ -224,7 +222,16 @@ CREATE TABLE `PCLIB_CONTENT` (
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Table structure for table `jobs` (padmin) */
+/* Tokens for the REST API (class AuthToken) */
+
+CREATE TABLE `PCLIB_TOKENS` (
+  `TOKEN` VARCHAR(255) NOT NULL,
+  `USER_ID` INT(11) DEFAULT NULL,
+  `EXPIRE` DATETIME NOT NULL,
+  PRIMARY KEY (`TOKEN`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8;
+
+/* CRON jobs can be set in padmin (padmin) */
 
 CREATE TABLE `jobs` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
@@ -257,4 +264,4 @@ insert into `LOOKUPS` (`APP`, `ID`, `CNAME`, `LABEL`, `POSITION`) values('padmin
 insert into `TRANSLATOR_LABELS` (`ID`, `LABEL`, `CATEGORY`) values(1,'App',1);
 
 /** Version of PCLIB database structures. */  
-INSERT INTO `APP_PARAMS` (`PARAM_NAME`, `PARAM_VALUE`, `TITLE`, `CREATED_AT`) VALUES('PCLIB_VERSION', '3.2.1', 'Version of PCLIB database structures', NOW());
+INSERT INTO `APP_PARAMS` (`PARAM_NAME`, `PARAM_VALUE`, `TITLE`, `CREATED_AT`) VALUES('PCLIB_VERSION', '3.3.0', 'Version of PCLIB database structures', NOW());

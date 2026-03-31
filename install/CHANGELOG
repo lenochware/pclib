@@ -1,3 +1,10 @@
+3.3.0
+- Added class Session ($app->session)
+- Added class ApiController for building REST apis
+- Added senisitive parameters protection
+- FileStorage, Request, Layout - various improvements
+- Datastructure improvements
+
 3.2.1
 - Added user parameters: AuthUser->getParam($name)
 - Added FileStorage->addFile(), FileStorage->addFiles()
