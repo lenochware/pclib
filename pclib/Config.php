@@ -23,7 +23,7 @@ $config = [
 	'pclib.auth' => ['algo' => 'md5', 'secret' => 'write any random string!', 'realm' => '', 'user-class' => null],
 
 	'pclib.app' => [
-		'language' => 'cs',
+		'language' => '',
 		'default-route' => '',
 		'layout' => '',
 		'autostart' => [],

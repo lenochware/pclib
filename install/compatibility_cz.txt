@@ -37,3 +37,4 @@ Poznámky ke kompatibilitě s předchozí verzí PCLIB
 
 - $app->request->headers Názvy hlaviček nejsou konvertovány na lowercase (Authorization m. authorization)
 - Některá pole db tabulek jsou nyní NOT NULL (názvy rolí, práv, číselníků apod.)
+- Defaultní nastavení jazyka je 'en'. Pro češtinu nastavit v configu 'pclib.app' => [ 'language' => 'cs', ... ]

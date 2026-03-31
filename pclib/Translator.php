@@ -61,6 +61,11 @@ function __construct($name = null)
 	$this->name = $name;
 }
 
+function setLanguage($language) {
+	$this->language = $language;
+	$this->cache = [];
+}
+
 /** Return storage object - if not exists, create one. */
 protected function getStorage()
 {

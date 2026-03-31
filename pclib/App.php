@@ -245,7 +245,6 @@ function addConfig($path)
  */
 public function setOptions(array $options)
 {
-	if (!empty($options['language'])) $this->setLanguage($options['language']);
 	if (!empty($options['debugmode'])) $this->debugMode = true;
 	if (!empty($options['friendly-url'])) $this->router->friendlyUrl = true;
 	if (!empty($options['layout'])) $this->setLayout($options['layout']);
@@ -272,6 +271,7 @@ public function setOptions(array $options)
 		}
 	};
 
+	if (!empty($options['language'])) $this->setLanguage($options['language']);
 	if (!empty($options['plugins'])) $this->addPlugins($options['plugins']);
 }
 
@@ -346,27 +346,29 @@ function redirect($route, $code = null)
  */
 function setLanguage($language)
 {
-	$trans = new Translator($this->translatorName);
-	$trans->language = $language;
+	$trans = $this->getService('translator');
+
+	if (!$trans) {
+		$trans = new Translator($this->translatorName);
+		$this->setService('translator', $trans);
+	}
 	
+	$trans->setLanguage($language);
+
+	$path = $this->paths['localization'].$language.'.php';
+	if (file_exists($path)) $trans->useFile($path);
+
 	if ($language == 'source') {
 		$trans->autoUpdate = true;
-	}
-	else {
-		$transFile = $this->paths['localization'].$language.'.php';
-		if (file_exists($transFile)) $trans->useFile($transFile);
 	}
 
 	if (!empty($this->services['db'])) {
 		try {
 			$trans->usePage('default');
 		} catch (\Exception $e) {
-			throw new Exception('Cannot load texts for translator - '.$e->getMessage());
+			//throw new Exception('Cannot load texts for translator - '.$e->getMessage());
 		}
-
 	}
-
-	$this->setService('translator', $trans);
 }
 
 function getLanguage()
