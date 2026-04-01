@@ -39,7 +39,7 @@ public $layout;
 public $services = [];
 
 /** Current environment (such as 'develop','test','production'). */
-public $environment = '';
+protected $environment = '';
 
 /** Enabling debugMode will display debug-toolbar. */
 public $debugMode = false;
@@ -94,6 +94,7 @@ function __get($name)
 		case 'routestr': return $this->router->action->path;
 		case 'content':  return $this->layout->values['CONTENT'];
 		case 'language': return $this->getLanguage();
+		case 'environment': return $this->environment;
 	}
 
 	$service = $this->getService($name);
@@ -107,6 +108,7 @@ function __set($name, $value)
 		case 'action':  $this->router->action->metod = $value; return;
 		case 'content': $this->setContent($value); return;
 		case 'language': $this->setLanguage($value); return;
+		case 'environment': $this->setEnvironment($value); return;
 	}
 	if ($value instanceof IService) {
 		$this->setService($name, $value);
@@ -141,6 +143,17 @@ function setContent($content)
 function setLayout($path)
 {
 	$this->layout = new Layout($path);
+}
+
+/**
+ * Set environment and reload configuration.
+ * @param string $value Environment name ('develop', 'production').
+ */
+function setEnvironment($value)
+{
+	$this->environment = $value;
+	$this->config = [];
+	$this->addConfig( PCLIB_DIR.'Config.php' );
 }
 
 /**
