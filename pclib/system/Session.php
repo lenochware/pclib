@@ -146,8 +146,14 @@ public function set($key, $value)
  * Delete session variable.
  * @param string $key Variable name  
  */
-public function delete($key)
+public function delete($key = null)
 {
+  if (empty($key)) {
+    if ($this->section) unset($_SESSION[$this->section]);
+    else $_SESSION = [];
+    return;
+  }
+
   if ($this->section) $key = $this->section . '.' . $key;
 
   $segments = explode('.', $key);

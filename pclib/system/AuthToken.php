@@ -43,11 +43,16 @@ class AuthToken extends BaseObject
 	{
 		$this->service('db');
 
-		$data = $this->db->select($this->table, ['TOKEN' => hash('sha256', $token)]);
+		$tokenHash = hash('sha256', $token);
+
+		$data = $this->db->select($this->table, ['TOKEN' => $tokenHash]);
 		if (!$data or ($data['EXPIRE'] ?? '') < date('Y-m-d H:i:s')) return false;
 
 		if ($refresh) {
-  		$this->db->update($this->table, ['EXPIRE' => date('Y-m-d H:i:s', time() + $this->expireSeconds)], ['TOKEN' => $token]);
+  		$this->db->update($this->table, 
+  			['EXPIRE' => date('Y-m-d H:i:s', time() + $this->expireSeconds)], 
+  			['TOKEN' => $tokenHash]
+  		);
 		}
 
 		return true;

@@ -509,7 +509,7 @@ function setSession($name, $value)
  * @see getSession()
  * @param string $name name of variable
  **/
-function deleteSession($name)
+function deleteSession($name = null)
 {
 	$this->session->delete($name);
 }
