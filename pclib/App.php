@@ -547,6 +547,17 @@ function newModel($name)
 }
 
 /**
+ * Execute application, process current request and write output.
+ * @param bool $debugMode Show debug bar?
+ **/
+function execute($debugMode = false)
+{
+	$this->debugMode = $debugMode;
+	$this->run();
+	$this->out();
+}
+
+/**
  * Execute method of the controller.
  * Without parameters, route is read from current url.
  * Route 'products/add' means: call method ProductsController->addAction();

@@ -2,6 +2,7 @@
 
 namespace pclib\extensions;
 use pclib\system\BaseObject;
+use pclib\EventManager;
 
 /**
  * Show DebugBar in your web-application.
@@ -74,6 +75,10 @@ public static function register()
 		'db.after-query'  => [$that, 'onAfterQuery'],
 		'router.redirect' => [$that, 'onRedirect'],
 	];
+
+	if (!$that->app->getService('events')) {
+		$that->app->setService('events', new EventManager);
+	}
 
 	$that->addEvents($events);
 		
