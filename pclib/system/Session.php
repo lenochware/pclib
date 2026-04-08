@@ -36,7 +36,7 @@ function __construct($section = '')
   $this->section = $section;
 }
 
-/*
+/**
  * Setup session options ie. session_start() parameters.
  * @param array $options See session_start()
  */
@@ -46,7 +46,7 @@ public function setOptions(array $options)
   $this->options = $options;
 }
 
-/*
+/**
  * Set session lifetime in seconds.
  * @param int $seconds
  */
@@ -56,7 +56,7 @@ public function setLifeTime($seconds)
   ini_set('session.gc_maxlifetime', $seconds);  
 }
 
-/*
+/**
  * Start session with security aware presets.
  */
 public function start()
@@ -84,7 +84,7 @@ public function start()
   }
 }
 
-/*
+/**
  * Get session variable - you can use dot notation 'group.variable'.
  * Throws exception when session is not initialized and $default is not set.
  * @param string $key Variable name 
@@ -114,7 +114,7 @@ public function get($key, $default = null)
   return $value;
 }
 
-/*
+/**
  * Set session variable - you can use dot notation 'group.variable'.
  * Throws exception when session is not initialized. 
  * @param string $key Variable name  
@@ -142,7 +142,7 @@ public function set($key, $value)
   $ref = $value;
 }
 
-/*
+/**
  * Delete session variable.
  * @param string $key Variable name  
  */
@@ -171,7 +171,7 @@ public function delete($key = null)
   unset($ref[$last]);
 }
 
-/*
+/**
  * Destroy whole session including session cookie.
  */
 public function destroy()

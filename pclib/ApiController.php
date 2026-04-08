@@ -1,10 +1,18 @@
 <?php 
+/**
+ * @file
+ * REST API Controller.
+ *
+ * @author -dk- <lenochware@gmail.com>
+ * @link https://pclib.brambor.net/
+ * @license MIT (https://opensource.org/licenses/MIT)
+ */
 
 namespace pclib;
 use pclib;
 
 /**
- * Controller for the application REST api with bearer authorisation, post/get methods, returning json.
+ * Controller for the application REST API with bearer authorisation, post/get methods, returning json.
  * Create your REST controllers as ancestors of ApiController.
  * @see App::run()
  * @see AuthToken
