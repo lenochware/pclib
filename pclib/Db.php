@@ -157,7 +157,7 @@ function connect(
 )
 {
 	if (empty($dataSource)) {
-		throw new \InvalidArgumentException('Invalid connection parameters.');
+		throw new \InvalidArgumentException('Database connection is not set.');
 	}
 
 	$dsarray = [];
