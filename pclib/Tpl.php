@@ -569,7 +569,7 @@ function print_String($id, $sub, $s)
 
 	if (isset($elem['size'])) {
 		if (!isset($elem['endian'])) $elem['endian'] = '...';
-		if(Str::length($s) > $elem['size'] + 2/*add length of endian*/) {
+		if(Str::length($s) > (int)$elem['size'] + 2/*add length of endian*/) {
 			if ($elem['tooltip']) $title = $s;
 			$s = Str::substr($s, 0, $elem['size']) . $elem['endian'];
 		}

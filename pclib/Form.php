@@ -1078,7 +1078,7 @@ function getVisibleElements()
 		$value = $this->values[$id];
 
 		if ($value == '') {
-			$elem['value_text'] = $elem['emptylb'];
+			$elem['value_text'] = $elem['emptylb'] ?? '';
 			$list[] = $elem;
 			continue;
 		}
