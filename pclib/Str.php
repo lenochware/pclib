@@ -44,7 +44,7 @@ static function format($str, array $params, $keepEmpty = false)
 		foreach($found[1] as $key) {
 			if ($keepEmpty and !isset($params[$i][$key])) continue;
 			$from[] = '{'.$key.'}';
-			$to[] = $params[$i][$key];
+			$to[] = $params[$i][$key] ?? null;
 		}
 		$newstr .= str_replace($from, $to, $str);
 	}
@@ -63,9 +63,9 @@ static function extractPath($path, $format)
 {
 	$path_a = pathinfo($path);
 	$trans = array(
-		'%d' => rtrim($path_a['dirname'],"/\\"),
-		'%f' => $path_a['filename'],
-		'%e' => $path_a['extension'],
+		'%d' => rtrim($path_a['dirname'] ?? '',"/\\"),
+		'%f' => $path_a['filename'] ?? '',
+		'%e' => $path_a['extension'] ?? '',
 	);
 	return strtr($format, $trans);
 }

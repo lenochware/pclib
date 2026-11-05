@@ -124,7 +124,7 @@ function getParam($name)
 
 /**
  * Return array [userName, password, defaultPassword].
- * @return array $credentials
+ * @return array|false $credentials False if user does not exists.
  */
 function getCredentials()
 {
@@ -138,6 +138,11 @@ function getCredentials()
  */
 public function __get($name)
 {
+	if (!array_key_exists($name, (array)$this->values)) {
+		$class = get_class($this);
+		throw new MemberAccessException("Cannot read an undeclared property $class->$name.");
+	}
+
 	return $this->values[$name];
 }
 
@@ -160,6 +165,7 @@ function passwordVerify(
 {
 	if (!$password) return false;
 	$cred = $this->getCredentials();
+	if (!$cred) return false;
 
 	if ($this->hasDefaultPassword()) {
 		return ($cred[2] == $password);

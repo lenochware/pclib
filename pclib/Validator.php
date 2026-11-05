@@ -141,7 +141,7 @@ class Validator extends system\ValidatorBase
 	{
 		$a = explode('..', $s);
 		if ($a[0] == '') $a[0] = -INF;
-		if ($a[1] == '') $a[1] = INF;
+		if (($a[1] ?? '') == '') $a[1] = INF;
 
 		return array((float)$a[0], (float)$a[1]);
 	}
@@ -153,7 +153,7 @@ protected function parseDate($datestr, $format)
 	$f = array_flip(preg_split("/[^a-z]+/i", $format, -1, PREG_SPLIT_NO_EMPTY));
 	$datearray = array();
 	foreach($fmtspec as $i) {
-		$datearray[] = isset($f[$i])? $d[$f[$i]] : date($i);
+		$datearray[] = isset($f[$i])? ($d[$f[$i]] ?? null) : date($i);
 	}
 	return $datearray;
 }

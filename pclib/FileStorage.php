@@ -68,7 +68,7 @@ function __construct($rootDir = '')
  */
 public function setOptions(array $options)
 {
-	$this->rootDir = $options['rootDir'];	
+	if (isset($options['rootDir'])) $this->rootDir = $options['rootDir'];
 }
 
 /**
@@ -385,7 +385,12 @@ function postedFiles($input_id = null)
 	$files = [];
 	$this->errors = [];
 	
-	$posted = $input_id? array($input_id => $_FILES[$input_id]) : (array)$_FILES;
+	if ($input_id) {
+		$posted = isset($_FILES[$input_id])? array($input_id => $_FILES[$input_id]) : [];
+	}
+	else {
+		$posted = (array)$_FILES;
+	}
 
 	//handle multiple file upload fields
 	$multiples = [];
@@ -441,8 +446,9 @@ function postedFiles($input_id = null)
 function output($loc, $showDownload = false)
 {
 	$file = $this->getFile($loc, true);
+	if (!$file) throw new FileNotFoundException("File not found.");
 	$path = $this->rootDir.$file['FILEPATH'];
-	if (!$file or !file_exists($path)) throw new FileNotFoundException("File not found.");
+	if (!file_exists($path)) throw new FileNotFoundException("File not found.");
 	$disposition = $showDownload? 'attachment':'inline';
 	header('Content-type: '.$file['MIMETYPE']);
 	header('Content-Disposition: '.$disposition.'; filename="'.$file['ORIGNAME'].'"');

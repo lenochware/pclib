@@ -61,6 +61,7 @@ function delete($keepDays, $allLogs = false)
 	$this->service('db');
 
 	$date = date('Y-m-d H:i:s', time() - ($keepDays * 24 * 3600));
+	$logger = null;
 	if (!$allLogs) $logger = $this->getLabelId($this->logger->name,1);
 
 	while(1) {

@@ -26,7 +26,7 @@ protected $headers;
 /** Return request method. 'POST','GET' etc. */
 function getMethod()
 {
-	return $_SERVER['REQUEST_METHOD'];
+	return $_SERVER['REQUEST_METHOD'] ?? null;
 }
 
 /** Is current request AJAX request? */
@@ -44,27 +44,27 @@ function isSSL()
 /** Return http host. */
 function getHost()
 {
-	return $_SERVER['HTTP_HOST'];
+	return $_SERVER['HTTP_HOST'] ?? null;
 }
 
 /** Return request port. */
 function getPort()
 {
-	return $_SERVER['SERVER_PORT'];
+	return $_SERVER['SERVER_PORT'] ?? null;
 }
 
 /** Return current url. */
 function getUrl()
 {
 	$scheme = $this->isSSL()? 'https://' : 'http://';
-	return sprintf("%s%s%s", $scheme, $_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI']);
+	return sprintf("%s%s%s", $scheme, $_SERVER['HTTP_HOST'] ?? '', $_SERVER['REQUEST_URI'] ?? '');
 }
 
 /** Return root Url. */
 function getRootUrl()
 {
 	$scheme = $this->isSSL()? 'https://' : 'http://';
-	return sprintf("%s%s%s", $scheme, $_SERVER['HTTP_HOST'], $this->getBaseUrl());	
+	return sprintf("%s%s%s", $scheme, $_SERVER['HTTP_HOST'] ?? '', $this->getBaseUrl());
 }
 
 
@@ -90,7 +90,7 @@ function getClientIp()
 /** Return server IP address (safe). */
 function getServerIp()
 {
-	return array_key_exists('SERVER_ADDR',$_SERVER) ? $_SERVER['SERVER_ADDR'] : $_SERVER['LOCAL_ADDR'];
+	return array_key_exists('SERVER_ADDR',$_SERVER) ? $_SERVER['SERVER_ADDR'] : ($_SERVER['LOCAL_ADDR'] ?? null);
 }
 
 function isConsole()
@@ -195,7 +195,7 @@ function getUserAgent()
 {
 	$agent = $version = '';
 	
-	$signature = $_SERVER['HTTP_USER_AGENT'];
+	$signature = $_SERVER['HTTP_USER_AGENT'] ?? '';
 	foreach ($this->userAgents as $name) {
 		if (stristr($signature, $name)) { $agent = $name; break; }
 	}

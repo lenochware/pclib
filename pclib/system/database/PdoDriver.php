@@ -61,7 +61,7 @@ function fetch($res = null, $fmt = 'a')
 	if (!$res) return array();
 	switch ($fmt) {
 		case 'f' : $row = $res->fetch(\PDO::FETCH_NUM);
-							 return $row[0];
+							 return $row[0] ?? null;
 		case 'o' : return $res->fetch(\PDO::FETCH_OBJ);
 		case 'r' : return $res->fetch(\PDO::FETCH_NUM);
 		case 'ar': return $res->fetch(\PDO::FETCH_BOTH);

@@ -124,7 +124,7 @@ class Tree extends system\BaseObject
 
       $line = [];
       foreach ($cells as $id) {
-        $line[] = $node[$id];
+        $line[] = $node[$id] ?? null;
       }
 
       $s .= trim(implode("|", $line), "|")."\n";
@@ -176,8 +176,8 @@ class Tree extends system\BaseObject
    */
   function get($nodeId)
   {
-    $key = $this->index[$nodeId];
-    return $this->nodes[$key] ?: null;
+    $key = $this->index[$nodeId] ?? null;
+    return ($this->nodes[$key] ?? null) ?: null;
   }
 
   /**
@@ -203,6 +203,7 @@ class Tree extends system\BaseObject
     $target = $this->get($nodeId);
     $key = $this->index[$nodeId] + 1;
 
+    $options = (array)$options + ['before' => null, 'child' => null];
     $data['LEVEL'] = $target['LEVEL'] + $options['child']? 1:0;
     if (!isset($data['ACTIVE'])) $data['ACTIVE'] = 1;
 
@@ -265,7 +266,7 @@ class Tree extends system\BaseObject
 
   private function fillNodes(&$nodes, $tree, $data, $id, $level)
   {
-    foreach ((array)$tree[$id] as $_id) {
+    foreach ((array)($tree[$id] ?? null) as $_id) {
       $row = $data[$_id];
       $row['LEVEL'] = $level;
       if (isset($tree[$_id])) $row['FOLDER'] = 'folder';
@@ -332,7 +333,7 @@ class Tree extends system\BaseObject
    */
   function expand(...$args)
   {
-    if (is_array($args[0])) $args = $args[0];
+    if (isset($args[0]) and is_array($args[0])) $args = $args[0];
 
     foreach($this->nodes as $i => $node)
     {
@@ -391,7 +392,7 @@ class Tree extends system\BaseObject
     $html = '';
     while($node = array_get($this->nodes, $i++))
     {
-      if (!$node['ACTIVE']) {
+      if (empty($node['ACTIVE'])) {
         $i = $this->nextSibling($i - 1);
 
         $next = array_get($this->nodes, $i);
@@ -462,7 +463,7 @@ class Tree extends system\BaseObject
     elseif ($strip == 'topitem') return $t->html('topitem');
     else {
       $t->values['items'] = '__items__';
-      list($begin, $end) = explode('__items__',  $t->html('folder'));
+      list($begin, $end) = array_pad(explode('__items__',  $t->html('folder')), 2, null);
       return ($strip == 'folderBegin')? $begin : $end;
     }
   }

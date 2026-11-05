@@ -64,7 +64,8 @@ function setUser(AuthUser $user)
 function getCredentials($userId)
 {
 	$this->service('db');
-	$data = $this->db->select($this->USERS_TAB, ['ID' => $userId]);	
+	$data = $this->db->select($this->USERS_TAB, ['ID' => $userId]);
+	if (!$data) return false;
 	return array($data['USERNAME'], $data['PASSW'], $data['DPASSW']);
 }
 

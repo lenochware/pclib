@@ -117,9 +117,15 @@ function __construct(?Db $db = null)
  */
 public function setOptions(array $options)
 {
+	foreach (['algo', 'secret'] as $key) {
+		if (!array_key_exists($key, $options)) {
+			throw new AuthException("Missing parameter '%s' in auth configuration.", [$key]);
+		}
+	}
+
 	$this->passwordAlgo = $options['algo'];
-	$this->secret = $options['secret'];	
-	$this->realm = $options['realm'] ?: $this->app->name;
+	$this->secret = $options['secret'];
+	$this->realm = ($options['realm'] ?? null) ?: $this->app->name;
 	if (isset($options['dsn'])) $this->getStorage()->db = new pclib\Db($options['dsn']);
 	if (isset($options['user-class'])) {
 		$this->userClass = $options['user-class'];
@@ -242,7 +248,7 @@ protected function setSessionUser(?pclib\AuthUser $user = null)
 
 protected function sessionHash($data)
 {
-	$remoteAddr = $this->verifyRemote? $_SERVER['REMOTE_ADDR'] : '';
+	$remoteAddr = $this->verifyRemote? ($_SERVER['REMOTE_ADDR'] ?? '') : '';
 	return md5(
 		 $remoteAddr    	//We fight against session stealing
 		 .$this->realm

@@ -92,7 +92,7 @@ public function setOptions(
 	array $options
 )
 {
-	$this->connect($options['dsn']);
+	$this->connect($options['dsn'] ?? null);
 }
 
 //parse connection string to array
@@ -452,7 +452,7 @@ function replace($tab, $data)
 	}
 	
 	if (is_array($data)) {
-		$sep = '';
+		$sep = $kstr = $vstr = '';
 		foreach($data as $k => $v) {
 			$kstr .= $sep.$this->escape($k, 'ident');
 			if (is_null($v)) $vstr .= $sep."NULL";
@@ -669,7 +669,7 @@ function tableName($dsstr)
 	}
 	else {
 		preg_match("/from\s+(\w+)/i", $dsstr, $found);
-		$table = $found[1];
+		$table = $found[1] ?? null;
 	}
 	return $table;
 }
@@ -878,7 +878,7 @@ private function parseSetClausule($sql)
 	foreach($found[1] as $i => $key) {
 		$data[$key] = trim($found[2][$i]);
 		if (strcasecmp($data[$key], 'null') == 0) $data[$key] = null;
-		if ($data[$key][0] == "'" and substr($data[$key],-1) == "'")
+		if (isset($data[$key][0]) and $data[$key][0] == "'" and substr($data[$key],-1) == "'")
 			$data[$key] = substr($data[$key],1,-1);
 	}
 	return $data;

@@ -57,7 +57,7 @@ function __construct($name = null)
  */
 public function setOptions(array $options)
 {
-	$this->name = $options['name'];	
+	$this->name = $options['name'] ?? null;
 }
 
 /** Return storage object - if not exists, create one. */

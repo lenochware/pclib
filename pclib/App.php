@@ -92,7 +92,7 @@ function __get($name)
 		case 'controller': return $this->router->action->controller;
 		case 'action':   return $this->router->action->method;
 		case 'routestr': return $this->router->action->path;
-		case 'content':  return $this->layout->values['CONTENT'];
+		case 'content':  return $this->layout->values['CONTENT'] ?? null;
 		case 'language': return $this->getLanguage();
 		case 'environment': return $this->environment;
 	}
@@ -105,7 +105,7 @@ function __set($name, $value)
 {
 	switch($name) {
 		case 'controller': $this->router->action->controller = $value; return;
-		case 'action':  $this->router->action->metod = $value; return;
+		case 'action':  $this->router->action->method = $value; return;
 		case 'content': $this->setContent($value); return;
 		case 'language': $this->setLanguage($value); return;
 		case 'environment': $this->setEnvironment($value); return;
@@ -386,7 +386,7 @@ function setLanguage($language)
 
 function getLanguage()
 {
-	if (!$this->services['translator']) return '';
+	if (empty($this->services['translator'])) return '';
 	return $this->services['translator']->language;
 }
 

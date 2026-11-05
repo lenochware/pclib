@@ -232,7 +232,7 @@ protected function prepareTemplate(Tpl $t)
 	$calculated = array();
 
 	foreach ($t->elements as $id => $el) {
-		if ($el['type'] == 'column' and ($el['get'] or $el['set'])) {
+		if ($el['type'] == 'column' and (!empty($el['get']) or !empty($el['set']))) {
 			$calculated[$id] = $id;
 		}
 
@@ -253,7 +253,7 @@ function setPrimaryId($id)
 
 function getPrimaryId()
 {
-	return $this->values[self::$options['primaryKey']];
+	return $this->values[self::$options['primaryKey']] ?? null;
 }
 
 /**
@@ -299,7 +299,7 @@ function hasColumn($name)
 {
 	$cols = $this->getColumns();
 	$el = $this->getElement($name);
-	return (bool)$cols[$name] ?: ($el['type'] == 'column');
+	return !empty($cols[$name]) ?: (($el['type'] ?? null) == 'column');
 }
 
 protected function getElement($name)
@@ -406,7 +406,7 @@ protected function getValuesForSave()
 	$elem = $this->getTemplate()->elements;
 
 	foreach ($this->modified as $name) {
-		if (isset($elem[$name]) and $elem[$name]['nosave']) continue;
+		if (!empty($elem[$name]['nosave'])) continue;
 		$values[$name] = $this->values[$name];
 	}
 	
@@ -420,8 +420,8 @@ protected function getValuesForSave()
  */
 function setRole($role)
 {
-	$el = $this->getTemplate()->elements[$role];
-	if ($el['type'] != 'role') {
+	$el = $this->getTemplate()->elements[$role] ?? null;
+	if (($el['type'] ?? null) != 'role') {
 		throw new Exception("Unknown role '%s'", array($role));
 	}
 
@@ -654,6 +654,7 @@ function getValue($name)
 protected function getCalculated($name)
 {
 	$el = $this->getElement($name);
+	$el['get'] = $el['get'] ?? '';
 	if ($el['get'] == 1) $el['get'] = 'get'.ucfirst($name);
 
 	if (!method_exists($this, $el['get'])) {
@@ -667,6 +668,7 @@ protected function getCalculated($name)
 protected function setCalculated($name, $value)
 {
 	$el = $this->getElement($name);
+	$el['set'] = $el['set'] ?? '';
 	if ($el['set'] == 1) $el['set'] = 'set'.ucfirst($name);
 
 	if (!method_exists($this, $el['set'])) {

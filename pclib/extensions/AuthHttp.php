@@ -39,8 +39,8 @@ protected function verifyCredentials(
 
 protected function getCredentials()
 {
-	$userName = $_SERVER['PHP_AUTH_USER'];
-	$password = $_SERVER['PHP_AUTH_PW'];
+	$userName = $_SERVER['PHP_AUTH_USER'] ?? null;
+	$password = $_SERVER['PHP_AUTH_PW'] ?? null;
 	if ($userName and $password) return array($userName, $password);
 	return false;
 }

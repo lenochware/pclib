@@ -173,11 +173,11 @@ public function validateElementCallback($event)
 	}
 
 	if (isset($elem['onvalidate'])) {
-		$value = $this->values[$id];
+		$value = $this->values[$id] ?? null;
 
 		$errorMsg = call_user_func($elem['onvalidate'], $this, $id, null, $value);
 		if ($errorMsg) {
-			$event->target->setError($elem['id'], $errorMsg, array($id, $value, $rule, $param));
+			$event->target->setError($elem['id'], $errorMsg, array($id, $value, null, null));
 
 			$event->propagate = false;
 			$event->result = false;
@@ -279,7 +279,7 @@ protected function getHttpData()
 	}
 
 	foreach ((array)$_FILES as $id => $aFile) {
-		if($this->elements[$id]['file'] and $aFile['size']) {
+		if(!empty($this->elements[$id]['file']) and $aFile['size']) {
 			if (is_string($aFile['name'])) $data[$id] = $aFile['name'];
 		}
 	}
@@ -426,7 +426,7 @@ function print_Errors()
 	if (!$this->invalid) return;
 	print "<div class=\"error-messages\">";
 	foreach($this->invalid as $id => $message) {
-		$lb = $this->elements[$id]['lb'] ?: $id;
+		$lb = ($this->elements[$id]['lb'] ?? null) ?: $id;
 		print "<div>$lb $message</div>";
 	}
 	print "</div>";
@@ -475,7 +475,7 @@ protected function trPrintElement($elem)
 protected function divPrintElement($elem)
 {
 	$id = $elem['id'];
-	if ($elem['hidden']) return;
+	if (!empty($elem['hidden'])) return;
 	print "<div>";
 	$this->print_Element($id, 'lb', null);
 	$value = $this->getValue($id);
@@ -513,7 +513,7 @@ function print_Input($id, $sub, $value)
 	$elem = $this->elements[$id];
 	$value = $this->escape($value);
 
-	if ($elem['file'] and $sub == 'filename') { print $value; return; }
+	if (!empty($elem['file']) and $sub == 'filename') { print $value; return; }
 
 	if (isset($elem['file-info']) and isset($elem['file-info'][$sub])) {
 		print $elem['file-info'][$sub];
@@ -522,19 +522,19 @@ function print_Input($id, $sub, $value)
 
 	$html5 = $this->getAttr($elem['id'],'html5');
 	$tag = $this->getTag($id);
-	$tag['maxlength'] = $elem['maxlength']? $elem['maxlength'] : $elem['size'];
+	$tag['maxlength'] = !empty($elem['maxlength'])? $elem['maxlength'] : $elem['size'];
 
 	//convert database date...
-	if ($elem['date'] and $value) {
+	if (!empty($elem['date']) and $value) {
 		$value = $this->formatDate($value, $elem['date']);
 	}
 
-	if ($elem['password']) $type = 'password';
-	elseif($elem['file'])  {
+	if (!empty($elem['password'])) $type = 'password';
+	elseif(!empty($elem['file']))  {
 		$type = 'file';
 		if (!empty($elem['accept'])) $tag['accept'] = $elem['accept'];
 
-		if ($elem['multiple']) {
+		if (!empty($elem['multiple'])) {
 			$tag['name'] = $tag['id'].'[]';
 			$tag['multiple'] = 1;
 		}
@@ -586,7 +586,7 @@ function print_Text($id, $sub, $value)
 
 	unset($tag['size']);
 	if (!$size = $elem['size']) $size = '60x6';
-	list($tag['cols'], $tag['rows']) = explode("x", $size);
+	list($tag['cols'], $tag['rows']) = array_pad(explode("x", $size), 2, null);
 	$tag['maxlength'] = $elem['maxlength'];
 
 	print $this->htmlTag('textarea', $tag, $value).$this->ieFix($id,$tag['name'],$value);
@@ -849,7 +849,7 @@ function preparedValues($skipEmpty = false)
 		if (!empty($elem['number']) and $elem['number'] != 'strict')
 			$value = $this->toNumber($value);
 
-		if (is_array($value) and $elem['multiple']) {
+		if (is_array($value) and !empty($elem['multiple'])) {
 			$value = implode(',', $value);
 		}
 
@@ -879,7 +879,7 @@ protected function uploadFs($tableName, $id)
 	$files = [];
 
 	foreach ($fs->postedFiles() as $file) {
-		$elem = $this->elements[$file['INPUT_ID']];
+		$elem = $this->elements[$file['INPUT_ID']] ?? null;
 		if (!$elem or !empty($elem['nosave'])) continue;
 
 		$entity = array_get($this->header, 'entity', $tableName);
@@ -900,7 +900,7 @@ protected function uploadBasic($old = [])
 {
 	foreach ($_FILES as $id => $aFile)
 	{
-		$elem = $this->elements[$id];
+		$elem = $this->elements[$id] ?? null;
 		if (!$elem) continue;
 		if ($aFile['error']) $this->invalid[$id] = 'Upload error ('.$aFile['error'].')';
 
@@ -1004,7 +1004,7 @@ function update($tab, $cond, ...$args)
 	}
 
 	if (count($_FILES)) {
-		$this->upload($tab, $old['ID'] ?: $old['id'], $old);
+		$this->upload($tab, ($old['ID'] ?? null) ?: ($old['id'] ?? null), $old);
 	}
 
 	$this->db->update($tab, $this->preparedValues(), $cond, $params);
@@ -1030,7 +1030,7 @@ function delete($tab, $cond, ...$args)
 	$data = $this->db->select($tab, $cond, $params);
 	$this->db->delete($tab, $cond, $params);
 
-	if ($this->header['fileupload']) {
+	if (!empty($this->header['fileupload'])) {
 		$entity = array_get($this->header, 'entity', $tab);
 		$this->deleteFiles($entity, $data);
 	}
@@ -1039,13 +1039,13 @@ function delete($tab, $cond, ...$args)
 protected function deleteFiles($entityName, $data)
 {
 	if ($this->fileStorage) {
-		$this->fileStorage->deleteFiles([$entityName, $data['ID'] ?: $data['id'] ]);
+		$this->fileStorage->deleteFiles([$entityName, ($data['ID'] ?? null) ?: ($data['id'] ?? null) ]);
 	}
 	else {
 		foreach ($this->elements as $id=>$elem) {
-			if (!$elem['file'] or !$elem['into']) continue;
+			if (empty($elem['file']) or empty($elem['into'])) continue;
 			$path = realpath($this->elements[$id]['into']);
-			if (!$data[$id]) continue;
+			if (empty($data[$id])) continue;
 			@unlink($path.'/'.$data[$id]);
 		}
 	}
@@ -1059,8 +1059,8 @@ protected function getVisibleIds()
 	{
 		if (!isset($this->elements[$id])) continue;
 		$elem = $this->elements[$id];
-		if ($elem['lb'] == '') continue;
-		if ($this->getAttr($elem['id'], 'noprint') or $elem['hidden']) continue;
+		if (($elem['lb'] ?? null) == '') continue;
+		if ($this->getAttr($elem['id'], 'noprint') or !empty($elem['hidden'])) continue;
 		$list[] = $id;
 	}
 
@@ -1098,7 +1098,7 @@ function getVisibleElements()
 				$value = implode(', ', $labels);
 			}
 			else {
-				$value = $this->app->text($value[0]? 'yes' : 'no');
+				$value = $this->app->text(!empty($value[0])? 'yes' : 'no');
 			}
 		}
 
@@ -1158,7 +1158,7 @@ function dbSync($tab)
 			$this->elements[$id]['nosave'] = 1;
 			continue;
 		}
-		if ($columns[$id]['type'] != 'string') continue;
+		if (($columns[$id]['type'] ?? null) != 'string') continue;
 		if (empty($el['maxlength']))
 			$this->elements[$id]['maxlength'] = $columns[$id]['size'];
 		if ($el['type'] != 'input') continue;
@@ -1170,7 +1170,7 @@ function dbSync($tab)
 //Has field extra storage for saving?
 protected function hasExtraSave($id)
 {
-	return ($this->elements[$id]['file'] and $this->fileStorage);
+	return (!empty($this->elements[$id]['file']) and $this->fileStorage);
 }
 
 function addHidden($name, $value)
@@ -1341,7 +1341,7 @@ protected function foot()
 	if ($this->hidden) {
 		ob_start();
 		foreach($this->hidden as $hid) {
-			$this->print_Input($hid, '', $this->values[$hid]);
+			$this->print_Input($hid, '', $this->values[$hid] ?? null);
 		}
 		$html = ob_get_contents();
 		ob_end_clean();

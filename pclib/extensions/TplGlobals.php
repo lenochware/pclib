@@ -54,7 +54,7 @@ class TplGlobals extends BaseObject implements IService
  */
 	function get($id)
 	{
-		return $this->values[$id];
+		return $this->values[$id] ?? null;
 	}
 
 /**

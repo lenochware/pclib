@@ -66,6 +66,8 @@ function getLabelId($label, $category)
 protected function removeUnusedLabel($id)
 {
 	$label = $this->db->select($this->LABELS_TAB, ['ID' => $id]);
+	if (!$label) return;
+
 	switch ($label['CATEGORY']) {
 		case 1: $fld = 'TRANSLATOR'; break;
 		case 2: $fld = 'LANG'; break;

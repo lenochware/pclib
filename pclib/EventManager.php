@@ -152,7 +152,7 @@ function stopPropagation()
 
 public function __get($name)
 {
-	return $this->data[$name];
+	return $this->data[$name] ?? null;
 }
 
 } //class Event

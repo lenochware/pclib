@@ -299,7 +299,7 @@ protected function getAttr($id, $attr)
 		$e = $this->elements[$id];
 		if (isset($e[$attr])) return $e[$attr];
 
-		while ($id = $this->elements[$id]['block']) {
+		while ($id = $this->elements[$id]['block'] ?? null) {
 			if (isset($this->elements[$id][$attr]))
 				return $this->elements[$id][$attr];
 		}
@@ -331,7 +331,7 @@ function getBlock($block)
 			if (isset($value)) break;
 		}
 
-		$values[$id] = isset($value)? $value : $this->values[$id];
+		$values[$id] = isset($value)? $value : ($this->values[$id] ?? null);
 	}
 
 	return $values;
@@ -356,7 +356,7 @@ function getValue($id)
 		$rowno = $this->elements[$block]['rowno'];
 
 		if (!empty($this->values[$block])) {
-			$value = array_get(isset($rowno)? $this->values[$block][$rowno] : $this->values[$block], $id);
+			$value = array_get(isset($rowno)? ($this->values[$block][$rowno] ?? null) : $this->values[$block], $id);
 		}
 		if (isset($value)) break;
 	}
@@ -373,13 +373,15 @@ protected function getVariable($id)
 		$id = '@'.substr($id, 6);
 	}
 
+	$bid = null;
+	$b = [];
 	if (isset($this->inBlock[0])) {
 		$bid = $this->inBlock[0];
-		$b = $this->elements[$bid];		
+		$b = $this->elements[$bid];
 	}
 
 	if (strpos($id, '@GET') === 0) {
-		list($tmp, $key) = explode('_', $id);
+		list($tmp, $key) = array_pad(explode('_', $id), 2, null);
 		$value = array_get($_GET, $key);
 	}
 	else {
@@ -387,8 +389,8 @@ protected function getVariable($id)
 			case '@baseurl': $value = BASE_URL; break;
 			case '@block_rowno': $value = $this->getRowNo(); break;
 			case '@block_count': $value = count(array_get($this->values, $bid, [])); break;
-			case '@block_top': $value = ($b['rowno'] == 0)? '1':'0'; break;
-			case '@block_bottom': $value = ($b['rowno'] == count(array_get($this->values, $bid, [])) - 1)? '1':'0'; break;
+			case '@block_top': $value = (($b['rowno'] ?? null) == 0)? '1':'0'; break;
+			case '@block_bottom': $value = (($b['rowno'] ?? null) == count(array_get($this->values, $bid, [])) - 1)? '1':'0'; break;
 		}	
 	}
 	
@@ -549,7 +551,7 @@ function print_Number($id, $sub, $value)
 {
 	$f = $this->elements[$id]["format"];
 	if ($f and is_numeric($value))
-		$value = number_format($value, $f[0], $f[1], $f[2]);
+		$value = number_format($value, $f[0] ?? 0, $f[1] ?? '', $f[2] ?? '');
 	print $value;
 }
 
@@ -890,10 +892,10 @@ protected function replaceParams($s)
 /** Return url for the element (button, link) with completed parameters. */
 protected function getUrl($elem)
 {
-	$url = $elem['href']? $elem['href'] : $elem['action'];
+	$url = !empty($elem['href'])? $elem['href'] : ($elem['action'] ?? null);
 	if ($url) return $this->replaceParams($url);
 
-	if ($elem['route']) {
+	if (!empty($elem['route'])) {
 		$rs = $this->replaceParams($elem['route']);
 		return $this->service('router')->createUrl($rs);
 	}
@@ -1110,7 +1112,7 @@ protected function getLkpList($list)
 	$items = array();
 	$length = count($list);
 	for ($i=0;$i<$length;$i+=2) {
-		$items[$list[$i]] = $list[$i+1];
+		$items[$list[$i]] = $list[$i+1] ?? null;
 	}
 	return $items;
 }
@@ -1175,9 +1177,9 @@ function __toString()
 function __get($name)
 {
 	if (strpos($name,'html_') === 0)
-		return $this->source->elements[$this->name]['html'][substr($name,5)];
+		return $this->source->elements[$this->name]['html'][substr($name,5)] ?? null;
 
-	return $this->source->elements[$this->name][$name];
+	return $this->source->elements[$this->name][$name] ?? null;
 }
 
 function __set($name, $value)

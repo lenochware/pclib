@@ -100,7 +100,7 @@ function execute($line)
 		$master = array_shift($terms);
 		$ok = $this->executeCmd($master);
 		if (!$ok) {
-			$this->setError($this->mng->errors[0]);
+			$this->setError($this->mng->errors[0] ?? null);
 			return false;
 		}
 		$this->masterCmd = $master;
@@ -126,7 +126,7 @@ protected function roleFilter(array $terms)
 	foreach ($terms as $cmd) {
 		$op    = trim($cmd[1]);
 		$ty   = $cmd[2];
-		$name  = $cmd[4];
+		$name  = $cmd[4] ?? null;
 		switch ($ty) {
 			case 'right':
 				$rid = $this->mng->sname($name, 'right');
@@ -154,7 +154,7 @@ protected function userFilter(array $terms)
 	foreach ($terms as $cmd) {
 		$op    = trim($cmd[1]);
 		$ty   = $cmd[2];
-		$name  = $cmd[4];
+		$name  = $cmd[4] ?? null;
 		switch ($ty) {
 			case 'active':  $filter['ACTIVE'] = ($op == '+')? 1:0; break;
 			case 'dpassw':
@@ -215,7 +215,7 @@ protected function query(array $terms)
 	$master = array_shift($terms);
 	$op    = trim($master[1]);
 	$ty   = $master[2];
-	$name  = strtr($master[4],'*','%');
+	$name  = strtr($master[4] ?? '','*','%');
 	$annot = array_get($master, 6, '');
 	
 	$pgsql = (get_class($this->db->drv) == 'pgsql')? $this->db->drv : null;
@@ -375,7 +375,7 @@ protected function executeCmd($cmd)
 {
 	$op    = trim($cmd[1]);
 	$opt   = $cmd[1].$cmd[2];
-	$name  = $cmd[4];
+	$name  = $cmd[4] ?? null;
 	$annot = array_get($cmd, 6, '');
 
 	if (!$op) return true;

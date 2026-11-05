@@ -27,7 +27,7 @@ function connect(
 	$ds
 )
 {
-	$port = $ds['port']? ';port='.$ds['port'] : '';
+	$port = !empty($ds['port'])? ';port='.$ds['port'] : '';
 	return $this->pdoConnect('mysql:dbname='.$ds['dbname'].';host='.$ds['host'].$port, $ds['user'], $ds['passw']);
 }
 

@@ -46,8 +46,14 @@ function __construct($db = null)
  */
 public function setOptions(array $options)
 {
+	foreach (['algo', 'secret'] as $key) {
+		if (!array_key_exists($key, $options)) {
+			throw new \pclib\AuthException("Missing parameter '%s' in auth configuration.", [$key]);
+		}
+	}
+
 	$this->passwordAlgo = $options['algo'];
-	$this->secret = $options['secret'];	
+	$this->secret = $options['secret'];
 	if (isset($options['dsn'])) $this->getStorage()->db = new \pclib\Db($options['dsn']);
 }
 

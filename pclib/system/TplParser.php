@@ -84,6 +84,7 @@ class TplParser extends BaseObject
 
 		$s = str_replace('\"', '&quot;', $s);
 		$lines = explode("\n", $s);
+		$typelist = [];
 		foreach ($lines as $line) {
 			$line = trim($line);
 			if ($line == '') continue;
@@ -193,7 +194,7 @@ class TplParser extends BaseObject
 		foreach ($partials as $line) {
 			$partial = $this->parseLine($line);
 
-			if (!$partial['file']) {
+			if (empty($partial['file'])) {
 				throw new \pclib\NoValueException("Attribute 'file' in 'include' must not be empty.");
 			}
 

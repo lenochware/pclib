@@ -89,17 +89,17 @@ protected function initPager()
 {
 	$pager = $this->getPager();
 
-	$pgid = $this->elements['pcl_document']['typelist']['pager'];
-	$el = $this->elements[$pgid];
+	$pgid = $this->elements['pcl_document']['typelist']['pager'] ?? null;
+	$el = $pgid? $this->elements[$pgid] : [];
 
-	if ($el['ul']) {
+	if (!empty($el['ul'])) {
 		$pager->pattern = '%1$s%3$s%2$s';
 		$pager->patternItems = '<li class="%s">%s</li>';
 	}
-	if ($el['pglen']) {
+	if (!empty($el['pglen'])) {
 		$pager->setPageLen($el['pglen']);
 	}
-	if ($el['size']) {
+	if (!empty($el['size'])) {
 		$pager->linkNumber = $el['size'];
 	}
 
@@ -244,11 +244,11 @@ function loadSession()
 
 	if ($s) {
 		$this->sql    = $s['sql'];
-		$this->hash   = $s['hash'];
+		$this->hash   = $s['hash'] ?? null; //deleted by Grid::invalidate()
 		$this->length = $s['length'];
 		$this->filter = $s['filter'];
 		$this->sortArray = $s['sortarray'];
-		$this->page = $s['page'];		
+		$this->page = $s['page'];
 	}
 }
 
@@ -533,7 +533,6 @@ protected function getQuery()
 				unset($this->sortArray[$id]);
 				continue;
 			}
-			$sort = $this->elements[$id]['sort'];
 			$orderby .= ','.$this->getOrderByField($id);
 			if ($id != $sval) $orderby .= ' desc';
 		}
@@ -552,7 +551,7 @@ protected function getQuery()
 //sort bind alphabetically by labels
 protected function getOrderByField($id)
 {
-	$sort = $this->elements[$id]['sort'];
+	$sort = $this->elements[$id]['sort'] ?? null;
 	if ($this->elements[$id]['type'] == 'bind') {
 		$sortedIds = array_keys($this->getItems($id));
 		if ($sortedIds) return "FIELD($id, ".implode(',', $sortedIds).')';
@@ -702,7 +701,7 @@ protected function getBaseUrl()
 	if (!$url) {
 		$a = clone $this->service('router')->action;
 		unset($a->params['sort'], $a->params['page']);
-		if (!$this->header['singlepage']) $a->params['grid'] = $this->name;
+		if (empty($this->header['singlepage'])) $a->params['grid'] = $this->name;
 		$url = $this->service('router')->createUrl($a);
 	}
 
@@ -715,7 +714,7 @@ private function sumFieldEquals(array $sum)
 	if ($this->sumArray['items']['pos'] > $sum['pos']) $rowno--;
 	$v1 = array_get($this->values['items'], [$rowno, $sum['field']]);
 	$v2 = array_get($this->values['items'], [$rowno+1, $sum['field']]);
-	if ($rowno == $this->pager->getValue('pglen')-1) $v2 = $this->sumArray['items']['last'][$sum['field']];
+	if ($rowno == $this->pager->getValue('pglen')-1) $v2 = array_get($this->sumArray['items'], ['last', $sum['field']]);
 	return ($v1 == $v2);
 }
 

@@ -63,8 +63,8 @@ protected static function getGenerator($path, $columns)
 {
 	$t = new PCTpl($path);
 
-	$options = $t->elements['templatefactory'];
-	if (!$options['create']) $options['create'] = 'tpl';
+	$options = $t->elements['templatefactory'] ?? [];
+	if (empty($options['create'])) $options['create'] = 'tpl';
 
 	$cols = array_values($columns);
 
@@ -100,7 +100,7 @@ protected static function getElements($options, $columns)
 		$el = array(
 			'type' => 'string',
 			'name' => $id,
-			'lb' => $col['comment'] ?: $id,
+			'lb' => ($col['comment'] ?? null) ?: $id,
 		);
 		$el = static::$getter($el, $col, $options);
 		$elements[] = static::mkEl($el);

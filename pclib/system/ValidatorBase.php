@@ -98,7 +98,7 @@ class ValidatorBase extends BaseObject
 			$message = $mEl['text'];
 		}
 		else {
-			$message = $this->messages[$messageId] ?: $messageId;
+			$message = ($this->messages[$messageId] ?? null) ?: $messageId;
 		}
 
 		if ($this->translator) {

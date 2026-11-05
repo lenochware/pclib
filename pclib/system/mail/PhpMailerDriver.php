@@ -77,7 +77,7 @@ class PhpMailerDriver
         $mailer->isHTML(true);
 
         $configurator = new DSNConfigurator();
-        $configurator->configure($mailer, $this->options['dsn']);
+        $configurator->configure($mailer, $this->options['dsn'] ?? '');
 
         // $mailer->SMTPAuth = true;
         // $mailer->SMTPSecure = 'tls';

@@ -27,15 +27,15 @@ class IOException extends Exception {}
 class MemberAccessException extends Exception {}
 class FileNotFoundException extends IOException {}
 class NoDatabaseException extends NoValueException {
-	public function __construct($message = 'Database connection required.', 
+	public function __construct($message = 'Database connection required.',
 		$code = 0, ?Exception $previous = null) {
-		parent::__construct($message, $code, $previous);
+		parent::__construct($message, null, $code, $previous);
 	}
 }
 class NotImplementedException extends Exception {
-	public function __construct($message = 'Feature is not implemented.', 
+	public function __construct($message = 'Feature is not implemented.',
 		$code = 0, ?Exception $previous = null) {
-		parent::__construct($message, $code, $previous);
+		parent::__construct($message, null, $code, $previous);
 	}
 }
 

@@ -115,7 +115,7 @@ function html()
 
 function onBeforeOut($event)
 {
-	$this->app->layout->values['CONTENT'] .= $this->html();
+	$this->app->layout->values['CONTENT'] = ($this->app->layout->values['CONTENT'] ?? '') . $this->html();
 }
 
 

@@ -69,7 +69,7 @@ function getNavig($options = array())
 	$options += $default;
 
 	$navig = [];
-	$maxlevel = $this->bookmarks[-1]['maxlevel'];
+	$maxlevel = $this->bookmarks[-1]['maxlevel'] ?? null;
 
 	for($i = 0; $i <= $maxlevel; $i++) {
 		if (!isset($this->bookmarks[$i])) continue;
@@ -178,7 +178,7 @@ protected function printScriptLink($src)
 	{
 		$src = $this->app->path($src);
 
-		if ($src[0] != '/') $src = BASE_URL.$src;
+		if (substr($src, 0, 1) != '/') $src = BASE_URL.$src;
 
 		$path = $this->app->paths['webroot'].$src;
 

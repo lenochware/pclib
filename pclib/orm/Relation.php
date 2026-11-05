@@ -32,13 +32,13 @@ class Relation extends Selection
  */
 function __construct(Model $model, $name)
 {
-	$params = $model->getTemplate()->elements[$name];
+	$params = $model->getTemplate()->elements[$name] ?? null;
 
-	if ($params['type'] != 'relation') {
+	if (($params['type'] ?? null) != 'relation') {
 		throw new Exception("Relation not found: '%s'", array($name));
 	}
 
-	if (!$params['table'] or !$params['key']) {
+	if (empty($params['table']) or empty($params['key'])) {
 		throw new Exception("Missing table or key name.");
 	}
 
@@ -59,7 +59,7 @@ function getType()
 
 function getJoinTableName()
 {
-	if ($this->params['through']) return $this->params['through'];
+	if (!empty($this->params['through'])) return $this->params['through'];
 
 	$names = array($this->model->getTableName(), $this->params['table']);
 	sort($names);
@@ -75,7 +75,7 @@ function getJoinCondition()
 		$t1 = $this->model->getTableName();
 		$t2 = $this->params['table'];
 		$tj = $this->getJoinTableName();
-		list($k1,$k2) = explode(',', $this->params['key']);
+		list($k1,$k2) = array_pad(explode(',', $this->params['key']), 2, null);
 		return "$tj.$k1=$t1.ID and $tj.$k2=$t2.ID";
 	}
 	else {
@@ -140,7 +140,7 @@ function clear()
 			break;
 		case 'many_to_many':
 			$joinTable = $this->getJoinTableName();
-			list($k1,$k2) = explode(',', $foreignKey);
+			list($k1,$k2) = array_pad(explode(',', $foreignKey), 2, null);
 
 			$this->from($table);
 			if(!isset($this->query['whereJoin'])) $this->query['whereJoin'] = array();

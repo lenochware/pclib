@@ -44,13 +44,14 @@ class BaseObject
 			return $classDef;
 		}
 
-		list($name, $value) = $args;
+		$name = $args[0];
+		$value = $args[1] ?? null;
 
 		if (isset($value)) {
 			$classDef[$name] = $value;
 		}
 		else {
-			return $classDef[$name];
+			return $classDef[$name] ?? null;
 		}
 	}
 

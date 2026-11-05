@@ -61,7 +61,7 @@ function __construct($path = '', $sessName = '')
 	$this->form->_init();
 	
 	if (array_get($_REQUEST, 'submitted') == $this->name) {
-		$this->submitted = $_REQUEST['pcl_form_submit'] ?: true;
+		$this->submitted = array_get($_REQUEST, 'pcl_form_submit') ?: true;
 		$this->values = $this->getHttpData();
 	}
 }
@@ -171,7 +171,7 @@ function print_BlockRow($block_id, $rowno = null)
 protected function _init()
 {
 	parent::_init();
-	$this->pk = $this->elements['pcl_document']['typelist']['primary'];
+	$this->pk = $this->elements['pcl_document']['typelist']['primary'] ?? null;
 }
 
 function out($block = null)

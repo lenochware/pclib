@@ -95,8 +95,9 @@ function valid()
  */
 protected function newModel($data)
 {
-	$className = Model::className($this->query['from']);
-	$model = new $className($this->query['from']);
+	$from = $this->query['from'] ?? null;
+	$className = Model::className($from);
+	$model = new $className($from);
 
 	if (!$this->cachedTemplate) {
 		$this->cachedTemplate = $model->getTemplate();
@@ -428,11 +429,11 @@ function getSql()
 {
 	extract($this->query, EXTR_SKIP);
 	
-	if (!$select or !$from) return '';
+	if (empty($select) or empty($from)) return '';
 	
 	$sql = 'SELECT '.implode(',', $select).' FROM '.$from;
 	if (isset($where))  $sql .= ' WHERE '.implode(' AND ', array_unique($where));
-	if (isset($whereJoin))  $sql .= ($where? ' AND ':' WHERE ').implode(' AND ', array_unique($whereJoin));
+	if (isset($whereJoin))  $sql .= (($where ?? null)? ' AND ':' WHERE ').implode(' AND ', array_unique($whereJoin));
 	if (isset($group))  $sql .= ' GROUP BY '.$group;
 	if (isset($having)) $sql .= ' HAVING '.implode(' AND ', array_unique($having));
 	if (isset($order))  $sql .= ' ORDER BY '.implode(',', $order);

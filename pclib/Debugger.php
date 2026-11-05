@@ -235,7 +235,7 @@ protected function colorize($s, $type)
 		'integer'=>'number','double'=>'number','boolean'=>'other',
 		'NULL'=>'other','array'=>'keyword','object'=>'keyword','string'=>'string'
 	);
-	$color = $this->colors[$trans[$type]];
+	$color = $this->colors[$trans[$type] ?? 'other'];
 	return "<span style=\"color:$color\">$s</span>";
 }
 

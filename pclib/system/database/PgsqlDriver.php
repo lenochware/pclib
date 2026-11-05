@@ -106,7 +106,7 @@ function fetch($res = null, $fmt = 'a')
 	if (!$res) return array();
 	switch ($fmt) {
 		case 'f' : $row = @pg_fetch_row($res);
-							 return $row[0];
+							 return $row[0] ?? null;
 		case 'o' : $data = @pg_fetch_object($res); break;
 		case 'r' : $data = @pg_fetch_row($res);    break;
 		case 'ar': $data = @pg_fetch_array($res);  break;
@@ -137,6 +137,7 @@ function dbName()
 
 function indexes($table)
 {
+	$dbname = '';
 	if (strpos($table, '.')) list($dbname, $table) = explode('.', $table);
 	if (!$dbname) $dbname = $this->dbName();
 
@@ -170,6 +171,7 @@ function indexes($table)
 
 function columns($table)
 {
+	$dbname = '';
 	if (strpos($table, '.')) list($dbname, $table) = explode('.', $table);
 	if (!$dbname) $dbname = $this->dbName();
 
@@ -212,10 +214,10 @@ private function u_type($type, $size)
 	'smallint' => 'int:2','serial' => 'int:4','text' => 'string:65535',
 	'timestamp' => 'date:2',
 	);
-	$type = $native[$type];
+	$type = $native[$type] ?? null;
 	if (!$type) return array(null, $size);
 	$type = explode(':', $type);
-	if (!$type[1]) $type[1] = $size;
+	if (empty($type[1])) $type[1] = $size;
 	return $type;
 }
 
