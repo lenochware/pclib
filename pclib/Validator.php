@@ -165,7 +165,7 @@ function isDateTime($value, $format = '')
 
 	if (!$format or $format == 1) $format = $this->dateTimeFormat;
 	list($d,$m,$y,$h,$i,$s) = $this->parseDate($value, $format);
-	if (!checkdate($m,$d,$y)) return false;
+	if (!checkdate((int)$m, (int)$d, (int)$y)) return false;
 	if (isset($h) and !$this->isTime($h.':'.$i.':'.($s ?: '00'))) return false;
 	return true;
 }

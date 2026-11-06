@@ -506,7 +506,7 @@ protected function applyFilter(array $dataArray)
 	for($i = 0; $i < count($dataArray); $i++) {
 		$skip = 0;
 		foreach ($this->filter as $col => $v) {
-			if (!fnmatch($this->filter[$col], $dataArray[$i][$col])) {
+			if (!fnmatch($this->filter[$col], $dataArray[$i][$col] ?? '')) {
 				$skip = 1;
 				break;
 			}

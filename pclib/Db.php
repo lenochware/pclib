@@ -603,14 +603,23 @@ function fetchPair($res = null)
 	while ($row = $this->drv->fetch($res, 'r')) {
 		if (!$n) $n = count($row);
 		if ($n == 1) $rows[] = $row[0];
-		elseif($n == 2) $rows[$row[0]] = $row[1];
+		elseif($n == 2) $rows[$this->arrayKey($row[0])] = $row[1];
 		else {
 			$id = array_shift($row);
-			$rows[$id] = $row;
+			$rows[$this->arrayKey($id)] = $row;
 		}
 	}
 
 	return $rows;
+}
+
+/*
+ * Float array key is truncated to int (and deprecated in php 8.1).
+ * Since php 8.1 PDO returns native floats, keep them as strings like in php 7.
+ */
+private function arrayKey($value)
+{
+	return is_float($value)? (string)$value : $value;
 }
 
 /**

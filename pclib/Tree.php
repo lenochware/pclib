@@ -163,7 +163,7 @@ class Tree extends system\BaseObject
     $node = [];
     foreach($cells as $i=>$name) { $node[$name] = array_get($part, $i); }
     $path = $node['PATH']; unset($node['PATH']);
-    $node['LEVEL'] = substr_count($path, '/');
+    $node['LEVEL'] = substr_count($path ?? '', '/');
     $node['LABEL'] = $node['LEVEL']? substr($path,strrpos($path, '/') + strlen('/')) : $path;
     if(!isset($node['ACTIVE'])) $node['ACTIVE'] = 1;
     return $node;

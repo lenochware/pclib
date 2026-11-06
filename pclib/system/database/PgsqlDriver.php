@@ -125,7 +125,7 @@ function lastError()
 
 function codePage($cp)
 {
- $ret = pg_set_client_encoding($cp);
+ $ret = pg_set_client_encoding($this->connection, $cp);
  if ($ret == -1) { $this->seterror('Failed set client encoding.'); return false; }
  return true;
 }
@@ -231,7 +231,7 @@ function escape($str, $type = 'string')
 {
 	if ($type == 'ident') return $this->quoteIdent($str);
 	if (!$str or is_numeric($str)) return $str;
-	return pg_escape_string($str);
+	return pg_escape_string($this->connection, $str);
 }
 
 } //class

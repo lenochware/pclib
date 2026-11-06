@@ -1238,7 +1238,7 @@ protected function toSqlDate($dtstr, $fmtstr = '')
 
 	while ($fmtpart = array_shift($fmt)) {
 		if (!in_array($fmtpart, $fmtspec)) continue;
-		$dtpart = str_pad(array_shift($dt), 2, "0", STR_PAD_LEFT);
+		$dtpart = str_pad(array_shift($dt) ?? '', 2, "0", STR_PAD_LEFT);
 		if ($fmtpart == 'y') { $dtpart = "20$dtpart"; $fmtpart = 'Y'; }
 		$oDT->$fmtpart = $dtpart;
 	}
@@ -1250,7 +1250,7 @@ protected function toSqlDate($dtstr, $fmtstr = '')
  */
 protected function toNumber($value)
 {
-	$number = preg_replace('/[^\d\.]+/','', $value);
+	$number = preg_replace('/[^\d\.]+/','', $value ?? '');
 	return (strlen($number) > 0)? $number : null;
 }
 
@@ -1414,7 +1414,7 @@ private function getValidationString()
 			break;
 		}
 
-		$lb = strip_tags(strtr($elem['lb'],'"|',"'/")) ?: $id;
+		$lb = strip_tags(strtr($elem['lb'] ?? '','"|',"'/")) ?: $id;
 
 		$output[] = "$id|$lb|$required|$rule|$options";
 	}

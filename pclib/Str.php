@@ -33,14 +33,14 @@ const ALPHASPEC = self::ALPHANUM . '!@#$%^&*()-_=+[]{}|;:\,.<>/?';
  */
 static function format($str, array $params, $keepEmpty = false)
 {
-	preg_match_all("/{([a-z0-9_.]+)}/i", $str, $found);
+	preg_match_all("/{([a-z0-9_.]+)}/i", $str ?? '', $found);
 	if (!$found[1]) return $str;
 	if (!is_array(array_get($params, 0))) $params = array($params);
 
 	$n = count($params);
 	$newstr = '';
 	for ($i = 0; $i < $n; $i++) {
-		$from = $to = null;
+		$from = $to = [];
 		foreach($found[1] as $key) {
 			if ($keepEmpty and !isset($params[$i][$key])) continue;
 			$from[] = '{'.$key.'}';
@@ -61,7 +61,7 @@ static function format($str, array $params, $keepEmpty = false)
  */
 static function extractPath($path, $format)
 {
-	$path_a = pathinfo($path);
+	$path_a = pathinfo($path ?? '');
 	$trans = array(
 		'%d' => rtrim($path_a['dirname'] ?? '',"/\\"),
 		'%f' => $path_a['filename'] ?? '',
@@ -109,7 +109,7 @@ static function random($size = 16, $characters = self::ALPHANUM)
  */
 static function match($str, $pattern)
 {
-    preg_match($pattern.'u', $str, $matches);
+    preg_match($pattern.'u', $str ?? '', $matches);
 
     if (! $matches) {
         return '';
@@ -127,7 +127,7 @@ static function match($str, $pattern)
  */
 static function matchAll($str, $pattern)
 {
-    preg_match_all($pattern.'u', $str, $matches);
+    preg_match_all($pattern.'u', $str ?? '', $matches);
 
     if (empty($matches[0])) {
         return [];
@@ -145,19 +145,20 @@ static function matchAll($str, $pattern)
  */
 static function replace($str, $search, $replace)
 {
-	return preg_replace($search.'u', $replace, $str);
+	return preg_replace($search.'u', $replace, $str ?? '');
 }
 
 /** @see mb_substr() */
 static function substr($str, $start, $length = null)
 {
+	$str = $str ?? '';
 	return mb_substr($str, $start, is_null($length)? mb_strlen($str, 'UTF-8') : $length, 'UTF-8');
 }
 
 /** @see mb_strpos() */
 static function strpos($str, $search, $offset = 0)
 {
-	return mb_strpos($str, $search, $offset, 'UTF-8');
+	return mb_strpos($str ?? '', $search, $offset, 'UTF-8');
 }
 
 /** @see mb_strlen() */
@@ -169,18 +170,19 @@ static function length($str)
 /** @see mb_strtoupper() */
 static function upper($str)
 {
-	return mb_strtoupper($str, 'UTF-8');
+	return mb_strtoupper($str ?? '', 'UTF-8');
 }
 
 /** @see mb_strtolower() */
 static function lower($str)
 {
-	return mb_strtolower($str, 'UTF-8');
+	return mb_strtolower($str ?? '', 'UTF-8');
 }
 
 /** @see str_pad() */
 static function lpad($str, $length, $pad = ' ')
 {
+  $str = $str ?? '';
   $short = max(0, $length - mb_strlen($str));
   return mb_substr(str_repeat($pad, $short), 0, $short).$str;
 }
@@ -188,6 +190,7 @@ static function lpad($str, $length, $pad = ' ')
 /** @see str_pad() */
 static function rpad($str, $length, $pad = ' ')
 {
+  $str = $str ?? '';
   $short = max(0, $length - mb_strlen($str));
   return $str.mb_substr(str_repeat($pad, $short), 0, $short);
 }
@@ -195,13 +198,13 @@ static function rpad($str, $length, $pad = ' ')
 /** Return true if  $str starts with $search. */
 static function startsWith($str, $search)
 {
-	return (strpos($str, $search) === 0);
+	return (strpos($str ?? '', $search) === 0);
 }
 
 /** Return true if  $str ends with $search. */
 static function endsWith($str, $search)
 {
-	$end = substr($str, -strlen($search));
+	$end = substr($str ?? '', -strlen($search));
 	return ($search === $end);
 }
 
@@ -226,6 +229,8 @@ static function filter($str, $preserve)
  */
 static function contains($str, $search, $ignoreCase = false)
 {
+    $str = $str ?? '';
+
     if ($ignoreCase) {
         $str = mb_strtolower($str);
         $search = mb_strtolower($search);
@@ -293,7 +298,7 @@ static function ascii($str)
 	'Ő'=>'O','Ű'=>'U',
 	);
 
-	return preg_replace('/[^(\x20-\x7F)]*/','', strtr($str, $accents));
+	return preg_replace('/[^(\x20-\x7F)]*/','', strtr($str ?? '', $accents));
 }
 
 /** @see htmlspecialchars() */

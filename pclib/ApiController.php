@@ -74,7 +74,7 @@ class ApiController extends Controller
 		if (!$pathArray) $pathArray = ['index'];
 
 		$path = array_reduce($pathArray, function($ret, $item) { return $ret.ucfirst($item); });
-		$name = strtolower( $this->request->method).$path.'Action';
+		$name = strtolower( $this->request->method ?? '').$path.'Action';
 		$this->action = $name;
 
 		return method_exists($this, $name)? $name : '';

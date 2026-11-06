@@ -291,8 +291,8 @@ protected function traceArray($e = null)
 	$maxlen = array(0,0);
 	foreach(array_reverse($strace) as $call) {
 
-		if (!isset($call['line'])) $call['line'] = null;
-		if (!isset($call['file'])) $call['file'] = null;
+		if (!isset($call['line'])) $call['line'] = '';
+		if (!isset($call['file'])) $call['file'] = '';
 		if (!isset($call['args'])) $call['args'] = [];
 
 		if (isset($call['class'])) {
