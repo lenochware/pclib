@@ -102,7 +102,7 @@ function translate($s, array $params = [])
 
 	$ts = array_get($this->cache, $s);
 	if (!$ts) $ts = $s;
-	if ($params) $ts = vsprintf ($ts, $params);
+	if ($params) $ts = Str::vsprintf($ts, $params);
 	return $ts;
 }
 

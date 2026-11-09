@@ -73,9 +73,11 @@ function __construct($path = '', $sessName = '')
  **/
 protected function getHttpData()
 {
-	$data = array_get($this->header['get']? $_GET : $_POST, 'data');
-	$rowdata = $this->header['get']? $_GET['rowdata'] : $_POST['rowdata'];
-
+	$request = $this->header['get']? $_GET : $_POST;
+	$data = array_get($request, 'data');
+	$rowdata = array_get($request, 'rowdata');
+	if (!is_array($data)) $data = [];
+	if (!is_array($rowdata)) $rowdata = [];
 
 	if ($this->config['pclib.security']['form-prevent-mass']) {
 		$validKeys = $this->getEditables();
@@ -105,7 +107,8 @@ protected function getValues()
 	$rows = parent::getValues();
 	if ($this->submitted) {
 		foreach ($rows as $i => $row) {
-			$rows[$i] = array_merge($rows[$i],$this->values['items'][$i]);
+			$item = $this->values['items'][$i] ?? null; //row may not be posted
+			if (is_array($item)) $rows[$i] = array_merge($rows[$i], $item);
 		}
 	}
 	return $rows;

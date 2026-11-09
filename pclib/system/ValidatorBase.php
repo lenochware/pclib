@@ -105,7 +105,7 @@ class ValidatorBase extends BaseObject
 			$s = $this->translator->translate($message, $args);
 		}
 		else {
-			$s = vsprintf($message, $args);
+			$s = \pclib\Str::vsprintf($message, $args);
 		}
 
 		$this->errors[$id] = $s;

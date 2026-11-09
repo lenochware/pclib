@@ -40,7 +40,7 @@ class BaseObject
 			return $classDef;
 		}
 		elseif(is_array($args[0])) {
-			self::$defaults[get_called_class()] = array_merge($classDef, $args[0]);
+			self::$defaults[get_called_class()] = array_merge((array)$classDef, $args[0]);
 			return $classDef;
 		}
 

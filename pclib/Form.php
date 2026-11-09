@@ -1085,7 +1085,12 @@ function getVisibleElements()
 
 		if ($elem['type'] == 'radio' or $elem['type'] == 'select') {
 			$items = $this->getItems($id, true);
-			$value = $items[$value];
+			if (is_array($value)) { //select multiple
+				$value = implode(', ', array_intersect_key($items, array_flip($value)));
+			}
+			else {
+				$value = $items[$value] ?? null;
+			}
 		}
 		elseif ($elem['type'] == 'check') {
 			$value = $this->getValue($id);

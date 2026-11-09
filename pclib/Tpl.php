@@ -610,7 +610,7 @@ function print_Bind($id, $sub, $value)
 		$value = implode (', ',$checked);
 	}
 	else {
-		if(isset($value,$items[$value])) $value = $items[$value];
+		if(is_scalar($value) and isset($items[$value])) $value = $items[$value];
 		elseif(isset($value,$items['*'])) $value = $items['*'];
 		else $value = array_get($items, $elem['default']);
 	}
@@ -782,7 +782,7 @@ function print_Block($block)
 	array_unshift($this->inBlock, $block);
 
 	if ($b['repeat']) $count = $b['repeat'];
-	else $count = isset($this->values[$block][0])? count($this->values[$block]):0;
+	else $count = (isset($this->values[$block][0]) and is_countable($this->values[$block]))? count($this->values[$block]):0;
 
 	if ($count and empty($b['noprint'])) {
 		for ($rowno = 0; $rowno < $count; $rowno++) {

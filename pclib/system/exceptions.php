@@ -11,7 +11,7 @@ class Exception extends \Exception
 	public function __construct($message, $args = null, $code = 0, ?\Exception $previous = null)
 	{
 		if (is_array($args)) {
-			$message = vsprintf($message, $args);
+			$message = Str::vsprintf($message, $args);
 		}
 		parent::__construct($message, $code, $previous);
 	}

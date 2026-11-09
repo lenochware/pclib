@@ -120,6 +120,7 @@ function fetch($res = null, $fmt = 'a')
 
 function lastError()
 {
+	if (!$this->connection) return ''; //connection failed
 	return pg_last_error($this->connection);
 }
 
@@ -231,6 +232,10 @@ function escape($str, $type = 'string')
 {
 	if ($type == 'ident') return $this->quoteIdent($str);
 	if (!$str or is_numeric($str)) return $str;
+	if (is_array($str)) {
+		trigger_error('Array cannot be used as query parameter.', E_USER_WARNING);
+		return '';
+	}
 	return pg_escape_string($this->connection, $str);
 }
 

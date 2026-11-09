@@ -151,7 +151,8 @@ function getLog($rowCount, ?array $filter = [])
 	);
 
 	foreach($events as $i => $tmp) {
-		$events[$i]['IP'] = long2ip($events[$i]['IP']);
+		$ip = $events[$i]['IP']; //can be '' - ip2long() returns false for IPv6
+		$events[$i]['IP'] = (is_numeric($ip) or is_null($ip))? long2ip((int)$ip) : null;
 	}
 
 	return $events;

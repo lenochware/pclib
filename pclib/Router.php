@@ -225,6 +225,7 @@ class Action
 	function fromString($s)
 	{
 		$this->module = $this->controller = $this->method = '';
+		if (!is_scalar($s)) $s = ''; //e.g. ?r[]=x in url
 
 		$allowedChars = "a-z0-9_:,;@ \-\.\/";	
 		$parts = $s? explode('/', preg_replace("/[^$allowedChars]/i","", $s)) : [];

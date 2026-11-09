@@ -114,9 +114,15 @@ protected function getObject($variable, $level)
 	foreach ($props as $prop) {
 		$private = $prop->isPrivate()? 1 : ($prop->isProtected()? 2 : 0);
 		if ($private and !$this->showPrivate) continue;
-		//if ($private) $prop->setAccessible(true);
-		
-		$node = $this->dumpArray($prop->getName(), $prop->getValue($variable), $level);
+		if ($private and PHP_VERSION_ID < 80100) $prop->setAccessible(true);
+
+		if ($prop->isInitialized($variable)) {
+			$node = $this->dumpArray($prop->getName(), $prop->getValue($variable), $level);
+		}
+		else { //typed property without value
+			$node = $this->dumpArray($prop->getName(), null, $level);
+			$node['value'] = $this->useHtml? $this->colorize('uninitialized', 'NULL') : 'uninitialized';
+		}
 		$node['private'] = $private;
 		$nodes[] = $node;
 	}
@@ -249,9 +255,10 @@ protected function colorize($s, $type)
 function getSource($fileName, $line, $width = 3)
 {
 	$s = '';
+	if (!$fileName or !is_file($fileName)) return $s;
 	$source = file($fileName);
 	for ($i = $line - $width; $i <= $line + $width; $i++) {
-		$s .= (($i == $line)? '->':'  ').$source[$i-1];
+		$s .= (($i == $line)? '->':'  ').($source[$i-1] ?? '');
 	}
 	if ($this->useHtml) $s = "<pre class=\"debug-source\" style=\"background:#eee\">$s</pre>";
 	return $s;
@@ -425,9 +432,9 @@ function simpleDump($var)
 		if ($var instanceof \SensitiveParameterValue) return '';
 		$reflection = new \ReflectionClass($var);
 		foreach ($reflection->getProperties() as $property) {
-			//$property->setAccessible(true);
-			$value = $property->getValue($var);
-			$vs .=  $property->getName().': '.$this->stringify($value, false)."\n";
+			if (PHP_VERSION_ID < 80100) $property->setAccessible(true);
+			$value = $property->isInitialized($var)? $this->stringify($property->getValue($var), false) : 'uninitialized';
+			$vs .=  $property->getName().': '.$value."\n";
 		}
 	} elseif (is_array($var)) {
 		$output = [];

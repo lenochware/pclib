@@ -46,7 +46,13 @@ class Validator extends system\ValidatorBase
 	function maxFileSize($file, $size)
 	{
 		if (!$file) return;
-		return ($file['size'] <= $size * 1024 * 1024);
+
+		//(array) - input with multiple files
+		foreach ((array)$file['size'] as $fileSize) {
+			if ($fileSize > $size * 1024 * 1024) return false;
+		}
+
+		return true;
 	}
 
 	/** Rule handler: Check file type. */
@@ -54,12 +60,23 @@ class Validator extends system\ValidatorBase
 	{
 		if (!$file) return;
 
+		//(array) - input with multiple files
+		$types = (array)$file['type'];
+		foreach ((array)$file['name'] as $i => $name) {
+			if (!$this->matchOneFileType($name, $types[$i] ?? '', $pattern)) return false;
+		}
+
+		return true;
+	}
+
+	protected function matchOneFileType($name, $type, $pattern)
+	{
 		foreach (explode(',', $pattern) as $value) {
 			$value = trim($value);
 			if ($value[0] == '.') {
-				if (Str::extractPath($file['name'], ".%e") == $value) return true;
+				if (Str::extractPath($name, ".%e") == $value) return true;
 			}
-			elseif (fnmatch($value, $file['type'])) return true;
+			elseif (fnmatch($value, $type)) return true;
 		}
 
 		return false;

@@ -430,7 +430,7 @@ function text($s, ...$args)
 	if (!empty($args) and is_array($args[0])) $args = $args[0];
 
 	if ($args and strpos($s, '%') !== false) {
-		$s = vsprintf ($s, $args);
+		$s = Str::vsprintf($s, $args);
 	}
 	return $s;
 }

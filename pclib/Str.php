@@ -307,5 +307,23 @@ static function htmlspecialchars($str)
 	return htmlspecialchars((string)$str, ENT_COMPAT, 'UTF-8');
 }
 
+/**
+ * vsprintf() which does not throw ValueError (php 8) when $args does not match $format.
+ * In such case warning is triggered and unformatted $format is returned.
+ * @see vsprintf()
+ */
+static function vsprintf($format, array $args)
+{
+	try {
+		$s = vsprintf($format, $args);
+	}
+	catch (\ValueError $e) {
+		trigger_error($e->getMessage(), E_USER_WARNING);
+		$s = false;
+	}
+
+	return ($s === false)? $format : $s;
+}
+
 
 }

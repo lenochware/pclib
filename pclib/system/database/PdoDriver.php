@@ -102,6 +102,10 @@ function escape($str, $type = 'string')
 {
 	if ($type == 'ident') return $this->quoteIdent($str);
 	if (!$str or is_numeric($str)) return $str;
+	if (is_array($str)) {
+		trigger_error('Array cannot be used as query parameter.', E_USER_WARNING);
+		return '';
+	}
 	return substr($this->connection->quote($str),1,-1);
 }
 

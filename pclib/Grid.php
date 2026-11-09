@@ -224,6 +224,7 @@ function summary($field, $sql = '', $sumblock = 'summary')
 function setSort($s)
 {
 	$this->sortArray = array();
+	if (!is_scalar($s)) return; //e.g. ?sort[]=x in url
 	preg_match_all("/(\w+)(:\w+)?/", $s, $found);
 	if (!$found) return;
 	foreach($found[1] as $i => $k) {
@@ -760,8 +761,10 @@ private function cmpFunc($id)
 
 	$func = function($a, $b) use ($id, $dir)
 	{
-		if ($a[$id] == $b[$id]) return 0;
-		return ($a[$id] < $b[$id]) ? -1*$dir : $dir;
+		$va = is_array($a)? ($a[$id] ?? null) : null;
+		$vb = is_array($b)? ($b[$id] ?? null) : null;
+		if ($va == $vb) return 0;
+		return ($va < $vb) ? -1*$dir : $dir;
 	};
 
 	return $func;

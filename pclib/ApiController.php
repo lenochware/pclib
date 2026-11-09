@@ -69,7 +69,8 @@ class ApiController extends Controller
 
 	function getMethod()
 	{
-		$pathArray = explode('/', $_GET['r'] ?? '');
+		$route = $_GET['r'] ?? '';
+		$pathArray = explode('/', is_scalar($route)? $route : ''); //e.g. ?r[]=x in url
 		array_shift($pathArray); //hack: throw away controller name
 		if (!$pathArray) $pathArray = ['index'];
 

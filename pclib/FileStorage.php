@@ -196,7 +196,8 @@ function copyFile($path, $loc)
  */
 function addFile($loc, $data)
 {
-	unset($data['FILE_ID'], $loc[2]);
+	unset($data['FILE_ID']);
+	if (is_array($loc)) unset($loc[2]);
 	return $this->setFile($loc, $data);
 }
 

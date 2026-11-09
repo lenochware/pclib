@@ -312,6 +312,7 @@ function from($s)
 protected function setWhereParams($s, $args)
 {
 	if (is_array($s)) {
+		if (!$s) throw new \pclib\Exception('Empty array in where() condition.');
 		return $this->createFieldList(' AND ', $s);
 	}
 
