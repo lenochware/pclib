@@ -31,6 +31,8 @@ function pdoConnect(
 	try {
 		$pdo = new \PDO($dsn, $user, $password);
 		$pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION /*SILENT?*/);
+		//Return numbers as strings - php 8.1+ returns native int/float (php 7 returned strings).
+		$pdo->setAttribute(\PDO::ATTR_STRINGIFY_FETCHES, true);
 		$this->connection = $pdo;
 		return $this->connection;
 	} catch (\PDOException $e) {

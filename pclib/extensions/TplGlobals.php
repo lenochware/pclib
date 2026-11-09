@@ -120,6 +120,9 @@ class TplGlobals extends BaseObject implements IService
 
 			// $t->addTag("global $id skip");
 
+			//global is not used in template - don't create incomplete element
+			if (!isset($t->elements[$id])) continue;
+
 			$t->elements[$id]['onprint'] = function($o, $id, $sub, $value) use($module) {
 
 				print $this->fetch(($module? "$module.":'') . $id, [$o, $id, $sub, $value]);

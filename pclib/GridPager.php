@@ -57,6 +57,7 @@ class GridPager extends system\BaseObject
 	 */
 	protected function clamp($num, $min, $max)
 	{
+		$num = (int)$num; //e.g. 'abc' from url - would be greater than $max in php 8
 		if ($max < $min) $max = $min;
 		if ($num < $min) $num = $min;
 		if ($num > $max) $num = $max;

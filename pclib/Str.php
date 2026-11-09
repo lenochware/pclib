@@ -198,6 +198,7 @@ static function rpad($str, $length, $pad = ' ')
 /** Return true if  $str starts with $search. */
 static function startsWith($str, $search)
 {
+	if ((string)$search === '') return false; //php 8 strpos() returns 0 for empty needle
 	return (strpos($str ?? '', $search) === 0);
 }
 
@@ -230,6 +231,7 @@ static function filter($str, $preserve)
 static function contains($str, $search, $ignoreCase = false)
 {
     $str = $str ?? '';
+    if ((string)$search === '') return false; //php 8 strpos() returns 0 for empty needle
 
     if ($ignoreCase) {
         $str = mb_strtolower($str);
