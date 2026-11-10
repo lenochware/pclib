@@ -62,8 +62,10 @@ function codePage($cp)
 
 function dbName()
 {
-	$q = $this->query("select DATABASE()");
-	return $this->fetch($q,'f');
+	//Path of the main database file
+	$q = $this->query("PRAGMA database_list");
+	$row = $this->fetch($q);
+	return $row['file'] ?? null;
 }
 
 function columns($table)
@@ -93,9 +95,14 @@ private function u_type($type)
 {
 	$size = null;
 	
-	if (strpos($type,'('))
-		list($type,$size) = sscanf($type, "%s(%d)");
-	
+	//e.g. 'varchar(255)'
+	if (preg_match('/^(.+?)\s*\(\s*(\d+)/', $type, $m)) {
+		$type = $m[1];
+		$size = (int)$m[2];
+	}
+
+	$type = strtolower(trim($type));
+
 	$native = array(
 	'integer' => 'int:8','bit' => 'bool',
 	'nvarchar' => 'string','nchar' => 'string','date' => 'date:1',

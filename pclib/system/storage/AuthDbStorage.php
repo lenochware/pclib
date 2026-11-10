@@ -99,7 +99,7 @@ protected function getRights($userId, array $roles)
 {
 	$rights = array();
 
-	$pgsql = (get_class($this->db->drv) == 'pgsql')? $this->db->drv : null;
+	$pgsql = ($this->db->drv instanceof \pclib\system\database\PgsqlDriver)? $this->db->drv : null;
 
 	$param['RIGHTS_TAB']   = $this->RIGHTS_TAB;
 	$param['REGISTER_TAB'] = $this->REGISTER_TAB;

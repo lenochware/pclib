@@ -34,7 +34,7 @@ function connect(
 	$ds
 )
 {
-	if ($ds['host'] != 'socket') $host = "host=".$ds['host'];
+	$host = ($ds['host'] != 'socket')? "host=".$ds['host'] : '';
 	$res = pg_connect(
 		$host." dbname=$ds[dbname] user=$ds[user] password=$ds[passw]",
 		$this->forceReconnect? PGSQL_CONNECT_FORCE_NEW : 0
@@ -51,7 +51,7 @@ function connect(
 function close()
 {
 	if (!$this->connection) return;
-	pgsql_close($this->connection);
+	pg_close($this->connection);
 	$this->connection = false;
 }
 
@@ -127,7 +127,7 @@ function lastError()
 function codePage($cp)
 {
  $ret = pg_set_client_encoding($this->connection, $cp);
- if ($ret == -1) { $this->seterror('Failed set client encoding.'); return false; }
+ if ($ret == -1) { $this->error = 'Failed set client encoding.'; return false; }
  return true;
 }
 

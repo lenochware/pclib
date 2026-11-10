@@ -187,7 +187,7 @@ function connect(
 	}
 
 	$this->drv = new $className;
-	$this->drv->verboseErrors = in_array('develop', $this->app->config['pclib.errors']);
+	$this->drv->verboseErrors = !empty($this->app->config['pclib.errors']['develop']);
 	$this->drv->forceReconnect = $this->forceReconnect;
 	$this->drv->connect($dsarray);
 	if (isset($dsarray['options']['charset'])) $this->drv->codePage($dsarray['options']['charset']);
@@ -354,7 +354,7 @@ function selectPair($dsstr, ...$args)
 **/
 function insert($tab, $data)
 {
-	if (!is_array($data) and get_class($this->drv) != 'mysql')
+	if (!is_array($data))
 		$data = $this->parseSetClausule($data);
 		
 	if (is_array($data)) {
@@ -425,7 +425,7 @@ function runDump($fileName, $skipErrors = false)
 		$sql .= $line;
 		if (preg_match('/;\s*$/iS', $line)) {
 			try {  $this->query($sql);  }
-			catch (Exception $e) {
+			catch (\Exception $e) {
 				$err++;
 				if (!$skipErrors) throw $e;
 			}
