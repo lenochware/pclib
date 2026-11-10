@@ -228,7 +228,7 @@ class MailMessage
         $this->attachments = $attachments;
     }
 
-    protected function parseName($input)
+    public function parseName($input)
     {
         if (preg_match('/^(.+?)\s*<[^>]+>$/u', $input, $matches)) {
             return trim($matches[1]);
@@ -237,7 +237,7 @@ class MailMessage
         return '';
     }
 
-    protected function parseEmail($input)
+    public function parseEmail($input)
     {
         // Pokud formát obsahuje email v hranatých závorkách
         if (preg_match('/<([^>]+)>/', $input, $matches)) {

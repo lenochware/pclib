@@ -28,6 +28,10 @@ class DebugDriver
     public function send(MailMessage $message)
     {
         print ($message->preview());
+
+        $message->status = MailMessage::STATUS_SUBMITTED;
+        $message->sendAt = date("Y-m-d H:i:s");
+        return true;
     }
 }
 

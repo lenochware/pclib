@@ -58,7 +58,13 @@ class PhpMailerDriver
 
         $mail->msgHTML($message->body);
 
-        $ok = $mail->send();
+        try {
+            $ok = $mail->send();
+        }
+        catch (Exception $e) { //PHPMailer exception - sending failed
+            $ok = false;
+            trigger_error('Mail sending failed: ' . $e->getMessage(), E_USER_WARNING);
+        }
 
         $message->status = $ok? MailMessage::STATUS_SUBMITTED : MailMessage::STATUS_FAILED;
         $message->sendAt = date("Y-m-d H:i:s");

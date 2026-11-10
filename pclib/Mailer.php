@@ -229,7 +229,7 @@ protected function template($id, array $data)
 public function schedule($id, array $data = [], array $mailFields = [])
 {
     $message = $this->create($id, $data, $mailFields);
-    $message->setStatus(MailMessage::STATUS_SCHEDULED);
+    $message->status = MailMessage::STATUS_SCHEDULED;
     return $this->save($message);
 }
 
@@ -242,6 +242,7 @@ public function dispatch($n = null)
 {
     $ok = $failed = 0;
 
+    $this->service('db');
     $mails = $this->db->selectAll(
         "select * from {table} where status='{status}' order by created_at
         ~ limit {n}",  
@@ -249,7 +250,7 @@ public function dispatch($n = null)
     );
 
     foreach ($mails as $mail) {
-        $message = $this->load($mail['id']);
+        $message = $this->load($mail['ID']);
         $this->send($message);
         $this->save($message);
 
@@ -345,7 +346,7 @@ protected function clearMessages()
     $keepDays = $this->options['keep_days'];
     if ($keepDays < 0) return;
 
-    $oldest = $this->db->select("select id, created_at FROM {0} where status > 1 ORDER BY id", $this->table);
+    $oldest = $this->db->select("select ID as id, CREATED_AT as created_at FROM {0} where status > 1 ORDER BY id", $this->table);
 
     if ($oldest) {
         $createdAt = new \DateTime($oldest['created_at']);
@@ -353,7 +354,8 @@ protected function clearMessages()
         $interval = $now->diff($createdAt);
 
         if ($interval->days > $keepDays) {
-            $this->db->delete($this->table, "status > 1 and (created_at < NOW() - INTERVAL {0} DAY)", $keepDays);
+            $limit = date('Y-m-d H:i:s', strtotime("-$keepDays days")); //portable (no NOW() - INTERVAL)
+            $this->db->delete($this->table, "status > 1 and created_at < '{0}'", $limit);
         }
     }    
 }
