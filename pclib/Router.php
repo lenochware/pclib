@@ -71,11 +71,12 @@ function addRedirect($old, $new, $code = 302)
  */
 function followRedirects()
 {
-	$redirect = $this->redirects[$this->action->path];
+	$redirect = $this->redirects[$this->action->path] ?? null;
 	if (!$redirect) return;
 
-	$this->action->path = $redirect['to'];
-	$url = $this->createUrl($this->action);
+	$action = new Action($redirect['to']);
+	$action->params = array_merge((array)$this->action->params, (array)$action->params);
+	$url = $this->createUrl($action);
 	header('Location: '. $url, true, $redirect['code']);
 	exit;
 }

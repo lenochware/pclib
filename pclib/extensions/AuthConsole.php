@@ -110,6 +110,8 @@ function execute($line)
 			$ok = $this->executeCmd($term);
 			if (!$ok) return false;
 		}
+
+	return true;
 }
 
 /** Helper for query() */
@@ -218,7 +220,7 @@ protected function query(array $terms)
 	$name  = strtr($master[4] ?? '','*','%');
 	$annot = array_get($master, 6, '');
 	
-	$pgsql = (get_class($this->db->drv) == 'pgsql')? $this->db->drv : null;
+	$pgsql = ($this->db->drv instanceof \pclib\system\database\PgsqlDriver)? $this->db->drv : null;
 
 	if ($op != '?') return false;
 	switch ($ty) {
@@ -527,7 +529,7 @@ protected function executeCmd($cmd)
 }
 
 /**Set message to $this->messages. */
-protected function message($message, $params)
+protected function message($message, $params = [])
 {
 	$this->messages[] = $this->app->text($message, $params);
 }

@@ -594,7 +594,7 @@ function run($rs = null)
 	$html = $ct->run($action);
 
 	$event = $this->trigger('app.after-run', ['action' => $action]);
-	if ($event and $event->propagate) return;
+	if ($event and !$event->propagate) return;
 
 	$this->setContent($html);
 }

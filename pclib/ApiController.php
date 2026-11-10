@@ -87,10 +87,11 @@ class ApiController extends Controller
 	 */
 	function getToken()
 	{
-		$headers = $this->request->getHeaders();
-		if (!isset($headers['Authorization'])) return '';
+		//header names are case-insensitive (http/2 sends lowercase)
+		$headers = array_change_key_case($this->request->getHeaders(), CASE_LOWER);
+		if (!isset($headers['authorization'])) return '';
 
-    if (preg_match('/Bearer\s(\S+)/', $headers['Authorization'], $matches)) {
+    if (preg_match('/Bearer\s(\S+)/', $headers['authorization'], $matches)) {
         return $matches[1];
     }
 

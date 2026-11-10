@@ -54,7 +54,7 @@ public function setOptions(array $options)
 
 	$this->passwordAlgo = $options['algo'];
 	$this->secret = $options['secret'];
-	if (isset($options['dsn'])) $this->getStorage()->db = new \pclib\Db($options['dsn']);
+	if (isset($options['dsn'])) $this->db = new \pclib\Db($options['dsn']);
 }
 
 /**

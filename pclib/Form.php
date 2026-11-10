@@ -1231,7 +1231,7 @@ protected function fileName($id)
 protected function toSqlDate($dtstr, $fmtstr = '')
 {
 	if (!$dtstr) return null;
-	$fmtspec = array('d','m','H','M','S','y','Y');
+	$fmtspec = array('d','m','H','i','s','y','Y');
 
 	$dt = preg_split("/[^0-9]+/", $dtstr);
 	if (!$fmtstr or $fmtstr == '1') $fmtstr = $this->config['pclib.locale']['datetime'];
@@ -1239,7 +1239,7 @@ protected function toSqlDate($dtstr, $fmtstr = '')
 	$fmt = $fmt[1];
 
 	$oDT = new \stdClass;
-	$oDT->d = $oDT->m = $oDT->H = $oDT->M = $oDT->S = '00'; $oDT->Y = '0000';
+	$oDT->d = $oDT->m = $oDT->H = $oDT->i = $oDT->s = '00'; $oDT->Y = '0000';
 
 	while ($fmtpart = array_shift($fmt)) {
 		if (!in_array($fmtpart, $fmtspec)) continue;
@@ -1247,7 +1247,7 @@ protected function toSqlDate($dtstr, $fmtstr = '')
 		if ($fmtpart == 'y') { $dtpart = "20$dtpart"; $fmtpart = 'Y'; }
 		$oDT->$fmtpart = $dtpart;
 	}
-	return "$oDT->Y-$oDT->m-$oDT->d $oDT->H:$oDT->M:$oDT->S";
+	return "$oDT->Y-$oDT->m-$oDT->d $oDT->H:$oDT->i:$oDT->s";
 }
 
 /**
