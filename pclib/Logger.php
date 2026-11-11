@@ -85,7 +85,7 @@ function log($category, $message_id, $message = null, $item_id = null)
 		'ACTION'  => $message_id,
 		'MESSAGE' => $message,
 		'ITEM_ID' => $item_id,
-		'IP'       => ip2long($this->app->request->clientIp),
+		'IP'       => ip2long($this->app->request->clientIp) ?: null, //false for IPv6 - '' fails in mysql strict mode
 		'UA'       => $ua[0] . ' ' . $ua[1],
 		'DT'       => date("Y-m-d H:i:s"),
 	);

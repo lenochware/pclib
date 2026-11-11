@@ -1357,6 +1357,14 @@ protected function foot()
 	return $html;
 }
 
+/**
+ * Return CSRF token stored in session.
+ * CSRF protection works only when session is active - without session
+ * empty token is used and check is effectively skipped. It's OK when user
+ * is authenticated by pclib Auth (it requires session), but not for apps using
+ * other authentication (e.g. http basic auth on webserver, ip address) - start
+ * session yourself in such case.
+ */
 private function getCsrfToken()
 {
 	if (!session_id()) return '';

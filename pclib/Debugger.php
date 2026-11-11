@@ -109,7 +109,7 @@ protected function getArray($variable, $level)
 protected function getObject($variable, $level)
 {
 	$nodes = array();
-	$rc = new \ReflectionClass($variable);
+	$rc = new \ReflectionObject($variable); //includes dynamic properties (stdClass etc.)
 	$props = $rc->getProperties();
 	foreach ($props as $prop) {
 		$private = $prop->isPrivate()? 1 : ($prop->isProtected()? 2 : 0);
@@ -400,7 +400,8 @@ function errorDump($message, $e = null)
 	if ($this->showSource) {
 		$sav = $this->useHtml;
 		$this->useHtml = false;
-		$node = end($this->traceArray($e));
+		$trace = $this->traceArray($e);
+		$node = end($trace);
 		$this->useHtml = $sav;
 		$s .= $this->getSource($node['file'], $node['line']);
 	}
@@ -430,7 +431,7 @@ function simpleDump($var)
 	if (is_object($var)) {
 		$output = [];
 		if ($var instanceof \SensitiveParameterValue) return '';
-		$reflection = new \ReflectionClass($var);
+		$reflection = new \ReflectionObject($var); //includes dynamic properties (stdClass etc.)
 		foreach ($reflection->getProperties() as $property) {
 			if (PHP_VERSION_ID < 80100) $property->setAccessible(true);
 			$value = $property->isInitialized($var)? $this->stringify($property->getValue($var), false) : 'uninitialized';

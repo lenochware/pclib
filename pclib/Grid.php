@@ -555,7 +555,8 @@ protected function getOrderByField($id)
 	$sort = $this->elements[$id]['sort'] ?? null;
 	if ($this->elements[$id]['type'] == 'bind') {
 		$sortedIds = array_keys($this->getItems($id));
-		if ($sortedIds) return "FIELD($id, ".implode(',', $sortedIds).')';
+		$quote = function($k) { return "'".$this->db->escape($k)."'"; };
+		if ($sortedIds) return "FIELD($id, ".implode(',', array_map($quote, $sortedIds)).')';
 	} 
 	return ($sort and $sort != '1')? $sort : $id;
 }

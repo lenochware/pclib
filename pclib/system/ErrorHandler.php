@@ -40,9 +40,8 @@ class ErrorHandler extends BaseObject
 	 */	
 	function register()
 	{
-		set_error_handler([$this, '_onError'], 
-			array_get($this->options, 'error_reporting', E_ALL ^ E_NOTICE)
-		);
+		//error types are filtered in _onError() according to options['error_reporting']
+		set_error_handler([$this, '_onError']);
 		set_exception_handler([$this, '_onException']);
 	}
 
@@ -95,19 +94,21 @@ class ErrorHandler extends BaseObject
 
 	/**
 	 * Callback for error handling.
-	 */	
+	 * Errors raised inside this handler are passed to php standard handler by php itself.
+	 */
 	function _onError($code, $message, $file, $line, $context = null)
 	{
-		// disable error capturing to avoid recursive errors
-		restore_error_handler();
+		//Not configured yet or error type not handled - use php standard handler.
+		if (!$this->options) return false;
+		if (!(array_get($this->options, 'error_reporting', E_ALL ^ E_NOTICE) & $code)) return false;
 
 		if (array_get($this->options, 'display') === 'php') return false;
 
 		//Handle warnings...
 		if ($this->codeSeverity($code) != 'Error') {
-			
-			//skip warning when '@' operator is used.
-			if (!error_reporting()) return;
+
+			//skip warning when '@' operator is used (in php 8 error_reporting() is not 0 there)
+			if (!(error_reporting() & $code)) return;
 
 			$this->_onWarning(
 				new \ErrorException($message, $code, 0, $file, $line)
@@ -129,6 +130,7 @@ class ErrorHandler extends BaseObject
 				return 'Warning';
 
 			case E_DEPRECATED:
+			case E_USER_DEPRECATED:
 			case E_NOTICE:
 			case E_USER_NOTICE:
 				return 'Notice';
@@ -149,8 +151,7 @@ class ErrorHandler extends BaseObject
 		if (!array_get($this->options, 'develop')) return;
 		if (!array_get($this->options, 'display')) return;
 
-		$this->service('debugger')->errorDump(
-			Str::format($this->MESSAGE_PATTERN, $this->getValues($e)),$e);
+		$this->displayError($e);
 	}
 
 	protected function getValues($e)
@@ -186,7 +187,7 @@ class ErrorHandler extends BaseObject
 			Str::format($this->MESSAGE_PATTERN, $this->getValues($e)),$e);
 		}
 		//fallback to most straighforward error message
-		catch(\Exception $ex) {
+		catch(\Throwable $ex) {
 			print $e->getMessage();
 			print "<br>Error while displaying exception: ".$ex->getMessage();
 		}
@@ -198,7 +199,7 @@ class ErrorHandler extends BaseObject
 	function displayProductionError($e)
 	{
 		if (!headers_sent()) {
-			header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
+			header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.1') . ' 500 Internal Server Error', true, 500);
 		}
 
 		try {
@@ -206,7 +207,7 @@ class ErrorHandler extends BaseObject
 			$t->values = $this->getValues($e);
 			print $t->html();
 		}
-		catch(\Exception $ex) {
+		catch(\Throwable $ex) {
 			print $e->getMessage();
 			print "<br>Error while displaying exception: ".$ex->getMessage();
 		}
@@ -224,7 +225,7 @@ class ErrorHandler extends BaseObject
 				Str::format($this->MESSAGE_LOG_PATTERN, $error)
 			);
 		}
-		catch(\Exception $ex) {
+		catch(\Throwable $ex) {
 			//print "<br>Error while logging exception: ".$ex->getMessage(); //silently ignore logger exceptions
 		}
 	}

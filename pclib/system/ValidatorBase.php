@@ -213,7 +213,9 @@ class ValidatorBase extends BaseObject
 
 		if (!empty($elem['file'])) {
 			$file = array_get($_FILES, $elem['id']);
-			$value = isset($file['name'])? $file : [];
+			//no new file uploaded (e.g. editing record with existing file) - nothing to validate
+			if (!array_filter((array)($file['name'] ?? []), 'strlen')) return true;
+			$value = $file;
 		}
 
 		foreach ((array)$elem as $rule => $param) {

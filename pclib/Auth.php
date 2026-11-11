@@ -88,7 +88,7 @@ function reloadLoggedUser()
 	$name = $this->loggedUser->values['USERNAME'];
 	$user = $this->getUser($name);
 
-	$this->setLoggedUser($user->isValid()? $user : null);
+	$this->setLoggedUser(($user and $user->isValid())? $user : null); //user may be deleted
 }
 
 /**

@@ -84,7 +84,7 @@ public function setOptions(array $options)
         throw new Exception("Mailer driver '".$this->options['driver']."' not found.");
     }    
 
-    $this->sender = new $className($options);
+    $this->sender = new $className($this->options);
     
     $this->table = $this->options['table'];
 

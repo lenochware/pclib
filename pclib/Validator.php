@@ -142,7 +142,7 @@ class Validator extends system\ValidatorBase
 	/** Rule handler: Match integer. */
 	function isNumericInt($value)
 	{
-		return (bool)filter_var($value, FILTER_VALIDATE_INT);
+		return filter_var($value, FILTER_VALIDATE_INT) !== false;
 	}
 
 	/** Rule handler: Check if value is in range [min, max]. */

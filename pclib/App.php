@@ -47,7 +47,7 @@ public $debugMode = false;
 /** var ErrorHandler */
 public $errorHandler;
 
-public $plugins;
+public $plugins = [];
 
 public $translatorName = 'App';
 
@@ -305,7 +305,6 @@ function environmentIp(array $env)
 
 function addPlugins(array $plugins)
 {
-	$this->plugins[] = [];
 
   foreach ($plugins as $name)
   {

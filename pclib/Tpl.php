@@ -320,7 +320,8 @@ function getBlock($block)
 
 	foreach($this->elements as $id => $tmp) {
 		if (!$this->isInBlock($id, $block) or $tmp['type'] == 'block') continue;
-	
+
+		$value = null;
 		$bid = $id;
 		while ($bid = array_get($this->elements[$bid], 'block')) {
 
@@ -1171,7 +1172,7 @@ function __construct(Tpl $source, $name)
 
 function __toString()
 {
-	return $this->source->values[$this->name];
+	return (string)($this->source->values[$this->name] ?? '');
 }
 
 function __get($name)

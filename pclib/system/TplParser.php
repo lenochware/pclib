@@ -64,7 +64,7 @@ class TplParser extends BaseObject
 		}
 		else {
 			$elements_def = substr($s, $start + strlen($tag_start), $end-$start-strlen($tag_start));
-			$template_def = trim(substr($s, $end-$start+strlen($tag_end)),"\r\n");
+			$template_def = trim(substr($s, $end+strlen($tag_end)),"\r\n");
 		}
 
 		return array($elements_def, $template_def);

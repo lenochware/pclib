@@ -204,7 +204,7 @@ class Tree extends system\BaseObject
     $key = $this->index[$nodeId] + 1;
 
     $options = (array)$options + ['before' => null, 'child' => null];
-    $data['LEVEL'] = $target['LEVEL'] + $options['child']? 1:0;
+    $data['LEVEL'] = $target['LEVEL'] + ($options['child']? 1:0);
     if (!isset($data['ACTIVE'])) $data['ACTIVE'] = 1;
 
     if ($options['before'] and !$options['child']) $key--;
@@ -286,7 +286,8 @@ class Tree extends system\BaseObject
     $flt = '';
 
     if ($topId) {
-      $first = $this->db->select($this->table, ['ID' => $topId]);     
+      $first = $this->db->select($this->table, ['ID' => $topId]);
+      if (!$first) { $this->reset(); return; } //top node not found - empty tree
       $last = $this->db->select($this->table, "TREE_ID='$treeId' AND ID>'{ID}' AND LEVEL<='{LEVEL}' ORDER BY ID", $first);
       $flt .= $last? sprintf("AND ID BETWEEN %d AND %d", $first['ID'], $last['ID'] - 1) : "AND ID>".$first['ID'];
     }
